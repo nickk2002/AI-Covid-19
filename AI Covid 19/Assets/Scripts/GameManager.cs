@@ -6,24 +6,12 @@ public class GameManager : MonoBehaviour
 {
     static public GameManager Instance;
     public List<Bot> listaBoti = new List<Bot>();
-
+    
     public void AddBot(Bot bot)
     {
         if(listaBoti.Find(x => x == bot) == null)
         {
             listaBoti.Add(bot);
-        }
-    }
-    public void Meet()
-    {
-        Bot bot1, bot2;
-        bot1 = bot2 = null;
-        foreach(Bot bot in listaBoti)
-        {
-            if (bot.currentState != Bot.State.Meet && bot1 == null)
-                bot1 = bot;
-            if(bot.currentState != Bot.State.Meet && bot1)
-
         }
     }
 

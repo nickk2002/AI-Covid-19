@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class MovementIntrePuncte : MonoBehaviour
 {
-    public GameObject[] pozitii = new GameObject[3];
+    public GameObject[] pozitii = new GameObject[3];/// trebuie sa putem sa punem mai mult de 3 pozitii
     public int current = 0;
     float radius = 2f;
     public bool moving = false;
@@ -16,18 +16,8 @@ public class MovementIntrePuncte : MonoBehaviour
     {
         
         agent = GetComponent<NavMeshAgent>();
-
-        for (int i=0; i <= 2; i++)
-        {
-
-            pozitii[i] = GameObject.Find("Loc" + i);
-
-
-            
-
-        }
-
         destinatie = agent.destination;
+        /// nu aveai nevoie de find acolo ca aveai in inspector
         
     }
 
@@ -41,25 +31,21 @@ public class MovementIntrePuncte : MonoBehaviour
             agent.destination = destinatie;
             moving = true;
         }
-
-            if (Vector3.Distance(pozitii[current].transform.position, transform.position) < radius)
-            {
-
-            moving = false;
-
-                current++;
-                if (current >= pozitii.Length)
-                {
-                    current = 0;
-                    
-                }
-
-
-            }
-
-            
-
+        /// agent.remainingDistance < radius  face acelasi lucru ca idee
         
+        if (Vector3.Distance(pozitii[current].transform.position, transform.position) < radius)
+        {
+            moving = false;
+            current++;
+            if (current >= pozitii.Length)
+            {
+                current = 0; 
+            }
+        }
+    }
+    private void OnTriggerEnter(Collider other)
+    {
         
     }
+
 }
