@@ -1,0 +1,11 @@
+Bot.cs
+
+view Angle -> unghiul vizual
+view Distance -> cate de departe vrea sa vada
+realSightView = false -> false inseamna ca vrei sa vezi in 
+scena doar linii care pot trece prin obiecte.
+daca este true. complica putin liniile prin scena si arata
+liniile care ocolesc obiectele
+
+// State si current state nu le folosesc nicaieri la fel
+ca si cu RandomLoc si RandomWalk
