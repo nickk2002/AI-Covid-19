@@ -17,12 +17,14 @@ public class Bot : MonoBehaviour
     public bool inMeeting = false;
     [SerializeField] int viewAngle;
     [SerializeField] float viewDistance;
+    [SerializeField] bool drawLines = false;
     [SerializeField] bool realSightView = false;
     Vector3 meetingPoint = Vector3.zero;
 
     // Start is called before the first frame update
     void Start()
     {
+        Random.InitState(System.DateTime.Now.Millisecond);
         GameManager.Instance.AddBot(this); // pun in Gamemanager bot-ul
         agent = GetComponent<NavMeshAgent>();
         agent.isStopped = true; // initial ii opresc pe amandoi
@@ -82,11 +84,6 @@ public class Bot : MonoBehaviour
             return; /// nu a vazut pe nimeni care sa fie disponibil
         
         botiPosibili.Sort(CompareBot);
-        //Debug.Log("cel mai apropiat de botul : " + gameObject.name + " este : " + botiPosibili[0]);
-        //foreach(Bot bot in botiPosibili)
-        //{
-        //    Debug.Log(Vector3.Distance(transform.position, bot.gameObject.transform.position)); // m-am asigurat ca sunt sortati bine
-        //}
 
         foreach (Bot partnerBot in botiPosibili)
         {
@@ -108,6 +105,15 @@ public class Bot : MonoBehaviour
     void LateUpdate()
     {
         TrySeeBot();
+        if (!inMeeting)
+        {
+            if (agent.hasPath == false || agent.remainingDistance < 2f)
+            {
+                agent.isStopped = false;
+                agent.destination = RandomLoc();
+            }
+        }
+
     }
     void DrawLineOfSight()
     {
@@ -143,10 +149,19 @@ public class Bot : MonoBehaviour
     {
         if (agent != null)
         {
-            Gizmos.DrawLine(transform.position, agent.destination);
-            Gizmos.DrawSphere(agent.destination, 1f);
+            if (inMeeting == true)
+            {
+                Gizmos.color = Color.red;
+                Gizmos.DrawSphere(agent.destination, 1f);
+            }
+            else
+            {
+                Gizmos.DrawLine(transform.position, agent.destination);
+                Gizmos.DrawSphere(agent.destination, 1f);
+            }
         }
-        DrawLineOfSight();
+        if(drawLines)
+            DrawLineOfSight();
         if (meetingPoint != Vector3.zero)
         {
             //Gizmos.color = Color.red;
