@@ -6,12 +6,12 @@ using UnityEngine.AI;
 [RequireComponent(typeof(NavMeshAgent))]
 public class Bot : MonoBehaviour
 {
-    
-    public enum State{
-        Random,
-        Meet,
-    }
-    public State currentState; /// inca nu folosesc nicaieri asta
+    public GameObject[] pozitii;/// trebuie sa putem sa punem mai mult de 3 pozitii
+    public int current = 0;
+    float radius = 2f;
+    public bool moving = false;
+    public GameObject posHolder;
+
     private NavMeshAgent agent;
     public float offsetMeeting = 5;
     public bool inMeeting = false;
@@ -24,10 +24,16 @@ public class Bot : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        Random.InitState(System.DateTime.Now.Millisecond);
         GameManager.Instance.AddBot(this); // pun in Gamemanager bot-ul
         agent = GetComponent<NavMeshAgent>();
         agent.isStopped = true; // initial ii opresc pe amandoi
+        pozitii = new GameObject[posHolder.transform.childCount];
+        int i = 0;
+        foreach (Transform child in posHolder.transform)
+        {
+            pozitii[i] = child.gameObject;
+            i++;
+        }
     }
     Vector3 RandomLoc()
     {
@@ -51,6 +57,7 @@ public class Bot : MonoBehaviour
             }
         }
         return false;
+        
     }
     void PrepareForMeeting(Bot bot,Vector3 meetingPosition)
     {
@@ -102,15 +109,26 @@ public class Bot : MonoBehaviour
 
 
     // Update is called once per frame
-    void LateUpdate()
+    void Update()
     {
-        TrySeeBot();
-        if (!inMeeting)
+        TrySeeBot(); /// incearca sa gaseasca partener daca nu gaseste e fals
+        if (inMeeting == false) /// daca nu se intalneste cu nimeni
         {
-            if (agent.hasPath == false || agent.remainingDistance < 2f)
+            agent.isStopped = false;
+            // daca nu are pozitie initiala
+            if (moving == false)
             {
-                agent.isStopped = false;
-                agent.destination = RandomLoc();
+                agent.destination = pozitii[current].transform.position;
+                moving = true;
+            }
+            if (Vector3.Distance(pozitii[current].transform.position, transform.position) < radius)
+            {
+                moving = false;
+                current++;
+                if (current >= pozitii.Length)
+                {
+                    current = 0;
+                }
             }
         }
 

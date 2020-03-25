@@ -5,10 +5,11 @@ using UnityEngine;
 
 public class MovementIntrePuncte : MonoBehaviour
 {
-    public GameObject[] pozitii = new GameObject[3];/// trebuie sa putem sa punem mai mult de 3 pozitii
+    public GameObject[] pozitii;/// trebuie sa putem sa punem mai mult de 3 pozitii
     public int current = 0;
     float radius = 2f;
     public bool moving = false;
+    public GameObject posHolder;
 
     NavMeshAgent agent;
     Vector3 destinatie;
@@ -16,7 +17,13 @@ public class MovementIntrePuncte : MonoBehaviour
     {
         
         agent = GetComponent<NavMeshAgent>();
-        destinatie = agent.destination;
+        pozitii = new GameObject[posHolder.transform.childCount];
+        int i = 0;
+        foreach(Transform child in posHolder.transform)
+        {
+            pozitii[i] = child.gameObject;
+            i++;
+        }
         /// nu aveai nevoie de find acolo ca aveai in inspector
         
     }
@@ -43,9 +50,4 @@ public class MovementIntrePuncte : MonoBehaviour
             }
         }
     }
-    private void OnTriggerEnter(Collider other)
-    {
-        
-    }
-
 }
