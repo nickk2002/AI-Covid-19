@@ -7,18 +7,19 @@ using UnityEngine.AI;
 public class Bot : MonoBehaviour
 {
     public GameObject[] pozitii;/// trebuie sa putem sa punem mai mult de 3 pozitii
-    public int current = 0;
+    private int current = 0; //pun privat pt ca sunt prea multe
     float radius = 2f;
-    public bool moving = false;
+    private bool moving = false;  /// la fel pun privat
     public GameObject posHolder;
 
     private NavMeshAgent agent;
     public float offsetMeeting = 5;
-    public bool inMeeting = false;
-    [SerializeField] int viewAngle;
-    [SerializeField] float viewDistance;
+    private bool inMeeting = false;
+    [SerializeField] bool randomLocations;
     [SerializeField] bool drawLines = false;
     [SerializeField] bool realSightView = false;
+    [SerializeField] int viewAngle;
+    [SerializeField] float viewDistance;
     Vector3 meetingPoint = Vector3.zero;
 
     // Start is called before the first frame update
@@ -73,9 +74,9 @@ public class Bot : MonoBehaviour
         if (dista == distb)
             return 0;
         if (dista < distb)
-            return -1;
+            return -1; // botul a
         else
-            return 1;
+            return 1; // botul b
     }
     void TrySeeBot()
     {
@@ -114,14 +115,17 @@ public class Bot : MonoBehaviour
         TrySeeBot(); /// incearca sa gaseasca partener daca nu gaseste e fals
         if (inMeeting == false) /// daca nu se intalneste cu nimeni
         {
-            agent.isStopped = false;
+            //agent.isStopped = false;
             // daca nu are pozitie initiala
             if (moving == false)
             {
-                agent.destination = pozitii[current].transform.position;
+                if (randomLocations)
+                    agent.SetDestination(RandomLoc());
+                else
+                    agent.destination = pozitii[current].transform.position;
                 moving = true;
             }
-            if (Vector3.Distance(pozitii[current].transform.position, transform.position) < radius)
+            if (agent.remainingDistance < radius)
             {
                 moving = false;
                 current++;
