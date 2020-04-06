@@ -2964,12 +2964,12 @@ MonoBehaviour:
   infected: 0
   head: {fileID: 4599840956060779586}
   sociabalLevel: 0
-  imunityLevel: 0
+  imunityLevel: 1
   inMeeting: 0
   talking: 0
   meetingBot: {fileID: 0}
   offsetMeeting: 3
-  cooldownMeeting: 60
+  cooldownMeeting: 10
   talkDuration: 0
   currentTalkTime: 0
   patroling: 0
@@ -2980,9 +2980,9 @@ MonoBehaviour:
   viewAngle: 60
   viewDistance: 30
   drawLines: 1
-  realSightView: 1
+  realSightView: 0
   infectionLevel: 0
-  infectionRadius: 5
+  infectionRadius: 10
   infectionSpeed: 1
   infectionGrowthInterval: 3
   PlaceHolderInfectedUI: {fileID: 8302193071066923143}

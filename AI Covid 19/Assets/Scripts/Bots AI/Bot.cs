@@ -9,12 +9,16 @@ public class Bot : MonoBehaviour
 {
     #region public var movement
     [Header("General")]
-    public bool infected;
-    [SerializeField] GameObject head;
+    [Tooltip("Sa se foloseasca doar inainte de a incepe jocul pentru a testa")]
+    public bool infected;// daca este adevarat de la inceputul jocului, bot-ul va fi infectat din prima secunda, e folosit pt simulari
+    [SerializeField] GameObject head; // gameobject considerat cap pentru bot
     [Range(0,10)]
-    [SerializeField] float sociabalLevel;
+    [SerializeField] float sociabalLevel; // cat de sociabil este un bot de la 1 la 10
     [Range(1, 10)]
-    [SerializeField] float imunityLevel;
+    [SerializeField] float imunityLevel; // cat de imun este un bot de la 1 la 10
+
+    // socilabilitatea influenteaza probabilitatea ca doi oameni sa vorbeasca
+    // imunitatea influenteaza cat de repede creste boala. imunitate mare -> boala creste incet, imunitatea mica boala se dezvolta repede
 
     [Header("Meeting Settings")]
     [SerializeField] bool inMeeting = false;
@@ -73,36 +77,42 @@ public class Bot : MonoBehaviour
     void Start()
     {
         GameManager.Instance.AddBot(this); // pun in Gamemanager bot-ul
-        agent = GetComponent<NavMeshAgent>();
-        animator = GetComponentInChildren<Animator>();
-        agent.autoBraking = false;
+        agent = GetComponent<NavMeshAgent>(); // iau Navmesh Agentul
+        animator = GetComponent<Animator>(); // iau animatorul
+        agent.autoBraking = false; // sa nu se opreasca cand se aproprie de destinatie
+
         if (posHolder != null)
         {
-            pozitii = new GameObject[posHolder.transform.childCount];
+            if (posHolder.transform.childCount == 0)// daca se intampla ca cineva sa puna un obiect aleator ca si PosHolder care nu are copii
+                Debug.LogError("Pos holder of bot : " + this.name + "has no other children");
 
+            pozitii = new GameObject[posHolder.transform.childCount]; // initializez vectorul de pozitii cu cati copii are posHolder
             int i = 0;
-            foreach (Transform child in posHolder.transform)
+            foreach (Transform child in posHolder.transform) // iterez prin fiecare copil din posHolder.transform (copii->transform)
             {
-                pozitii[i] = child.gameObject;
-                i++;
+                pozitii[i] = child.gameObject; // vectorul de pozitii retine gameobject-uri asa ca .gameobject
+                i++; // cresc indexul
             }
-            Debug.LogWarning("Nu este setat Pos Holder");
         }
-        else
+        else 
+        {
+            // daca nu avem posHolder pus in inspector afisam un warning si folosim locatii random
+            Debug.LogWarning("Nu este setat Pos Holder, Folosim pozitii random");
             randomLocations = true;
+        }
 
         if (infected == true)
+        {
             StartInfection();
-        coughInterval = Random.Range(3f, 10f);
+            Debug.Log(infectionLevel);
+        }
+        
     }
     Vector3 RandomLoc()
     {
-        return new Vector3(Random.Range(-500, 500), 0, Random.Range(-500, 500));
+        return new Vector3(Random.Range(-500, 500), 0, Random.Range(-500, 500)); // locatie random pentru mapa mare.de 1000 * 1000 Scena : AISimulations
     }
-    void RandomWalk()
-    {
-        agent.SetDestination(RandomLoc());
-    }
+    /// daca vede un obiect
     bool CanSeeObject(Transform initial,Transform target)
     {
         Vector3 diferenta = target.position - initial.position;
@@ -125,15 +135,17 @@ public class Bot : MonoBehaviour
         }
         return false;
     }
-    void PrepareForMeeting(Bot bot,Bot other,Vector3 currentMeetingPosition,int waitTime)
+    void PrepareForMeeting(Bot bot,Bot other,Vector3 currentMeetingPosition,int meetingDuration)
     {
-        bot.agent.isStopped = false;
-        bot.agent.destination = currentMeetingPosition;
-        bot.meetingPoint = currentMeetingPosition;
-        bot.inMeeting = true;
-        bot.meetingBot = other;
-        bot.talkDuration = waitTime;
+        // pregatesc pentru intalnire botul bot si botul other pentru intalnire
+        bot.agent.isStopped = false; // ma asigur ca nu sunt opriti
+        bot.agent.destination = currentMeetingPosition; // pun destinatia
+        bot.meetingPoint = currentMeetingPosition; // spun meeting point de vazut in inspector, nu fac nimic din cod cu el
+        bot.inMeeting = true; // sunt in drum spre intalnire
+        bot.meetingBot = other;// cu cine se intalneste
+        bot.talkDuration = meetingDuration; // cat timp dureaza intalnirea
     }
+
     private int CompareBot(Bot a,Bot b)
     {
         // pt a compara botii a si b in functie de distanta. returneaza bot-ul cel mai apropiat de cel curent
@@ -146,11 +158,13 @@ public class Bot : MonoBehaviour
         else
             return 1; // botul b
     }
-    void TrySeeBot()
+    void TryMeetBot()
     {
         List<Bot> botiPosibili = new List<Bot>(); /// lista cu toti botii posibili
         foreach(Bot partnerBot in GameManager.Instance.listaBoti)
         {
+            /// daca botul pe care il caut este diferit de botul curent si daca botul curent nu este in meeting si 
+            /// daca partnetBot la fel nu este in meeting il adaug la lista de boti posibili
             if (partnerBot != this && !inMeeting && !partnerBot.inMeeting 
                 && CanSeeObject(head.transform,partnerBot.head.transform) 
                 && CanSeeObject(partnerBot.head.transform,head.transform))
@@ -161,17 +175,17 @@ public class Bot : MonoBehaviour
         if (botiPosibili.Count == 0)
             return; /// nu a vazut pe nimeni care sa fie disponibil
         
-        botiPosibili.Sort(CompareBot);
+        botiPosibili.Sort(CompareBot); /// sortez botii dupa distanta
 
         foreach (Bot partnerBot in botiPosibili)
         {
-            if (!inMeeting && !partnerBot.inMeeting)
+            if (!inMeeting && !partnerBot.inMeeting)/// daca nu sunt meeting nici botul curent nici partnerbot
             {
                 //Debug.Log("se intalnesc cei doi boti: " + this.name + "si" + partnerBot.name);
 
                 Vector3 diferenta = partnerBot.transform.position - transform.position;/// vectorul de la botul curent la celelalt
-                diferenta /= 2; // jumatatea distantei
-                Vector3 meetingPointHalf = transform.position + diferenta; // punctul de intalnire
+                diferenta /= 2; // jumatatea vectorului
+                Vector3 meetingPointHalf = transform.position + diferenta; // punctul de intalnire la jumatate
                 Vector3 offset = diferenta.normalized * offsetMeeting; // offset pt inalnire
                 int randomValueBetweenRange = Random.Range(1, 10); // trebuie verificat sa fie la fel cu Range[1,10] sau daca e modificat in viitor
 
@@ -181,9 +195,10 @@ public class Bot : MonoBehaviour
                 {
 
                     int randomTime = Random.Range(5, 10);  // aleg un numar random de secunde pentru timpul de intalnire
-                    PrepareForMeeting(this, partnerBot, meetingPointHalf - offset, randomTime); // botul curent si celelalt
-                    PrepareForMeeting(partnerBot, this, meetingPointHalf + offset, randomTime); // celelalt bot si botul curent
-                    break; //am inchis
+                    // this-> bot curent, partnetBot-> botul cu care se intalneste
+                    PrepareForMeeting(this, partnerBot, meetingPointHalf - offset, randomTime); // pregatesc botul curent pentru intalnire
+                    PrepareForMeeting(partnerBot, this, meetingPointHalf + offset, randomTime); // pregatesc celelalt bot pentru intalnire
+                    break; // o data ce am gasit un partener de intalnire atunci inchid pentru ca numai are sens sa caut altul.
                 }
             }
         }
@@ -191,59 +206,77 @@ public class Bot : MonoBehaviour
     public void StartInfection()
     {
         //Debug.Log("infect him");
+        /// Daca am placeHolder pentru cerc rosu sau verde pus
         if (PlaceHolderInfectedUI != null)
         {
             InfectedUI ui = PlaceHolderInfectedUI.GetComponent<InfectedUI>();
-            ui.imageDisplay.GetComponent<Image>().color = Color.red;
+            ui.imageDisplay.GetComponent<Image>().color = Color.red; // pun culoarea rosu pentru ca este infectat
         }
-        infectionLevel = 1;
+        infectionLevel = 1;// incep infectia
     }
     void TryInfectOtherBot()
     {
         foreach(Bot possibleTarget in GameManager.Instance.listaBoti)
         {
-            if (possibleTarget == this)
+            if (possibleTarget == this) // daca botul possibleTarget nu este botul curent
                 continue;
-
-            /// daca botul este infectat momentan poate sa infecteze alt bot care nu este infectat 
-            /// TODO : si daca il vede.
+            /// daca botul este infectat momentan poate sa infecteze alt bot care nu este infectat intr-o anumita distanta
+            /// TODO : si daca il vede. de vazut cum fcuntioneaza
             float dist = Vector3.Distance(transform.position, possibleTarget.gameObject.transform.position);
             if(possibleTarget.infectionLevel == 0 && dist <= infectionRadius)
             {
-                possibleTarget.StartInfection();
+                possibleTarget.StartInfection();// incep infectia 
             }
         }
     }
+
     void Cough()
     {
-        float value = Random.Range(1, 100); // tusea are procent de 80%
         if (animator == null)
+        {
+            Debug.LogWarning("Nu am animator");
             return;
+        }
+        // mecanica de tusit
+        // daca coughInterval este 0, adica inainte era 0 acum il initalizez cu un random intre 3 si 10. poate fi oricat sincer.
+        if (coughInterval == 0)
+        {
+            coughInterval = Random.Range(3f, 10f);/// initializez un interval random pentru tusit, daca pun f la Random.Range() imi da un float
+        }
+        float value = Random.Range(1, 100); // tusea are procent de 80% . daca nu pun f la Random.Range() imi da un int intre 1 si 100
+        // daca coughTime > coughInterval ( a trecut timpul de asteptat) , random-ul este peste 80% si el nu tuseste acum
         if (currentCoughTime > coughInterval && value >= 80 && animator.GetBool("cough") == false)
         {
-            currentCoughTime = 0;
-            animator.SetTrigger("cough");
-            TryInfectOtherBot();
-            coughInterval = Random.Range(3f, 10f);
+            animator.SetTrigger("cough");// vezi animator 
+            currentCoughTime = 0; // currentCoughTime = 0 pt ca reinitializez cronometrul
+            TryInfectOtherBot(); // doar cand tuseste incearca sa infecteze alt bot
+            coughInterval = Random.Range(3f, 10f); // al random interval pt incercat sa tuseasca
         }
-        currentCoughTime += Time.deltaTime;
+        currentCoughTime += Time.deltaTime;// cronometrul creste cu Time.deltaTime
     }
     void EndMeeting(Bot bot)
     {
-        bot.inMeeting = false;
-        bot.patroling = false;
-        bot.talking = false;
-        bot.agent.isStopped = false;
-        bot.lastFinishedMeetingTime = Time.time;
-        bot.currentTalkTime = 0;
-        bot.talkDuration = 0;
+        // trebuie sa am grija sa resetez toate variabilele pentru amandoi botii, nu doar pentru unul dintr ei
+
+        bot.agent.isStopped = false;// ma asiugur ca navmeshagentul este activ si poate merge
+        bot.inMeeting = false; // nu mai este in intalnire
+        bot.meetingBot = null; // nu are bot de intalnire, meetingBot nu e folosit in cod,este doar de testat in inspector
+        bot.talkDuration = 0; // intalnirea dureaza 0 secunde, la fel e doar pt initializare sa fie 0 in inspector
+        bot.currentTalkTime = 0;// resetez cronometrul de vorbit
+
+        bot.patroling = false; // inapoi la starea initiala
+        bot.talking = false; // numai vorbeste
+
+        bot.lastFinishedMeetingTime = Time.time;  // intalnirea s-a terminat la timpul Time.time(cate secunde au trecut de la inceputul jocului)
+
     }
     void Talk()
     {
+
         if (currentTalkTime > talkDuration)
         {
-            EndMeeting(this);
-            EndMeeting(meetingBot);
+            EndMeeting(this);// resetez totul pentru botul curent
+            EndMeeting(meetingBot);// resetez totul pentru botul cu care se intalneste
         }
         else
             currentTalkTime += Time.deltaTime;
@@ -253,13 +286,13 @@ public class Bot : MonoBehaviour
     {
         if (infectionLevel > 0)
         {
-            Cough();
+            Cough();// tuseste
             if (currentInfectionTime > infectionGrowthInterval) /// un minut
             {
-                infectionLevel += infectionSpeed / imunityLevel;
-                currentInfectionTime = 0;
-            }
-            currentInfectionTime += Time.deltaTime;
+                infectionLevel += infectionSpeed / imunityLevel; // creste invers proportional cu imunitatea
+                currentInfectionTime = 0;// resetez cronomoetrul de crescut infectia
+            }else
+                currentInfectionTime += Time.deltaTime;
         }
     }
 
@@ -269,7 +302,7 @@ public class Bot : MonoBehaviour
         /// daca cooldown-ul a trecut de la ultima intalnire sau daca initial nu am avut nicio intalnire
         if (Time.time - lastFinishedMeetingTime >= cooldownMeeting || lastFinishedMeetingTime == 0)
         {
-            TrySeeBot(); /// incearca sa gaseasca partener daca nu gaseste e fals
+            TryMeetBot(); /// incearca sa gaseasca partener daca nu gaseste e fals
         }
         if (inMeeting == false) /// daca nu se intalneste cu nimeni
         {
