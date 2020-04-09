@@ -5,26 +5,28 @@ using UnityEngine;
 public class BotSpawner : MonoBehaviour
 {
     public GameObject enemy;
-    public int numar;
+    public float randomPosRange = 500;
+    public int howMany;
 
 
     void Pune(int index)
     {
-        Vector3 pos = new Vector3(Random.Range(-500f, 500f), 0, Random.Range(-500f, 500f));
+        Vector3 pos = new Vector3(Random.Range(-randomPosRange, randomPosRange), 0, Random.Range(-randomPosRange, randomPosRange));
         GameObject bot = Instantiate(enemy,pos,Quaternion.identity);
         bot.transform.SetParent(transform);
-        if (index == 3 || index == 7)
-            bot.GetComponent<Bot>().infected = true;
-        //Debug.Log("I am here bot spwa");
+        if (index == 1 || index == 2 || index == 3)// start with 3 already infected Bots for the simulation
+            bot.GetComponent<Bot>().alreadyInfected = true;
     }
 
     // Start is called before the first frame update
     void Start()
     {
-        for (int i = 1; i <= numar; i++)
+        Random.InitState(1);
+        for (int i = 1; i <= howMany; i++)
         {
             Pune(i);
         }
+        
     }
 
 }
