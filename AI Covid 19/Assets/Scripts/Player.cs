@@ -32,7 +32,7 @@ public class Player : MonoBehaviour
     }
     private void Start()
     {
-
+        
     }
 
     AudioClip RandomAudio()
@@ -57,7 +57,7 @@ public class Player : MonoBehaviour
     }
     void TryInfectSomeone()
     {
-        foreach(Bot bot in GameManager.Instance.listaBoti)
+        foreach(Bot bot in GameManager.Instance.listBots)
         {
             /// daca nu este infectat si este in distanta potrivita atunci il infecteaza
             if (bot.infectionLevel == 0 && CanInfect(bot))
