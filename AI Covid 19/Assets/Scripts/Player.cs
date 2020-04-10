@@ -51,7 +51,7 @@ public class Player : MonoBehaviour
     bool CanInfect(Bot bot)
     {
         float dist = Vector3.Distance(transform.position, bot.transform.position);
-        if (dist <= coughInfectDistance)
+        if (dist <= coughInfectDistance && bot.cured == false)
             return true;
         return false;
     }
