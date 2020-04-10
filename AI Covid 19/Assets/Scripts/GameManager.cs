@@ -8,7 +8,9 @@ public class GameManager : MonoBehaviour
     static public GameManager Instance;
     public Text textPercentage;
     public List<Bot> listBots = new List<Bot>();
+    public List<Hospital> listHospitals = new List<Hospital>();
     public AnimationCurve infectionCurve; // click on this in the inspector while the game in running
+    public AnimationCurve coughCurve;
     // draws the grapth of infected people over time
     int currentlyInfected = 0;
 
@@ -35,6 +37,7 @@ public class GameManager : MonoBehaviour
     {
         if (Instance == null)
             Instance = this;
+        DrawFunc();
     }
     void Start() { 
         infectionCurve = new AnimationCurve();
@@ -76,5 +79,27 @@ public class GameManager : MonoBehaviour
                     Debug.Break();// if reached 100% than stop Play Mode(this line of code just pauses the game, like pressing pause in unity)
             }
        }
+    }
+    float CoughFunction(float x)
+    {
+        return 20 * (Mathf.Pow((8f / 10),x));
+    }
+    void DrawFunc()
+    {
+        int cnt = 0;
+        bool firstTime = coughCurve.keys.Length == 0;
+        for (float i = 0; i < 10; i += 0.1f)
+        {
+            float x2 = i;
+            float y2 = CoughFunction(i);
+            Keyframe keyframe = new Keyframe(x2, y2);
+            if (firstTime)
+                coughCurve.AddKey(keyframe);
+            else
+            {
+                coughCurve.MoveKey(cnt,keyframe);
+                cnt++;
+            }
+        }
     }
 }
