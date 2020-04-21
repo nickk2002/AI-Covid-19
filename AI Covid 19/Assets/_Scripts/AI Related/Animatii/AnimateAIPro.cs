@@ -3,10 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 
-public class AnimateAI : MonoBehaviour
+public class AnimateAIPro : MonoBehaviour
 {
-    [SerializeField] float speedLowAngle;
-    [SerializeField] float speedHighAngle;
     [SerializeField] private float angleAccuracy = 1f;
     NavMeshAgent agent;
     Animator animator;
@@ -15,7 +13,6 @@ public class AnimateAI : MonoBehaviour
     float angle;
     float lastAngle;
     private bool rotating = false;
-    private bool lastBool = false;
     private bool smallAngleRot = false;
 
 
@@ -49,16 +46,6 @@ public class AnimateAI : MonoBehaviour
         if (agent.hasPath == false)
             return;
         angle = Vector3.Angle(transform.forward, direction) * Mathf.Sign(Vector3.Dot(transform.right, direction));
-        //angle = Mathf.Atan(direction.x / direction.z) * Mathf.Rad2Deg;
-        
-        /// daca am 30-60 de grade vreau rapid. adica angle * 10
-        /// daca am 90-180 de grade vreau ma incet adica angle * 7
-        float multiply;
-        if (angle > 90)
-             multiply = speedHighAngle;
-        else
-            multiply = speedLowAngle;
-
         if (Mathf.Abs(lastAngle) < angleAccuracy && angle != 0)
         {
             animator.SetFloat("Rotation",angle / 90);
@@ -91,8 +78,8 @@ public class AnimateAI : MonoBehaviour
         else
         {
             Debug.Log("now moving");
-            //if(Vector3.Distance(transform.position,agent.destination) > 1f)
-              //  transform.forward = lastDirection;
+            if(Vector3.Distance(transform.position,agent.destination) > 1f)
+                transform.forward = lastDirection;
             agent.isStopped = false;
             transform.position = agent.nextPosition;
         }
