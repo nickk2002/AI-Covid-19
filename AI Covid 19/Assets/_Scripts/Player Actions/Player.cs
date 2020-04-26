@@ -9,18 +9,24 @@ public class Player : MonoBehaviour
 {
     // Start is called before the first frame update
     static public Player Instance;
-    public bool hasObject = false;
+
     public AudioClip [] coughSoundArray;
     [Header("Coughing")]
+    
     public float coughInfectDistance = 5f;
-    public Image coughLoadingBarUI;
-    public TextMeshProUGUI coughTextUI;
+    public float maxNumberCoughs = 3f;
 
-
+    [HideInInspector] public Camera mainCamera;
+    [HideInInspector] public bool hasObject = false;
     float currentTimer;
     AudioClip coughClip;
     AudioClip lastAudioClip;
     AudioSource source;
+    
+    private float coughCount = 0;
+    private Image coughLoadingBarUI;
+    private TextMeshProUGUI coughTextUI;
+
 
 
     void Awake()
@@ -28,11 +34,12 @@ public class Player : MonoBehaviour
         if (Instance == null)
             Instance = this;
         source = GetComponent<AudioSource>();
-        
+        mainCamera = GetComponentInChildren<Camera>();
     }
     private void Start()
     {
-        
+        coughLoadingBarUI = UIManager.Instance.coughLoadingBarUI;
+        coughTextUI = UIManager.Instance.coughText;
     }
 
     AudioClip RandomAudio()
@@ -70,8 +77,9 @@ public class Player : MonoBehaviour
     }
     void CoughMecanic()
     {
-        if (Input.GetKeyDown(KeyCode.C) && (coughClip == null || currentTimer > coughClip.length))
+        if (Input.GetKeyDown(KeyCode.C) && coughCount < maxNumberCoughs && (coughClip == null || currentTimer > coughClip.length))
         {
+            coughCount++;
             coughClip = RandomAudio();
             //Debug.Log("Playing clip : " + coughClip.name);
             source.PlayOneShot(coughClip);
