@@ -11,8 +11,8 @@ public class AnimateAIPro : MonoBehaviour
     Vector3 lastDirection;
     
     float angle;
-    float lastAngle;
     private bool rotating = false;
+    private bool alreadyRotated = false;
     private bool smallAngleRot = false;
 
 
@@ -44,16 +44,30 @@ public class AnimateAIPro : MonoBehaviour
     void Move(Vector3 direction)
     {
         if (agent.hasPath == false)
-            return;
-        angle = Vector3.Angle(transform.forward, direction) * Mathf.Sign(Vector3.Dot(transform.right, direction));
-        if (Mathf.Abs(lastAngle) < angleAccuracy && angle != 0)
         {
-            animator.SetFloat("Rotation",angle / 90);
+            animator.SetFloat("Rotation", 0);
+            animator.SetFloat("Velocity", 0);
+            return;
         }
-        animator.SetFloat("Velocity",direction.magnitude / agent.speed);
+        if (direction.magnitude > 1)
+            direction.Normalize();
+        angle = Vector3.Angle(transform.forward, direction) * Mathf.Sign(Vector3.Dot(transform.right, direction));
         
-        rotating = (Mathf.Abs(angle) > angleAccuracy);
-        lastAngle = angle;
+        Debug.Log(angle);
+        rotating = animator.GetBool("rotating");
+        if (Mathf.Abs(angle) > 0.1f && alreadyRotated == false)
+        {
+            alreadyRotated = true;
+            rotating = true;
+            animator.SetFloat("StartAngle",angle / 90);
+        }
+        if(rotating == false && alreadyRotated == true){
+            transform.Rotate(0, angle * Time.deltaTime * 10, 0);
+        }
+        animator.SetFloat("Angle", angle / 90,0.1f,Time.deltaTime);
+        animator.SetFloat("Velocity",direction.magnitude);
+        
+
     }
 
 
@@ -61,8 +75,10 @@ public class AnimateAIPro : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (agent.isStopped == false)
+        if (rotating == false)
+        {
             lastDirection = agent.desiredVelocity;
+        }
         Move(lastDirection);
     }
     private void OnAnimatorMove()
@@ -78,8 +94,6 @@ public class AnimateAIPro : MonoBehaviour
         else
         {
             Debug.Log("now moving");
-            if(Vector3.Distance(transform.position,agent.destination) > 1f)
-                transform.forward = lastDirection;
             agent.isStopped = false;
             transform.position = agent.nextPosition;
         }

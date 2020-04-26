@@ -3,6 +3,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.AI;
 using System;
+using UnityEngine.Serialization;
 
 [RequireComponent(typeof(NavMeshAgent))]
 [RequireComponent(typeof(AnimateAI))]
@@ -55,7 +56,6 @@ public class Bot : MonoBehaviour
     [SerializeField] float currentTalkTime = 0; // the current elasped time of talking (here for debugging)
     
     [Header("Patrol type")]
-    [SerializeField] bool patroling = false; // if he is patroling
     [SerializeField] bool randomLocations = false; // if he uses randomLocations
     [SerializeField] float randomRange = 10f;// the range of the random
     [SerializeField] float stoppingDistance = 3f;// the distance in which the agent stops and moves to the next position
@@ -70,17 +70,15 @@ public class Bot : MonoBehaviour
     [SerializeField] float growthInterval = 3; /// infection grows by 1 unit every three seconds
 
     [Header("Coughing")]
-    [SerializeField] float maxCoughInterval = 20;
-    [SerializeField] float minCoughInterval = 1;
-    [SerializeField] bool pureRandom = false;
     [SerializeField] float coughInterval; // random value between [maxCoughInverval,minCoughInterval]
     [SerializeField] float currentCoughTime = 0; // do not change
-    [SerializeField] float infectDist = 10; // if this bot coughs, the distance of the virus transmission
+    [SerializeField] float infectionDist = 10; // if this bot coughs, the distance of the virus transmission
     
     // if bot1 coughs and bot2 is in 10m distance then bot2 gets infected too
 
     [Header("UI")]
     [SerializeField] GameObject PlaceHolderInfectedUI; // for the circle UI
+    [SerializeField] private GameObject PanelStatsUI; // ui for bot stats
     #endregion
 
     public enum State
@@ -100,12 +98,17 @@ public class Bot : MonoBehaviour
     private Vector3 currentDestination;
     Vector3 meetingPoint;
     List<Tuple<Bot, float>> listIgnoredBots = new List<Tuple<Bot, float>>();
+
+    private bool startPatroling;
     
     private int bedIndex;
+    private Vector3 bedPosition;
     private Hospital hospital;
 
     float currentInfectionTime = 0;
     float lastFinishedMeetingTime = 0;
+
+    private InfectedUI ui;
 
     void SetUpPosHolder()
     {
@@ -133,7 +136,6 @@ public class Bot : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        Debug.Log(name);
         currentState = State.Patrol;
         GameManager.instance.AddBot(this); // pun in Gamemanager bot-ul
 
@@ -147,6 +149,7 @@ public class Bot : MonoBehaviour
         obstacle.enabled = false;
         agent.autoBraking = false; // sa nu se opreasca cand se aproprie de destinatie
 
+        ui = PlaceHolderInfectedUI.GetComponent<InfectedUI>();
         SetUpPosHolder();
         if (alreadyInfected == true)
         {
@@ -293,11 +296,34 @@ public class Bot : MonoBehaviour
         /// Daca am placeHolder pentru cerc rosu sau verde pus
         if (PlaceHolderInfectedUI != null)
         {
-            InfectedUI ui = PlaceHolderInfectedUI.GetComponent<InfectedUI>();
             ui.imageDisplay.GetComponent<Image>().color = Color.red; // pun culoarea rosu pentru ca este infectat
         }
         infectionLevel = 1;// incep infectia
     }
+
+    private void DrawUIPanel()
+    {
+        if (PlaceHolderInfectedUI != null /* && Vector3.Distance(transform.position,Player.Instance.mainCamera.transform.position) < 30f*/)
+        {
+            Vector3 desiredPos = transform.position + new Vector3(0,10,0);
+            Vector3 actualPos = Player.Instance.mainCamera.WorldToScreenPoint(desiredPos);
+            if (actualPos.z > 0)
+            {
+                ui.panel.transform.position = actualPos;
+                ui.panel.transform.localScale = new Vector3(0.5f, 0.5f, 0.5f);
+                ui.panel.SetActive(true);
+            }
+        }
+    }
+
+    private void OnMouseExit()
+    {
+        if (PlaceHolderInfectedUI != null)
+        {
+            ui.panel.SetActive(false);
+        }
+    }
+
     void TryInfectOtherBot()
     {
         foreach(Bot possibleTarget in GameManager.instance.listBots)
@@ -305,7 +331,7 @@ public class Bot : MonoBehaviour
             if (possibleTarget == this || possibleTarget.cured == true) // daca botul possibleTarget nu este botul curent si daca nu e vindecat deja  
                 continue;
             /// daca botul este infectat momentan poate sa infecteze alt bot care nu este infectat intr-o anumita distanta
-            /// TODO : si daca il vede. de vazut cum fcuntioneaza,
+            /// TODO : si daca il vede. de vazut cum functioneaza
             // Varianta vechie bazzata doar pe distanta:
             //float dist = Vector3.Distance(transform.position, possibleTarget.gameObject.transform.position);
             //if(possibleTarget.infectionLevel == 0 && dist <= infectDist)
@@ -313,7 +339,7 @@ public class Bot : MonoBehaviour
             //    possibleTarget.StartInfection();// incep infectia 
             //}
             // varianta noua:
-            if(possibleTarget.infectionLevel == 0 && CanSeeObject(transform,possibleTarget.transform, infectDist, viewAngle))
+            if(possibleTarget.infectionLevel == 0 && CanSeeObject(transform,possibleTarget.transform, infectionDist, viewAngle))
             {
                 possibleTarget.StartInfection();
             }
@@ -331,12 +357,8 @@ public class Bot : MonoBehaviour
         // daca coughInterval este 0, adica inainte era 0 acum il initalizez cu un random intre valmin si valmax
         if (coughInterval == 0)
         {
-            if (!pureRandom)
-            {
-                float coughVal = GameManager.instance.coughCurve.Evaluate(infectionLevel);// evaluate from gamemanager  function
-                coughInterval = UnityEngine.Random.Range(coughVal - 1, coughVal);// add a bit of random 
-            }else
-                coughInterval = UnityEngine.Random.Range(minCoughInterval, maxCoughInterval);
+            float coughVal = GameManager.instance.coughCurve.Evaluate(infectionLevel);// evaluate from gamemanager  function
+            coughInterval = UnityEngine.Random.Range(coughVal - 1, coughVal);// add a bit of random 
         }
         // if the bot is not currently coughing
         if (animator.GetBool("cough") == false)
@@ -344,13 +366,8 @@ public class Bot : MonoBehaviour
             // daca coughTime > coughInterval ( a trecut timpul de asteptat) 
             if (currentCoughTime > coughInterval)
             {
-                if (!pureRandom)
-                {
-                    float coughVal = GameManager.instance.coughCurve.Evaluate(infectionLevel);// evaluate from a function
-                    coughInterval = UnityEngine.Random.Range(coughVal - 1, coughVal);// add a bit of random 
-                }
-                else
-                    coughInterval = UnityEngine.Random.Range(minCoughInterval, maxCoughInterval);
+                float coughVal = GameManager.instance.coughCurve.Evaluate(infectionLevel);// evaluate from a function
+                coughInterval = UnityEngine.Random.Range(coughVal - 1, coughVal);// add a bit of random 
                 currentCoughTime = 0; // reinitializez cronometrul          
                 animator.SetTrigger("cough");// vezi animator 
                 TryInfectOtherBot(); // doar cand tuseste incearca sa infecteze alt bot
@@ -371,16 +388,14 @@ public class Bot : MonoBehaviour
         bot.currentTalkTime = 0;// resetez cronometrul de vorbit
 
         bot.currentState = State.Patrol;
-        bot.patroling = false; // inapoi la starea initiala
+        bot.startPatroling = false; // inapoi la starea initiala
         bot.talking = false; // numai vorbeste
 
         bot.lastFinishedMeetingTime = Time.time;  // intalnirea s-a terminat la timpul Time.time(cate secunde au trecut de la inceputul jocului)
         bot.animator.SetBool("talking",false);
     }
     void Talk()
-    {
-        if (currentTalkTime == 0)
-            Debug.Log("start talking from bot script");
+    {    
         if (currentTalkTime > talkDuration)
         {
             EndMeeting(this);// resetez totul pentru botul curent
@@ -401,14 +416,21 @@ public class Bot : MonoBehaviour
 
     private void LateUpdate()
     {
+        DrawUIPanel();
         if (infectionLevel > 0)
         {
+            
+            Image image = new List<Image>(ui.panel.GetComponentsInChildren<Image>()).Find(img => img.type == Image.Type.Filled);
+            image.fillAmount = infectionLevel / 10;
+            Debug.Log(image.name);
+                
             Cough();// tuseste
             if (currentInfectionTime > growthInterval) /// un minut
             {
                 infectionLevel += infectionSpeed / immunityLevel; // creste invers proportional cu imunitatea
                 infectionLevel = Mathf.Min(infectionLevel, 10); // infectia maxima e 10
                 currentInfectionTime = 0;// resetez cronomoetrul de crescut infectia
+
             }else
                 currentInfectionTime += Time.deltaTime;
         }
@@ -417,8 +439,6 @@ public class Bot : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        Debug.Log("here every update! haha");
-        Debug.Log("Ce mai faci");
         if(currentState == State.Patrol)
         {
             if(agent.isStopped == true)
@@ -426,7 +446,7 @@ public class Bot : MonoBehaviour
             if (agent.enabled == false)
                 agent.enabled = true;
             // in caz ca pe viitor
-            if(patroling == false || Vector3.Distance(a: transform.position,b: currentDestination) < stoppingDistance)
+            if(startPatroling == false || Vector3.Distance(a: transform.position,b: currentDestination) < stoppingDistance)
             {
                 if (randomLocations)
                 {
@@ -442,13 +462,14 @@ public class Bot : MonoBehaviour
                     if (currentIndexPatrol >= patrolPositions.Length)
                         currentIndexPatrol = 0;
                 }
-                patroling = true;
+                startPatroling = true;
             }
             // Tranzitia 1 in starea de MEET
             /// daca cooldown-ul a trecut de la ultima intalnire sau daca initial nu am avut nicio intalnire
             if (Time.time - lastFinishedMeetingTime >= cooldownMeeting || lastFinishedMeetingTime == 0)
             {
-                TryMeetBot(); /// incearca sa gaseasca partener 
+                if(!cured || (cured == true && Vector3.Distance(transform.position,bedPosition) > 100f)) // daca nu e vindecat sau daca e vindecat si e departe de spital
+                    TryMeetBot(); /// incearca sa gaseasca partener 
             }
             /// Tranzitia 2 in starea de GOTOHOSPITAL
             if (infectionLevel > 5) // un anumit nivel
@@ -462,9 +483,10 @@ public class Bot : MonoBehaviour
                         Tuple<Vector3, int> tuple = currentHospital.BedPosition();
                         if (tuple.Item2 != -1)
                         {
-                            currentDestination = tuple.Item1;
+                            currentDestination = tuple.Item1; 
                             bedIndex = tuple.Item2;
                             hospital = currentHospital;
+                            bedPosition = currentDestination;
                             agent.SetDestination(target: currentDestination);
                             currentState = State.Hospital;
                             break;
@@ -489,8 +511,8 @@ public class Bot : MonoBehaviour
             {
                 infectionLevel = 0;
                 hospital.LeaveBed(index: bedIndex);
-                patroling = false;
-                cured = true;
+                startPatroling = false;
+                cured = true; 
                 currentState = State.Patrol;
             }
         }
