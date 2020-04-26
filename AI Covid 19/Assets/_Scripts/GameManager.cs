@@ -6,15 +6,15 @@ using UnityEngine.UI;
 public class GameManager : MonoBehaviour
 {
     public static GameManager instance;
-    public Text textPercentage;
+    public float gameDuration = 60f;
     public List<Bot> listBots = new List<Bot>();
     public List<Hospital> listHospitals = new List<Hospital>();
     public AnimationCurve infectionCurve; // click on this in the inspector while the game in running
-
     public AnimationCurve coughCurve;
 
     // draws the grapth of infected people over time
     int currentlyInfected = 0;
+    private Text textPercentage;
 
     public void AddBot(Bot bot)
     {
@@ -41,24 +41,30 @@ public class GameManager : MonoBehaviour
     {
         if (instance == null)
             instance = this;
-        DrawFunc();
+        infectionCurve = new AnimationCurve();
+        coughCurve = new AnimationCurve();
+        
     }
 
     void Start()
     {
-        infectionCurve = new AnimationCurve();
+        textPercentage = UIManager.Instance.textInfectPercentage;
+        DrawFunc();
     }
+    
+    
 
     // Update is called once per frame
     void Update()
     {
+        if(Time.time > gameDuration)
+            Debug.Break();
         if (currentlyInfected != CountNumberInfected())
         {
             float x2 = Time.time;
             int y2 = CountNumberInfected();
             Keyframe newKeyFrame = new Keyframe(x2, y2);
             // just for UI, draw a function in the animation curve
-            // I can explain better if we talk
             if (currentlyInfected == 0)
             {
                 infectionCurve.AddKey(newKeyFrame);
@@ -68,7 +74,7 @@ public class GameManager : MonoBehaviour
                 Keyframe lastKeyFrame = infectionCurve.keys[infectionCurve.keys.Length - 1];
                 float x1 = lastKeyFrame.time;
                 int y1 = (int) lastKeyFrame.value;
-
+            
                 newKeyFrame.inTangent = Mathf.Atan((y2 - y1) / (x2 - x1));
                 lastKeyFrame.outTangent = Mathf.Atan((y2 - y1) / (x2 - x1));
                 infectionCurve.AddKey(newKeyFrame);

@@ -5,22 +5,22 @@ using UnityEngine.UI;
 
 
 public class InfectedUI : MonoBehaviour
-{
-    public Canvas canvas;
+{    
     public GameObject circleImagePrefab;
-    public Image imageDisplay;
-    private static int cnt = 0;
+    public GameObject botPanel;
     
+    [HideInInspector]
+    public GameObject imageDisplay;
 
-    private void Awake()
+    public GameObject panel;
+
+    private void Start()
     {
         if(circleImagePrefab != null)
         {
-            GameObject imageObject = Instantiate(circleImagePrefab);
-            imageObject.transform.SetParent(canvas.transform);
-            
-            imageDisplay = imageObject.GetComponent<Image>();
-            cnt++;
+            imageDisplay = Instantiate(circleImagePrefab, UIManager.Instance.canvas.transform, true);
+            panel = Instantiate(botPanel, UIManager.Instance.canvas.transform, true);
+            panel.SetActive(false);
         }        
     }
 
@@ -29,8 +29,16 @@ public class InfectedUI : MonoBehaviour
     {
         if (imageDisplay != null)
         {
-            Vector3 position = Camera.main.WorldToScreenPoint(transform.position);
-            imageDisplay.transform.position = position;
+            Vector3 position = Player.Instance.mainCamera.WorldToScreenPoint(transform.position);
+            if (position.z < 0)
+            {
+                imageDisplay.SetActive(false);
+            }
+            else
+            {
+                imageDisplay.SetActive(true);
+                imageDisplay.transform.position = position;
+            }
         }
     }
 }
