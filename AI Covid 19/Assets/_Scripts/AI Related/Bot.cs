@@ -4,18 +4,67 @@ using UnityEngine.UI;
 using UnityEngine.AI;
 using System;
 using UnityEngine.Serialization;
+using System.Collections;
+using System.Reflection;
+using System.Linq;
+using UnityEditor;
+using UnityEngine.Events;
+
+[Serializable]
+public enum State
+{
+    Patrol,
+    Meet,
+    Typing,
+    Washing,
+    Hospital,
+    AnyAction,
+}
+
+[Serializable]
+public class BotAction
+{
+    public float probability;
+    public float stopDistance;
+    public Transform targetTransform;
+    public Vector3 position;
+    public Quaternion rotation;
+
+    //public bool Equals(BotAction other)
+    //{
+    //    return other.ToString() == this.ToString();
+    //}
+}
+
 
 [RequireComponent(typeof(NavMeshAgent))]
 [RequireComponent(typeof(AnimateAI))]
-[Serializable]
 // the core component of the AI 400+ lines of code, so it will take a while to read everything
 public class Bot : MonoBehaviour
 {
+    public List<bool> toggleList = new List<bool>();
+    public List<BotAction> actionList = new List<BotAction>();
 
-    // I use header to make a nice looking inspector, and SerializeField to make private variables be visible in the inspector
     #region public vars
+    public BotAction washHandsAction = new BotAction
+    {
+    };
+    public BotAction typingAction = new BotAction
+    {
+    };
+    public BotAction cookingAction = new BotAction
+    {
+    };
+    public BotAction eatingAction = new BotAction
+    {
+    };
+    public BotAction hospitalAction = new BotAction
+    {
+    };
+    public BotAction lookAtSphereAction = new BotAction();
     [Header("General")]
     [Tooltip("This is setting can be used for play testing")]
+    // I use header to make a nice looking inspector, and SerializeField to make private variables be visible in the inspector
     public bool alreadyInfected;// if this option is enabled in the inspector the bot will start the game already infected
     [SerializeField] GameObject head; // gameobject for head used for detecting if two bots see each other
     [Range(0,10)] // a cool feature for modifying in the inspector with a slider
@@ -48,8 +97,8 @@ public class Bot : MonoBehaviour
     [SerializeField] Bot meetingBot; // shows in the inspector who is the dialog partner, there is no need to modify it in the inspector
     [SerializeField] float offsetMeeting = 5;// an offset which says the distance between them when they are talking
     [SerializeField] float cooldownMeeting = 60;// after this bot has left the meeting he has a cooldown untill he finds another meeting
-                                               // TODO : make cooldownMeeting be determined by sociableLevel ( rezolvat in Start)
-                                               // is set by the AIManger initially, can be modified in inspector
+                                                // TODO : make cooldownMeeting be determined by sociableLevel ( rezolvat in Start)
+                                                // is set by the AIManger initially, can be modified in inspector
     
     [Header("Talk Seetings")]
     [SerializeField] int talkDuration = 0; // talk duration
@@ -65,7 +114,7 @@ public class Bot : MonoBehaviour
     // assign you empty object to posHolder in the inspector (see BasicScene.unity for details)
 
     [Header("Infection")]
-    [SerializeField] public float infectionLevel;// from 1 to 10
+    public float infectionLevel;// from 1 to 10
     [SerializeField] float infectionSpeed = 0.1f;
     [SerializeField] float growthInterval = 3; /// infection grows by 1 unit every three seconds
 
@@ -77,18 +126,13 @@ public class Bot : MonoBehaviour
     // if bot1 coughs and bot2 is in 10m distance then bot2 gets infected too
 
     [Header("UI")]
-    [SerializeField] GameObject PlaceHolderInfectedUI; // for the circle UI
-    [SerializeField] private GameObject PanelStatsUI; // ui for bot stats
-    #endregion
+    public GameObject PlaceHolderInfectedUI; // for the circle UI
+    
 
-    public enum State
-    {
-        Patrol,
-        Meet,
-        Hospital
-    }
+
     public bool cured = false;
     public State currentState;
+    #endregion
 
     private NavMeshObstacle obstacle;
     private Animator animator;// animator
@@ -104,12 +148,55 @@ public class Bot : MonoBehaviour
     private int bedIndex;
     private Vector3 bedPosition;
     private Hospital hospital;
+    private ActionPlace place;
 
     float currentInfectionTime = 0;
     float lastFinishedMeetingTime = 0;
+    float lastFinishedAnyActionTime = 0;
+    private BotAction currentAction = null;
+
+
+    private bool startAction;
+    private bool actionPending;
 
     private InfectedUI ui;
+    public UnityEvent loadEvent;
 
+    #region actionList
+    public void ClearList() { 
+        actionList.Clear();
+    }
+    public void AddAction(BotAction action)
+    {
+
+        if (actionList.Find(x => x == action) == null)
+        {
+            Debug.Log("aduaga actiune");
+            actionList.Add(action);
+        }
+    }
+    public void RemoveAction(BotAction action)
+    {
+
+        if (actionList.Count == 0) return;
+        if (actionList.Contains(action) == true)
+        {
+            actionList.Remove(action);
+        }
+    }
+    private int CompareAction(BotAction a, BotAction b)
+    {
+        // pt a compara botii a si b in functie de distanta. returneaza bot-ul cel mai apropiat de cel curent
+        float pa = a.probability;
+        float pb = b.probability;
+        if (pa == pb)
+            return 0;
+        if (pa > pb)
+            return -1; // botul a
+        else
+            return 1; // botul b
+    }
+    #endregion
     void SetUpPosHolder()
     {
         if (posHolder != null)
@@ -136,7 +223,7 @@ public class Bot : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        currentState = State.Patrol;
+        currentState = State.AnyAction;
         GameManager.instance.AddBot(this); // pun in Gamemanager bot-ul
 
         cooldownMeeting = AIManager.instance.maxMeetingCooldown / sociableLevel;
@@ -149,12 +236,22 @@ public class Bot : MonoBehaviour
         obstacle.enabled = false;
         agent.autoBraking = false; // sa nu se opreasca cand se aproprie de destinatie
 
-        ui = PlaceHolderInfectedUI.GetComponent<InfectedUI>();
+        if (head == null)
+            head = gameObject;
+        if(PlaceHolderInfectedUI != null)
+            ui = PlaceHolderInfectedUI.GetComponent<InfectedUI>();
         SetUpPosHolder();
         if (alreadyInfected == true)
         {
             StartInfection();
         }
+    }
+    public static int GetListenerNumber(UnityEventBase unityEvent)
+    {
+        var field = typeof(UnityEventBase).GetField("m_Calls", BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.DeclaredOnly);
+        var invokeCallList = field.GetValue(unityEvent);
+        var property = invokeCallList.GetType().GetProperty("Count");
+        return (int)property.GetValue(invokeCallList);
     }
     Vector3 RandomLoc()
     {
@@ -315,6 +412,10 @@ public class Bot : MonoBehaviour
             }
         }
     }
+    private void OnMouseEnter()
+    {
+        DrawUIPanel();
+    }
 
     private void OnMouseExit()
     {
@@ -416,7 +517,6 @@ public class Bot : MonoBehaviour
 
     private void LateUpdate()
     {
-        DrawUIPanel();
         if (infectionLevel > 0)
         {
             
@@ -435,24 +535,54 @@ public class Bot : MonoBehaviour
                 currentInfectionTime += Time.deltaTime;
         }
     }
-
+    void EndAction()
+    {
+        lastFinishedAnyActionTime = Time.time;
+        agent.isStopped = false;
+        startAction = false;
+        actionPending = false;
+        place.occupied = false;
+    }
+    IEnumerator TypingCoroutine()
+    {
+        int waitTime = UnityEngine.Random.Range(10, 15);
+        Debug.Log("start typing");
+        animator.SetBool("typing",true);
+        yield return new WaitForSeconds(waitTime);
+        animator.SetBool("typing", false);
+        EndAction();
+    }
+    IEnumerator WashingCoroutine()
+    {
+        yield return new WaitForSeconds(3f);
+        EndAction();
+    }
+    IEnumerator LookCoroutine()
+    {
+        transform.LookAt(currentAction.targetTransform);
+        yield return new WaitForSeconds(10f);
+        EndAction();
+    }
     // Update is called once per frame
     void Update()
     {
-        if(currentState == State.Patrol)
+
+        if (currentState == State.Patrol)
         {
             if(agent.isStopped == true)
                 agent.isStopped = false;
             if (agent.enabled == false)
                 agent.enabled = true;
             // in caz ca pe viitor
+            // aleg destinatia
             if(startPatroling == false || Vector3.Distance(a: transform.position,b: currentDestination) < stoppingDistance)
             {
                 if (randomLocations)
                 {
                     Vector3 randomLocation = RandomLoc();
-                    agent.SetDestination(target: randomLocation);
                     currentDestination = randomLocation;
+                    agent.SetDestination(target: currentDestination);
+                    
                 }
                 else
                 {    
@@ -464,6 +594,9 @@ public class Bot : MonoBehaviour
                 }
                 startPatroling = true;
             }
+
+
+            
             // Tranzitia 1 in starea de MEET
             /// daca cooldown-ul a trecut de la ultima intalnire sau daca initial nu am avut nicio intalnire
             if (Time.time - lastFinishedMeetingTime >= cooldownMeeting || lastFinishedMeetingTime == 0)
@@ -494,7 +627,37 @@ public class Bot : MonoBehaviour
                     }
                 }
             }
-        }else if(currentState == State.Meet)
+    
+            if (actionPending == false && actionList.Count > 0 && Time.time - lastFinishedAnyActionTime > 5f)
+            {
+                float random = UnityEngine.Random.value;
+                actionList.Sort(CompareAction);
+
+                for (int i = 0; i < actionList.Count; i++)
+                {
+                    BotAction action = actionList[i];
+                    if (random < action.probability /* && (action != currentAction || currentAction == null)*/)
+                    {
+                        foreach (ActionPlace possiblePlace in GameManager.instance.desks)
+                        {
+                            Debug.Log("Place name : " + possiblePlace);
+                            if (possiblePlace.occupied == false)
+                            {
+                                place = possiblePlace;
+                                possiblePlace.occupied = true;
+                                actionPending = true;
+                                currentAction = action;
+                                currentDestination = action.position;
+                                agent.SetDestination(currentDestination);
+                                currentState = State.AnyAction;
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        else if(currentState == State.Meet)
         {
             if (Vector3.Distance(a: transform.position, b: meetingPoint) < 1f)
                 agent.enabled = false;
@@ -515,8 +678,70 @@ public class Bot : MonoBehaviour
                 cured = true; 
                 currentState = State.Patrol;
             }
+        }else if(currentState == State.AnyAction)
+        {
+            if (actionPending == false && actionList.Count > 0)
+            {
+                Debug.Log("tring another action");
+                float random = UnityEngine.Random.value;
+                actionList.Sort(CompareAction);
+
+                for (int i = 0; i < actionList.Count; i++)
+                {
+                    BotAction action = actionList[i];
+                    if (random < action.probability && (action != currentAction || currentAction == null))
+                    {
+                        foreach (ActionPlace possiblePlace in GameManager.instance.desks)
+                        {
+                            if (possiblePlace.occupied == false)
+                            {
+                                possiblePlace.occupied = true;
+                                place = possiblePlace;
+                                actionPending = true;
+                                currentAction = action;
+                                currentDestination = action.position;
+                                agent.SetDestination(currentDestination);
+                                break;
+                            }
+                        }
+                    }
+                }
+            }   
+            if(actionPending == false)
+            {
+                Debug.Log("failed to find any good action");
+                startPatroling = false;
+                currentState = State.Patrol;
+                return;
+            }
+
+            if (actionPending == true && Vector3.Distance(transform.position, currentDestination) < currentAction.stopDistance + 0.1f)
+            {
+                if (startAction == false)
+                {
+                    startAction = true;
+                    transform.position = currentAction.position;
+                    transform.rotation = currentAction.rotation;
+                    agent.isStopped = true;
+                    Debug.Log("start Action");
+                    if (currentAction.Equals(typingAction))
+                    {
+                        Debug.Log("it is typing action");
+                        StartCoroutine(TypingCoroutine());
+                    }
+                    else if (currentAction.Equals(lookAtSphereAction))
+                    {
+                        StartCoroutine(LookCoroutine());
+                    }
+                    else
+                    {
+                        Debug.Log("stating washing coroutine");
+                        StartCoroutine(WashingCoroutine());
+                    }
+                }
+            }
         }
-        
+
 
     }
     void DrawLineOfSight()
@@ -565,7 +790,13 @@ public class Bot : MonoBehaviour
                 Gizmos.DrawSphere(agent.destination, 1f);
             }
         }
-        if(drawLines)
+        //Debug.Log("event has in gizmos for " + name + " : " + GetListenerNumber(loadEvent) + "listeners");
+        if (drawLines)
             DrawLineOfSight();
+        AssemblyReloadEvents.beforeAssemblyReload += ClearList;
+    }
+    private void OnDisable()
+    {
+        AssemblyReloadEvents.beforeAssemblyReload -= ClearList;
     }
 }
