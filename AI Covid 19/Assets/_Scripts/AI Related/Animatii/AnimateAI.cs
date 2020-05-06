@@ -6,7 +6,7 @@ using UnityEngine.AI;
 
 public class AnimateAI : MonoBehaviour
 {
-    [SerializeField] float turnMulitplyer = 5;
+   public float turnMulitplyer = 5;
     NavMeshAgent agent;
     Animator animator;
     float angle;
