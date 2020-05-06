@@ -9,6 +9,8 @@ public class GameManager : MonoBehaviour
     public float gameDuration = 60f;
     public List<Bot> listBots = new List<Bot>();
     public List<Hospital> listHospitals = new List<Hospital>();
+    public List<ActionPlace> desks;
+
     public AnimationCurve infectionCurve; // click on this in the inspector while the game in running
     public AnimationCurve coughCurve;
 
