@@ -55,7 +55,6 @@ namespace UnityStandardAssets.Characters.ThirdPerson
 			move = Vector3.ProjectOnPlane(move, m_GroundNormal);
 			m_TurnAmount = Mathf.Atan2(move.x, move.z);
 			m_ForwardAmount = move.z;
-          
 
 			ApplyExtraTurnRotation();
 
@@ -118,7 +117,7 @@ namespace UnityStandardAssets.Characters.ThirdPerson
 
 		void UpdateAnimator(Vector3 move)
 		{
-            // update the animator parameters
+			// update the animator parameters
 			m_Animator.SetFloat("Forward", m_ForwardAmount, 0.1f, Time.deltaTime);
 			m_Animator.SetFloat("Turn", m_TurnAmount, 0.1f, Time.deltaTime);
 			m_Animator.SetBool("Crouch", m_Crouching);
@@ -222,5 +221,5 @@ namespace UnityStandardAssets.Characters.ThirdPerson
 				m_Animator.applyRootMotion = false;
 			}
 		}
-    }
+	}
 }

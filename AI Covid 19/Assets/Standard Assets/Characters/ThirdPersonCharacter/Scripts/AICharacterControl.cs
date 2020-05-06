@@ -25,14 +25,8 @@ namespace UnityStandardAssets.Characters.ThirdPerson
 
         private void Update()
         {
-            if (Input.GetMouseButton(0))
-            {
-                RaycastHit hit;
-                Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-                if(Physics.Raycast(ray,out hit)){
-                    agent.SetDestination(hit.point);
-                }
-            }
+            if (target != null)
+                agent.SetDestination(target.position);
 
             if (agent.remainingDistance > agent.stoppingDistance)
                 character.Move(agent.desiredVelocity, false, false);
@@ -44,11 +38,6 @@ namespace UnityStandardAssets.Characters.ThirdPerson
         public void SetTarget(Transform target)
         {
             this.target = target;
-        }
-        private void OnDrawGizmos()
-        {
-            Gizmos.color = Color.red;
-            Gizmos.DrawLine(transform.position, transform.position + agent.desiredVelocity);
         }
     }
 }
