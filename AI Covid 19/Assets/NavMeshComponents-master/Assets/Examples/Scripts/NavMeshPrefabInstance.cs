@@ -6,7 +6,7 @@ using UnityEngine.AI;
 [DefaultExecutionOrder(-102)]
 public class NavMeshPrefabInstance : MonoBehaviour
 {
-    [SerializeField]
+   public
     NavMeshData m_NavMesh;
     public NavMeshData navMeshData
     {
@@ -14,7 +14,7 @@ public class NavMeshPrefabInstance : MonoBehaviour
         set { m_NavMesh = value; }
     }
 
-    [SerializeField]
+   public
     bool m_FollowTransform;
     public bool followTransform
     {
