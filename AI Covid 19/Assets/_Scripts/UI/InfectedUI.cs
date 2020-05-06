@@ -11,7 +11,7 @@ public class InfectedUI : MonoBehaviour
     
     [HideInInspector]
     public GameObject imageDisplay;
-
+    [HideInInspector]
     public GameObject panel;
 
     private void Start()
