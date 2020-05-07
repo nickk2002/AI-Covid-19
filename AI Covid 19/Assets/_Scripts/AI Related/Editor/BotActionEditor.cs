@@ -14,14 +14,14 @@ using UnityEngine.SceneManagement;
 public class BotActionEditor : PropertyDrawer
 {
     bool foldout = false;
-    Rect rectButton;
+    Rect rectSetPosition;
+    Rect rectSnap;
     float lungime;
     public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
     {
         if (foldout)
         {
-
-            return rectButton.y + 20;
+            return rectSnap.y + 20;
         }
         return base.GetPropertyHeight(property, label);
     }
@@ -29,7 +29,9 @@ public class BotActionEditor : PropertyDrawer
     {
         EditorGUI.BeginProperty(position, label, property);
         //position = EditorGUI.PrefixLabel(position, GUIUtility.GetControlID(FocusType.Passive),new GUIContent(label));
+        foldout = EditorPrefs.GetBool("expandAction");
         foldout = EditorGUI.Foldout(new Rect(position.x,position.y,position.width,15), foldout, label.text);
+        EditorPrefs.SetBool("expandAction",foldout);
         if(foldout == true)
         {
             var aduna = 20;
@@ -42,9 +44,9 @@ public class BotActionEditor : PropertyDrawer
             var rectTransfrom = new Rect(position.x, rectstopDistance.y + aduna, position.width, 16f);
             var botPosition = property.FindPropertyRelative("position");
             var rectPos = new Rect(rectTransfrom.x, rectTransfrom.y + aduna, position.width, 16);
-            rectButton = new Rect(rectPos.x, rectPos.y + 40 , position.width, 16);
+            rectSetPosition = new Rect(rectPos.x, rectPos.y + aduna, position.width, 16);
             var botRotation = property.FindPropertyRelative("rotation");
-            lungime = rectButton.y + aduna;
+            lungime = rectSetPosition.y + aduna;
 
             //new school
             //EditorGUI.indentLevel -= 2;
@@ -55,6 +57,7 @@ public class BotActionEditor : PropertyDrawer
             //EditorGUILayout.PropertyField(stopDistance);
             //EditorGUILayout.PropertyField(targetT, true);
             //EditorGUILayout.EndVertical();
+
             EditorGUI.PropertyField(rectprob, probability);
             EditorGUI.PropertyField(rectstopDistance, stopDistance);
             EditorGUI.PropertyField(rectTransfrom, targetT);
@@ -62,14 +65,32 @@ public class BotActionEditor : PropertyDrawer
 
 
             Bot ceva = GetParent(property) as Bot;
-            GameObject go = ceva.gameObject;           
-            
-            if (GUI.Button(rectButton,"Set Bot Relative Position"))
-            {
-                botPosition.vector3Value = go.transform.position;
-                botRotation.quaternionValue = go.transform.rotation;
+            GameObject go = ceva.gameObject;
+            BotAction action = fieldInfo.GetValue(property.serializedObject.targetObject) as BotAction;
 
+            if (GUI.Button(rectSetPosition,"Set Bot Relative Position"))
+            {
+                
+                if (action.targetTransform == null)
+                {
+                    botPosition.vector3Value = go.transform.position;
+                }
+                else
+                {
+                    botPosition.vector3Value = go.transform.position - action.targetTransform.position;/// diferenta intre vectori
+                }
+                botRotation.quaternionValue = go.transform.rotation;
             }
+            rectSnap = new Rect(rectPos.x, rectSetPosition.y + aduna, position.width, 16);
+            if (GUI.Button(rectSnap,"Snap Object To Position"))
+            {
+                //Debug.Log("the position is now : " )
+                Vector3 snap = botPosition.vector3Value + action.targetTransform.position;
+                Debug.Log("Going to put him at position : " + snap);
+                go.transform.position = action.position + action.targetTransform.position;
+            }
+            if (GUI.changed)
+                EditorUtility.SetDirty(fieldInfo.GetValue(property.serializedObject.targetObject) as UnityEngine.Object);
         }
         EditorGUI.EndProperty();
     }
@@ -82,7 +103,6 @@ public class BotActionEditor : PropertyDrawer
         {
             if (element.Contains("["))
             {
-                Debug.Log("Containes that thing");
                 var elementName = element.Substring(0, element.IndexOf("["));
                 var index = Convert.ToInt32(element.Substring(element.IndexOf("[")).Replace("[", "").Replace("]", ""));
                 obj = GetValue(obj, elementName, index);

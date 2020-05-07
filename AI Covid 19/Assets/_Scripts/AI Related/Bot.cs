@@ -22,18 +22,20 @@ public enum State
 }
 
 [Serializable]
-public class BotAction
+public class BotAction : IEquatable<BotAction>
 {
     public float probability;
     public float stopDistance;
     public Transform targetTransform;
     public Vector3 position;
     public Quaternion rotation;
+    public string name;
 
-    //public bool Equals(BotAction other)
-    //{
-    //    return other.ToString() == this.ToString();
-    //}
+    public override int GetHashCode()
+    {
+        return probability.GetHashCode() ^ stopDistance.GetHashCode() ^ targetTransform.GetHashCode() ^ position.GetHashCode();
+    }
+    public bool Equals(BotAction other) => GetHashCode() == other.GetHashCode();
 }
 
 
@@ -42,6 +44,7 @@ public class BotAction
 // the core component of the AI 400+ lines of code, so it will take a while to read everything
 public class Bot : MonoBehaviour
 {
+    public string actionName = "No Action";
     public List<bool> toggleList = new List<bool>();
     public List<BotAction> actionList = new List<BotAction>();
 
@@ -148,7 +151,7 @@ public class Bot : MonoBehaviour
     private int bedIndex;
     private Vector3 bedPosition;
     private Hospital hospital;
-    private ActionPlace place;
+    private ActionPlace lastPlace;
 
     float currentInfectionTime = 0;
     float lastFinishedMeetingTime = 0;
@@ -160,7 +163,6 @@ public class Bot : MonoBehaviour
     private bool actionPending;
 
     private InfectedUI ui;
-    public UnityEvent loadEvent;
 
     #region actionList
     public void ClearList() { 
@@ -171,7 +173,6 @@ public class Bot : MonoBehaviour
 
         if (actionList.Find(x => x == action) == null)
         {
-            Debug.Log("aduaga actiune");
             actionList.Add(action);
         }
     }
@@ -541,7 +542,7 @@ public class Bot : MonoBehaviour
         agent.isStopped = false;
         startAction = false;
         actionPending = false;
-        place.occupied = false;
+        lastPlace.occupied = false;
     }
     IEnumerator TypingCoroutine()
     {
@@ -563,10 +564,28 @@ public class Bot : MonoBehaviour
         yield return new WaitForSeconds(10f);
         EndAction();
     }
+
+    public static void RandomShuffle<T>(IList<T> lista)
+    {
+        int n = lista.Count;
+        while(n > 0)
+        {
+            n--;
+            int temp = UnityEngine.Random.Range(0, n);
+            T value = lista[temp];
+            lista[temp] = lista[n];
+            lista[n] = value;
+        }
+    }
+
     // Update is called once per frame
     void Update()
     {
-
+        if(currentAction != null)
+        {
+            Debug.Log("<color=yellow>hei action</color>" + " " +  currentAction.name);
+            actionName = currentAction.name;
+        }
         if (currentState == State.Patrol)
         {
             if(agent.isStopped == true)
@@ -627,8 +646,7 @@ public class Bot : MonoBehaviour
                     }
                 }
             }
-    
-            if (actionPending == false && actionList.Count > 0 && Time.time - lastFinishedAnyActionTime > 5f)
+            if (actionPending == false && actionList.Count > 0 && Time.time - lastFinishedAnyActionTime > 5)
             {
                 float random = UnityEngine.Random.value;
                 actionList.Sort(CompareAction);
@@ -636,21 +654,27 @@ public class Bot : MonoBehaviour
                 for (int i = 0; i < actionList.Count; i++)
                 {
                     BotAction action = actionList[i];
-                    if (random < action.probability /* && (action != currentAction || currentAction == null)*/)
+                    if (random < action.probability)
                     {
+                        RandomShuffle(GameManager.instance.desks);
                         foreach (ActionPlace possiblePlace in GameManager.instance.desks)
                         {
-                            Debug.Log("Place name : " + possiblePlace);
-                            if (possiblePlace.occupied == false)
+                            if (possiblePlace.occupied == false && possiblePlace != lastPlace)
                             {
-                                place = possiblePlace;
+                                Debug.Log($"<color=red> found action </color>");
                                 possiblePlace.occupied = true;
+                                lastPlace = possiblePlace;
+                                
                                 actionPending = true;
                                 currentAction = action;
-                                currentDestination = action.position;
+
+                                Debug.Log("found desk : " + possiblePlace.name);
+                                // sets destination
+                                currentDestination = action.position + possiblePlace.transform.position;
                                 agent.SetDestination(currentDestination);
+
                                 currentState = State.AnyAction;
-                                break;
+                                return;
                             }
                         }
                     }
@@ -682,25 +706,31 @@ public class Bot : MonoBehaviour
         {
             if (actionPending == false && actionList.Count > 0)
             {
-                Debug.Log("tring another action");
                 float random = UnityEngine.Random.value;
                 actionList.Sort(CompareAction);
 
                 for (int i = 0; i < actionList.Count; i++)
                 {
                     BotAction action = actionList[i];
-                    if (random < action.probability && (action != currentAction || currentAction == null))
+                    if (random < action.probability)
                     {
+                        RandomShuffle(GameManager.instance.desks);
                         foreach (ActionPlace possiblePlace in GameManager.instance.desks)
                         {
-                            if (possiblePlace.occupied == false)
+                            if (possiblePlace.occupied == false && possiblePlace != lastPlace)
                             {
+                                Debug.Log($"<color=red> found action </color>");
                                 possiblePlace.occupied = true;
-                                place = possiblePlace;
+                                lastPlace = possiblePlace;
+
                                 actionPending = true;
                                 currentAction = action;
-                                currentDestination = action.position;
+
+                                Debug.Log("found desk : " + possiblePlace.name);
+                                // sets destination
+                                currentDestination = action.position + possiblePlace.transform.position;
                                 agent.SetDestination(currentDestination);
+
                                 break;
                             }
                         }
@@ -709,7 +739,7 @@ public class Bot : MonoBehaviour
             }   
             if(actionPending == false)
             {
-                Debug.Log("failed to find any good action");
+                Debug.Log("<color=red> failed </color> to find any good action");
                 startPatroling = false;
                 currentState = State.Patrol;
                 return;
@@ -720,10 +750,10 @@ public class Bot : MonoBehaviour
                 if (startAction == false)
                 {
                     startAction = true;
-                    transform.position = currentAction.position;
+                    transform.position = currentDestination;
                     transform.rotation = currentAction.rotation;
                     agent.isStopped = true;
-                    Debug.Log("start Action");
+                    Debug.Log("<color=green> Start Action </color>");
                     if (currentAction.Equals(typingAction))
                     {
                         Debug.Log("it is typing action");
