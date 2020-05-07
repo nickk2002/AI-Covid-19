@@ -6,12 +6,8 @@ using System.Reflection;
 using UnityEngine.SceneManagement;
 
 [CustomEditor(typeof(Bot))]
-[CanEditMultipleObjects]
 public class CustomBot : Editor
 {
-
-
-
     bool foldout;
     bool generalSettings;
     List<string> fieldsArray = new List<string>();
@@ -25,10 +21,6 @@ public class CustomBot : Editor
         Debug.Log("added listener");
         LoadEveryThing();
     }
-    private void OnDisable()
-    {
-        bot.loadEvent.RemoveAllListeners();
-    }
     void LoadEveryThing()
     {
         // keep foldouts the way they were before
@@ -39,11 +31,18 @@ public class CustomBot : Editor
         // reset fields and action arrays
         fieldsArray.Clear();
         actionArray.Clear();
+        /// use refelction to fill action array and fields array
+
+        
         foreach (FieldInfo field in typeof(Bot).GetFields(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Default))
         {
             string nume = field.Name;
             if (nume.EndsWith("Action") && field.FieldType == typeof(BotAction) && field.IsPrivate == false)
             {
+                BotAction action = field.GetValue(bot) as BotAction;
+                FieldInfo nameField = typeof(BotAction).GetField("name");
+                nameField.SetValue(action, field.Name);
+                Debug.Log("now the name is : " + field.Name);
                 actionArray.Add(field);
             }
             else
@@ -57,14 +56,18 @@ public class CustomBot : Editor
       
         serializedObject.Update();
 
+        // draw script gui
         GUI.enabled = false;
         EditorGUILayout.ObjectField("Script", MonoScript.FromMonoBehaviour((Bot)target), typeof(Bot), false);
         GUI.enabled = true;
+
+        //draw foldout
         foldout = EditorGUILayout.Foldout(foldout, "Behaviour Settings");
         EditorPrefs.SetBool("foldout", foldout);
 
         if (foldout)
         {
+            // make sure the bot toggle size matches the actionArray size
             if (bot.toggleList.Count < actionArray.Count)
             {
                 int dif = actionArray.Count - bot.toggleList.Count;
@@ -74,32 +77,35 @@ public class CustomBot : Editor
                 }
             }
             int index = 0;
-            SerializedProperty toggleListProperty = serializedObject.FindProperty("toggleList");
+            SerializedProperty toggleListProperty = serializedObject.FindProperty("toggleList"); // get the toggle list
             bot.ClearList();
             foreach (FieldInfo fieldInfo in actionArray)
             {
                 if (index < bot.toggleList.Count)
                 {
+                    // begin a horizontal allignment
                     GUILayout.BeginHorizontal();
-                    //Debug.Log(index + " " + bot.toggleList.Count);
+
+                    // se the value of the toggle
                     SerializedProperty toggleIndex = toggleListProperty.GetArrayElementAtIndex(index);
                     toggleIndex.boolValue = EditorGUILayout.Toggle(toggleIndex.boolValue, GUILayout.Width(16));
                     var item = bot.toggleList[index];
-                    index++;
 
-                    GUILayout.Space(10);
-                    string name = fieldInfo.Name;
+                    index++;/// increase the index
 
+                    GUILayout.Space(10); // ad some space
+                    string name = fieldInfo.Name; // get the name of the action
+                    
                     BotAction actiune = (BotAction)fieldInfo.GetValue(bot);
-                    Debug.Log(actiune.ToString());
                     if (item == true)
                     {
+                        // draw the expandable action
                         bot.AddAction(actiune);
                         EditorGUILayout.PropertyField(serializedObject.FindProperty(name), GUILayout.MinWidth(100));
                     }
                     else
                     {
-                        Debug.Log("remove");
+                        // draw a label
                         bot.RemoveAction(actiune);
                         string actualName = char.ToUpper(name[0]) + name.Substring(1);
                         EditorGUILayout.LabelField(actualName);
