@@ -3110,55 +3110,55 @@ MonoBehaviour:
     targetTransform: {fileID: 0}
     position: {x: 0, y: 0, z: 0}
     rotation: {x: 0, y: 0, z: 0, w: 0}
-    isRelative: 0
+    name: 
   - probability: 0
     stopDistance: 0
     targetTransform: {fileID: 0}
     position: {x: 0, y: 0, z: 0}
     rotation: {x: 0, y: 0, z: 0, w: 0}
-    isRelative: 0
+    name: 
   washHandsAction:
     probability: 1
     stopDistance: 0
     targetTransform: {fileID: 0}
     position: {x: 0, y: 0, z: 0}
     rotation: {x: 0, y: 0, z: 0, w: 0}
-    isRelative: 0
+    name: 
   typingAction:
     probability: 1
     stopDistance: 0
     targetTransform: {fileID: 0}
     position: {x: 0, y: 0, z: 0}
     rotation: {x: 0, y: 0, z: 0, w: 0}
-    isRelative: 0
+    name: 
   cookingAction:
     probability: 1
     stopDistance: 0
     targetTransform: {fileID: 0}
     position: {x: 0, y: 0, z: 0}
     rotation: {x: 0, y: 0, z: 0, w: 0}
-    isRelative: 0
+    name: 
   eatingAction:
     probability: 1
     stopDistance: 0
     targetTransform: {fileID: 0}
     position: {x: 0, y: 0, z: 0}
     rotation: {x: 0, y: 0, z: 0, w: 0}
-    isRelative: 0
+    name: 
   hospitalAction:
     probability: 1
     stopDistance: 0
     targetTransform: {fileID: 0}
     position: {x: 0, y: 0, z: 0}
     rotation: {x: 0, y: 0, z: 0, w: 0}
-    isRelative: 0
+    name: 
   lookAtSphereAction:
     probability: 0
     stopDistance: 0
     targetTransform: {fileID: 0}
     position: {x: 0, y: 0, z: 0}
     rotation: {x: 0, y: 0, z: 0, w: 0}
-    isRelative: 0
+    name: 
   alreadyInfected: 0
   head: {fileID: 0}
   sociableLevel: 0
@@ -3189,9 +3189,6 @@ MonoBehaviour:
   PlaceHolderInfectedUI: {fileID: 0}
   cured: 0
   currentState: 0
-  loadEvent:
-    m_PersistentCalls:
-      m_Calls: []
 --- !u!1001 &758966777
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -7617,19 +7614,19 @@ MonoBehaviour:
     targetTransform: {fileID: 0}
     position: {x: 0, y: 0, z: 0}
     rotation: {x: 0, y: 0, z: 0, w: 0}
-    isRelative: 0
+    name: 
   - probability: 0
     stopDistance: 0
     targetTransform: {fileID: 0}
     position: {x: 0, y: 0, z: 0}
     rotation: {x: 0, y: 0, z: 0, w: 0}
-    isRelative: 0
+    name: 
   - probability: 0
     stopDistance: 0
     targetTransform: {fileID: 0}
     position: {x: 0, y: 0, z: 0}
     rotation: {x: 0, y: 0, z: 0, w: 0}
-    isRelative: 0
+    name: 
 --- !u!4 &1758160011
 Transform:
   m_ObjectHideFlags: 0
@@ -7671,42 +7668,42 @@ MonoBehaviour:
     targetTransform: {fileID: 0}
     position: {x: 0, y: 0, z: 0}
     rotation: {x: 0, y: 0, z: 0, w: 0}
-    isRelative: 0
+    name: 
   typingAction:
     probability: 1
     stopDistance: 0
     targetTransform: {fileID: 0}
     position: {x: 0, y: 0, z: 0}
     rotation: {x: 0, y: 0, z: 0, w: 0}
-    isRelative: 0
+    name: 
   cookingAction:
     probability: 1
     stopDistance: 0
     targetTransform: {fileID: 0}
     position: {x: 0, y: 0, z: 0}
     rotation: {x: 0, y: 0, z: 0, w: 0}
-    isRelative: 0
+    name: 
   eatingAction:
     probability: 1
     stopDistance: 0
     targetTransform: {fileID: 0}
     position: {x: 0, y: 0, z: 0}
     rotation: {x: 0, y: 0, z: 0, w: 0}
-    isRelative: 0
+    name: 
   hospitalAction:
     probability: 1
     stopDistance: 0
     targetTransform: {fileID: 0}
     position: {x: 0, y: 0, z: 0}
     rotation: {x: 0, y: 0, z: 0, w: 0}
-    isRelative: 0
+    name: 
   lookAtSphereAction:
     probability: 0
     stopDistance: 0
     targetTransform: {fileID: 0}
     position: {x: 0, y: 0, z: 0}
     rotation: {x: 0, y: 0, z: 0, w: 0}
-    isRelative: 0
+    name: 
   alreadyInfected: 0
   head: {fileID: 0}
   sociableLevel: 0
@@ -7737,9 +7734,6 @@ MonoBehaviour:
   PlaceHolderInfectedUI: {fileID: 0}
   cured: 0
   currentState: 0
-  loadEvent:
-    m_PersistentCalls:
-      m_Calls: []
 --- !u!4 &1791280159 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 8215572780367793168, guid: e90b75abd17ad804bb8c42ab432c259b,
@@ -8883,6 +8877,51 @@ PrefabInstance:
         type: 3}
       propertyPath: typingAction.rotation.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5262784027839207880, guid: e90b75abd17ad804bb8c42ab432c259b,
+        type: 3}
+      propertyPath: actionList.Array.data[0].probability
+      value: 20
+      objectReference: {fileID: 0}
+    - target: {fileID: 5262784027839207880, guid: e90b75abd17ad804bb8c42ab432c259b,
+        type: 3}
+      propertyPath: actionList.Array.data[0].name
+      value: typingAction
+      objectReference: {fileID: 0}
+    - target: {fileID: 5262784027839207880, guid: e90b75abd17ad804bb8c42ab432c259b,
+        type: 3}
+      propertyPath: washHandsAction.name
+      value: washHandsAction
+      objectReference: {fileID: 0}
+    - target: {fileID: 5262784027839207880, guid: e90b75abd17ad804bb8c42ab432c259b,
+        type: 3}
+      propertyPath: typingAction.probability
+      value: 20
+      objectReference: {fileID: 0}
+    - target: {fileID: 5262784027839207880, guid: e90b75abd17ad804bb8c42ab432c259b,
+        type: 3}
+      propertyPath: typingAction.name
+      value: typingAction
+      objectReference: {fileID: 0}
+    - target: {fileID: 5262784027839207880, guid: e90b75abd17ad804bb8c42ab432c259b,
+        type: 3}
+      propertyPath: cookingAction.name
+      value: cookingAction
+      objectReference: {fileID: 0}
+    - target: {fileID: 5262784027839207880, guid: e90b75abd17ad804bb8c42ab432c259b,
+        type: 3}
+      propertyPath: eatingAction.name
+      value: eatingAction
+      objectReference: {fileID: 0}
+    - target: {fileID: 5262784027839207880, guid: e90b75abd17ad804bb8c42ab432c259b,
+        type: 3}
+      propertyPath: hospitalAction.name
+      value: hospitalAction
+      objectReference: {fileID: 0}
+    - target: {fileID: 5262784027839207880, guid: e90b75abd17ad804bb8c42ab432c259b,
+        type: 3}
+      propertyPath: lookAtSphereAction.name
+      value: lookAtSphereAction
       objectReference: {fileID: 0}
     - target: {fileID: 5262784029458685337, guid: e90b75abd17ad804bb8c42ab432c259b,
         type: 3}
