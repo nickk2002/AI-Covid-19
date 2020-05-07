@@ -26,6 +26,7 @@ public class GameManager : MonoBehaviour
         }
     }
 
+
     int CountNumberInfected()
     {
         int cnt = 0;
@@ -41,6 +42,7 @@ public class GameManager : MonoBehaviour
     // Start is called before the first frame update
     void Awake()
     {
+        //Time.timeScale = 2.5f;
         if (instance == null)
             instance = this;
         infectionCurve = new AnimationCurve();
