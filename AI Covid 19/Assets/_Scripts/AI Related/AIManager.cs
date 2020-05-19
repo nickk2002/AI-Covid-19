@@ -11,16 +11,42 @@ public class AIManager : MonoBehaviour
     public float minViewDistance = 10f;// cat de putin poate sa vada un bot
     public float minTalkDuration = 20f;// TODO : sa introduc conditiile astea in Bot.cs in TryMeetBot
     public float maxTalkDuration = 60f;// un minut
+
+    public AnimationCurve coughCurve;
     // Start is called before the first frame update
     void Awake()
     {
         if (instance == null)
             instance = this;
+        coughCurve = new AnimationCurve();
     }
 
-    // Update is called once per frame
-    void Update()
+    private void Start()
     {
-        
+        DrawFunc();
+    }
+
+    float CoughFunction(float x)
+    {
+        return 20 * (Mathf.Pow((8f / 10), x));
+    }
+
+    void DrawFunc()
+    {
+        int cnt = 0;
+        bool firstTime = coughCurve.keys.Length == 0;
+        for (float i = 0; i < 10; i += 0.1f)
+        {
+            float x2 = i;
+            float y2 = CoughFunction(i);
+            Keyframe keyframe = new Keyframe(x2, y2);
+            if (firstTime)
+                coughCurve.AddKey(keyframe);
+            else
+            {
+                coughCurve.MoveKey(cnt, keyframe);
+                cnt++;
+            }
+        }
     }
 }
