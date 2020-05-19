@@ -2,14 +2,15 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using System;
+
 
 public class GameManager : MonoBehaviour
 {
     public static GameManager instance;
     public float gameDuration = 60f;
-    public List<Bot> listBots = new List<Bot>();
-    public List<Hospital> listHospitals = new List<Hospital>();
-    public List<ActionPlace> desks;
+    public float timeScale = 1;
+
 
     public AnimationCurve infectionCurve; // click on this in the inspector while the game in running
     public AnimationCurve coughCurve;
@@ -18,37 +19,20 @@ public class GameManager : MonoBehaviour
     int currentlyInfected = 0;
     private Text textPercentage;
 
-    public void AddBot(Bot bot)
-    {
-        if (listBots.Find(x => x == bot) == null) // if bot is not in the list, then I add it into the list
-        {
-            listBots.Add(bot);
-        }
-    }
 
-
-    int CountNumberInfected()
-    {
-        int cnt = 0;
-        foreach (Bot bot in listBots)
-        {
-            if (bot.infectionLevel > 0)
-                cnt++;
-        }
-
-        return cnt;
-    }
-
-    // Start is called before the first frame update
     void Awake()
     {
-        //Time.timeScale = 2.5f;
+        Debug.Log("called awake");
         if (instance == null)
             instance = this;
         infectionCurve = new AnimationCurve();
         coughCurve = new AnimationCurve();
+        ActionPlace.ClearDict();
+        Bot.ClearBots();
         
     }
+
+
 
     void Start()
     {
@@ -61,12 +45,14 @@ public class GameManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        Time.timeScale = timeScale;
         if(Time.time > gameDuration)
             Debug.Break();
-        if (currentlyInfected != CountNumberInfected())
+        int infected = Bot.CountNumberInfected();
+        if (currentlyInfected != infected)
         {
             float x2 = Time.time;
-            int y2 = CountNumberInfected();
+            int y2 = infected;
             Keyframe newKeyFrame = new Keyframe(x2, y2);
             // just for UI, draw a function in the animation curve
             if (currentlyInfected == 0)
@@ -86,9 +72,9 @@ public class GameManager : MonoBehaviour
                 infectionCurve.AddKey(lastKeyFrame);
             }
 
-            currentlyInfected = CountNumberInfected();
+            currentlyInfected = infected;
             float percentage =
-                currentlyInfected * 1.0f / listBots.Count *
+                currentlyInfected * 1.0f / Bot.listBots.Count *
                 100; // 100% means all infected, 50% means half of them are infected
             if (textPercentage != null)
             {

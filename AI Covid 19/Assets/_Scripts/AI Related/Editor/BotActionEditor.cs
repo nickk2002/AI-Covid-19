@@ -16,35 +16,43 @@ public class BotActionEditor : PropertyDrawer
     bool foldout = false;
     Rect rectSetPosition;
     Rect rectSnap;
+    Rect rectPos;
     float lungime;
     public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
     {
         if (foldout)
         {
-            return rectSnap.y + 20;
+            return 180;
         }
         return base.GetPropertyHeight(property, label);
     }
     public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
     {
+        Debug.Log("Entering on gui");
         EditorGUI.BeginProperty(position, label, property);
         //position = EditorGUI.PrefixLabel(position, GUIUtility.GetControlID(FocusType.Passive),new GUIContent(label));
-        foldout = EditorPrefs.GetBool("expandAction");
         foldout = EditorGUI.Foldout(new Rect(position.x,position.y,position.width,15), foldout, label.text);
-        EditorPrefs.SetBool("expandAction",foldout);
+
         if(foldout == true)
         {
+            property.serializedObject.ApplyModifiedProperties();
             var aduna = 20;
             var probability = property.FindPropertyRelative("probability");
+            
             var stopDistance = property.FindPropertyRelative("stopDistance");
             var rectprob = new Rect(position.x, position.y + 20, position.width, 16);
             var rectstopDistance = new Rect(rectprob.x, rectprob.y + aduna, position.width, 16);
+
             var targetT = property.FindPropertyRelative("targetTransform");
-            
             var rectTransfrom = new Rect(position.x, rectstopDistance.y + aduna, position.width, 16f);
+
             var botPosition = property.FindPropertyRelative("position");
-            var rectPos = new Rect(rectTransfrom.x, rectTransfrom.y + aduna, position.width, 16);
-            rectSetPosition = new Rect(rectPos.x, rectPos.y + aduna, position.width, 16);
+            rectPos = new Rect(rectTransfrom.x, rectTransfrom.y + aduna, position.width, 16);
+
+            var place = property.FindPropertyRelative("place");
+            var rectPlace = new Rect(rectPos.x, rectPos.y + aduna * 2, position.width, 16);
+            
+            rectSetPosition = new Rect(rectPlace.x, rectPlace.y + aduna, position.width, 16);
             var botRotation = property.FindPropertyRelative("rotation");
             lungime = rectSetPosition.y + aduna;
 
@@ -62,15 +70,29 @@ public class BotActionEditor : PropertyDrawer
             EditorGUI.PropertyField(rectstopDistance, stopDistance);
             EditorGUI.PropertyField(rectTransfrom, targetT);
             EditorGUI.PropertyField(rectPos, botPosition);
+            EditorGUI.PropertyField(rectPlace, place);
+            lungime = 140;
 
 
             Bot ceva = GetParent(property) as Bot;
             GameObject go = ceva.gameObject;
             BotAction action = fieldInfo.GetValue(property.serializedObject.targetObject) as BotAction;
 
-            if (GUI.Button(rectSetPosition,"Set Bot Relative Position"))
+            lungime += aduna;
+            if (action.targetTransform != null)
             {
-                
+                GameObject targetGameobject = action.targetTransform.gameObject;
+                if (targetGameobject.GetComponent<ActionPlace>() == null)
+                {
+                    targetGameobject.AddComponent<ActionPlace>();
+                    Debug.Log("addint action by editor script");
+                }
+                ActionPlace targetPlace = targetGameobject.GetComponent<ActionPlace>();
+                targetPlace.type = action.place;
+            }
+            if (GUI.Button(rectSetPosition, "Set Bot Relative Position"))
+            {
+
                 if (action.targetTransform == null)
                 {
                     botPosition.vector3Value = go.transform.position;
@@ -82,15 +104,15 @@ public class BotActionEditor : PropertyDrawer
                 botRotation.quaternionValue = go.transform.rotation;
             }
             rectSnap = new Rect(rectPos.x, rectSetPosition.y + aduna, position.width, 16);
-            if (GUI.Button(rectSnap,"Snap Object To Position"))
+            if (GUI.Button(rectSnap, "Snap Object To Position"))
             {
                 //Debug.Log("the position is now : " )
                 Vector3 snap = botPosition.vector3Value + action.targetTransform.position;
                 Debug.Log("Going to put him at position : " + snap);
                 go.transform.position = action.position + action.targetTransform.position;
+                go.transform.rotation = action.rotation;
             }
-            if (GUI.changed)
-                EditorUtility.SetDirty(fieldInfo.GetValue(property.serializedObject.targetObject) as UnityEngine.Object);
+
         }
         EditorGUI.EndProperty();
     }

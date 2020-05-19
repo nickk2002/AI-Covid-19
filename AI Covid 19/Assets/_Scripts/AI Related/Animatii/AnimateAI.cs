@@ -6,7 +6,7 @@ using UnityEngine.AI;
 
 public class AnimateAI : MonoBehaviour
 {
-   public float turnMulitplyer = 5;
+    [SerializeField] float turnMulitplyer = 5;
     NavMeshAgent agent;
     Animator animator;
     float angle;
@@ -22,7 +22,7 @@ public class AnimateAI : MonoBehaviour
     }
     void Move(Vector3 direction)
     {
-        if (!agent.hasPath || agent.isStopped == true)
+        if (!agent.hasPath || agent.isStopped == true || agent.enabled == false)
         {
             UpdateAnimator(0, 0);
         }
@@ -61,7 +61,9 @@ public class AnimateAI : MonoBehaviour
             transform.position = animator.rootPosition;
         }
         else
+        {
             transform.position = agent.nextPosition;
+        }
         transform.rotation = animator.rootRotation;
     }
     private void OnDrawGizmos()
