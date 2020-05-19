@@ -4,56 +4,113 @@ using UnityEngine;
 using UnityEditor;
 using System.Reflection;
 using UnityEngine.SceneManagement;
+using System.IO;
+using System.Linq;
+using System;
 
 [CustomEditor(typeof(Bot))]
+[CanEditMultipleObjects]
 public class CustomBot : Editor
 {
     bool foldout;
     bool generalSettings;
-    List<string> fieldsArray = new List<string>();
-    List<FieldInfo> actionArray = new List<FieldInfo>();
     Bot bot;
-    bool start;
+    bool upToDate;
+
 
     private void OnEnable()
     {
         bot = (Bot)target; // set the bot target
-        Debug.Log("added listener");
+        Debug.Log("call on enable on the custom bot");
         LoadEveryThing();
     }
+
     void LoadEveryThing()
     {
         // keep foldouts the way they were before
         foldout = EditorPrefs.GetBool("foldout");
         generalSettings = EditorPrefs.GetBool("general");
 
-        // Debug.Log(bot.name + "in enabled");
-        // reset fields and action arrays
-        fieldsArray.Clear();
-        actionArray.Clear();
-        /// use refelction to fill action array and fields array
+        Debug.Log(bot.name);
+        bot.SetUpReflection();
+    }
+    void ListLoading()
+    {
+        int index = 0;
+        SerializedProperty toggleListProperty = serializedObject.FindProperty("toggleList"); // get the toggle list
+        bot.ClearList();
 
-        
-        foreach (FieldInfo field in typeof(Bot).GetFields(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Default))
+        Debug.Log("loading the list");
+        foreach (BotAction action in bot.reflectionActions)
         {
-            string nume = field.Name;
-            if (nume.EndsWith("Action") && field.FieldType == typeof(BotAction) && field.IsPrivate == false)
+            if (index < bot.toggleList.Count)
             {
-                BotAction action = field.GetValue(bot) as BotAction;
-                FieldInfo nameField = typeof(BotAction).GetField("name");
-                nameField.SetValue(action, field.Name);
-                Debug.Log("now the name is : " + field.Name);
-                actionArray.Add(field);
-            }
-            else
-            {
-                fieldsArray.Add(nume);
+                // begin a horizontal allignment
+                GUILayout.BeginHorizontal();
+
+                // se the value of the toggle
+                if (index >= toggleListProperty.arraySize)
+                    return;
+                SerializedProperty toggleIndex = toggleListProperty.GetArrayElementAtIndex(index);
+                toggleIndex.boolValue = EditorGUILayout.Toggle(toggleIndex.boolValue, GUILayout.Width(16));
+                var item = bot.toggleList[index];
+
+                index++;/// increase the index
+
+                GUILayout.Space(10); // ad some space
+                string name = action.name; // get the name of the action
+
+                if (item == true)
+                {
+                    // draw the expandable action
+                    bot.AddAction(action);
+                    Debug.Log("serializing : " + action.name);
+                    EditorGUILayout.PropertyField(serializedObject.FindProperty(name), GUILayout.MinWidth(100));
+                }
+                else
+                {
+                    // draw a label
+                    bot.RemoveAction(action);
+                    Debug.Log(name);
+                    string actualName = char.ToUpper(name[0]) + name.Substring(1);
+                    EditorGUILayout.LabelField(actualName);
+                }
+                GUILayout.EndHorizontal();
             }
         }
+        serializedObject.ApplyModifiedProperties();
     }
+    void DrawImage()
+    {
+        // draw Texturee
+        Texture texture;
+        string text;
+        if (bot.reflectionActions.SequenceEqual(SaveSystem.LoadBotActions()))
+        {
+            texture = Resources.Load("tick") as Texture;
+            upToDate = true;
+            text = "Everything up to date";
+        }
+        else
+        {
+            texture = Resources.Load("cross") as Texture;
+            upToDate = false;
+            text = "Not up to date";
+        }
+
+        GUILayout.BeginHorizontal();
+        GUILayout.Box(texture);
+        GUILayout.BeginVertical();
+        GUILayout.Space(10);
+        GUILayout.Label(text);
+        GUILayout.EndVertical();
+        GUILayout.EndHorizontal();
+        GUILayout.Space(10);
+    }
+
+
     public override void OnInspectorGUI()
     {
-      
         serializedObject.Update();
 
         // draw script gui
@@ -64,76 +121,41 @@ public class CustomBot : Editor
         //draw foldout
         foldout = EditorGUILayout.Foldout(foldout, "Behaviour Settings");
         EditorPrefs.SetBool("foldout", foldout);
-
+        serializedObject.Update();
         if (foldout)
         {
-            // make sure the bot toggle size matches the actionArray size
-            if (bot.toggleList.Count < actionArray.Count)
+            DrawImage();
+            ListLoading();
+            if (!upToDate && GUILayout.Button("Save Preset"))
             {
-                int dif = actionArray.Count - bot.toggleList.Count;
-                for (int i = 1; i <= dif; i++)
-                {
-                    bot.toggleList.Add(false);
-                }
+                bot.SavePreset();
             }
-            int index = 0;
-            SerializedProperty toggleListProperty = serializedObject.FindProperty("toggleList"); // get the toggle list
-            bot.ClearList();
-            foreach (FieldInfo fieldInfo in actionArray)
+            if (!upToDate && GUILayout.Button("Revert changes"))
             {
-                if (index < bot.toggleList.Count)
-                {
-                    // begin a horizontal allignment
-                    GUILayout.BeginHorizontal();
-
-                    // se the value of the toggle
-                    SerializedProperty toggleIndex = toggleListProperty.GetArrayElementAtIndex(index);
-                    toggleIndex.boolValue = EditorGUILayout.Toggle(toggleIndex.boolValue, GUILayout.Width(16));
-                    var item = bot.toggleList[index];
-
-                    index++;/// increase the index
-
-                    GUILayout.Space(10); // ad some space
-                    string name = fieldInfo.Name; // get the name of the action
-                    
-                    BotAction actiune = (BotAction)fieldInfo.GetValue(bot);
-                    if (item == true)
-                    {
-                        // draw the expandable action
-                        bot.AddAction(actiune);
-                        EditorGUILayout.PropertyField(serializedObject.FindProperty(name), GUILayout.MinWidth(100));
-                    }
-                    else
-                    {
-                        // draw a label
-                        bot.RemoveAction(actiune);
-                        string actualName = char.ToUpper(name[0]) + name.Substring(1);
-                        EditorGUILayout.LabelField(actualName);
-                    }
-                    GUILayout.EndHorizontal();
-                }
+                bot.UpdatePreset();
             }
-            Debug.Log(bot.actionList.Count + "bot list");
-            serializedObject.ApplyModifiedProperties();
+            if (upToDate && GUILayout.Button("Update all other"))
+            {
+                bot.UpdateAllOthers();
+            }
         }
         generalSettings = EditorGUILayout.Foldout(generalSettings, "General Settings");
         EditorPrefs.SetBool("general", generalSettings);
         if (generalSettings)
         {
-            foreach (string name in fieldsArray)
+            foreach (string name in bot.reflectionFields)
             {
-                //Debug.Log("field name : " + name);
                 try
                 {
                     EditorGUILayout.PropertyField(serializedObject.FindProperty(name), true);
                 }
-                catch
+                catch (NullReferenceException)
                 {
                     continue;
                 }
             }
         }
         serializedObject.ApplyModifiedProperties();
-
+        //DrawDefaultInspector();
     }
 }
