@@ -28,8 +28,8 @@ public class InfectedUI : MonoBehaviour
     void Update()
     {
         if (imageDisplay != null)
-        {
-            Vector3 position = Player.Instance.mainCamera.WorldToScreenPoint(transform.position);
+        {   
+            Vector3 position = Camera.main.WorldToScreenPoint(transform.position);
             if (position.z < 0)
             {
                 imageDisplay.SetActive(false);
