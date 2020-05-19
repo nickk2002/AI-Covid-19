@@ -1,20 +1,15 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using UnityEditor;
 using UnityEngine;
+using UnityEngine.Events;
 
 public class PreviewAnimation : MonoBehaviour
 {
-    public string animationName;
-    Animator animator;
-
-    private void OnDrawGizmos()
+    public static int numar = 0;
+    private void Start()
     {
-        //if (animator == null)
-        //{
-        //    animator = GetComponent<Animator>();
-        //    animator.Play(animationName);
-        //    animator.speed = 0;
-        //}
-        //animator.Update(Time.deltaTime);
+        numar += 5;
+        Debug.Log("numarul este " + numar);
     }
 }

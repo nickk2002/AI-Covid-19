@@ -509,6 +509,7 @@ SkinnedMeshRenderer:
   m_MotionVectors: 1
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -670,6 +671,7 @@ SkinnedMeshRenderer:
   m_MotionVectors: 1
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -998,6 +1000,7 @@ SkinnedMeshRenderer:
   m_MotionVectors: 1
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -1709,12 +1712,12 @@ NavMeshAgent:
   m_AgentTypeID: 0
   m_Radius: 0.5
   m_Speed: 1
-  m_Acceleration: 8
+  m_Acceleration: 1
   avoidancePriority: 50
   m_AngularSpeed: 120
   m_StoppingDistance: 0
   m_AutoTraverseOffMeshLink: 1
-  m_AutoBraking: 1
+  m_AutoBraking: 0
   m_AutoRepath: 1
   m_Height: 2
   m_BaseOffset: 0
@@ -1731,7 +1734,7 @@ CapsuleCollider:
   m_IsTrigger: 0
   m_Enabled: 1
   m_Radius: 0.25742963
-  m_Height: 1.9097542
+  m_Height: 2.12
   m_Direction: 1
   m_Center: {x: -0.028424453, y: 0.87793696, z: -4.3728743e-11}
 --- !u!114 &5262784027839207880
@@ -1746,82 +1749,84 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a4377aa04b8e88741a611c0bdf52be12, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  toggleList: 000100000000
+  actionName: 
+  toggleList: 010101010101
   actionList:
   - probability: 1
-    stopDistance: 0
+    stopDistance: 2
     targetTransform: {fileID: 0}
     position: {x: 0, y: 0, z: 0}
     rotation: {x: 0, y: 0, z: 0, w: 0}
+    name: washHandsAction
+    place: 0
+  - probability: 0.8
+    stopDistance: 3
+    targetTransform: {fileID: 0}
+    position: {x: 0, y: -0.339, z: 0}
+    rotation: {x: 0, y: 0, z: 0, w: 0}
+    name: typingAction
+    place: 0
+  - probability: 0.8
+    stopDistance: 4
+    targetTransform: {fileID: 0}
+    position: {x: 0, y: 0, z: 0}
+    rotation: {x: 0, y: 0, z: 0, w: 0}
+    name: lookAtSphereAction
+    place: 0
+  currentState: 0
   washHandsAction:
-    probability: 0
-    stopDistance: 0
-    targetTransform: {fileID: 0}
-    position: {x: 0, y: 0, z: 0}
-    rotation: {x: 0, y: 0, z: 0, w: 0}
-  typingAction:
     probability: 1
-    stopDistance: 0
+    stopDistance: 2
     targetTransform: {fileID: 0}
     position: {x: 0, y: 0, z: 0}
     rotation: {x: 0, y: 0, z: 0, w: 0}
-  cookingAction:
-    probability: 0
-    stopDistance: 0
+    name: washHandsAction
+    place: 0
+  typingAction:
+    probability: 0.8
+    stopDistance: 3
     targetTransform: {fileID: 0}
-    position: {x: 0, y: 0, z: 0}
+    position: {x: 0, y: -0.339, z: 0}
     rotation: {x: 0, y: 0, z: 0, w: 0}
-  eatingAction:
-    probability: 0
-    stopDistance: 0
-    targetTransform: {fileID: 0}
-    position: {x: 0, y: 0, z: 0}
-    rotation: {x: 0, y: 0, z: 0, w: 0}
-  hospitalAction:
-    probability: 0
-    stopDistance: 0
-    targetTransform: {fileID: 0}
-    position: {x: 0, y: 0, z: 0}
-    rotation: {x: 0, y: 0, z: 0, w: 0}
+    name: typingAction
+    place: 0
   lookAtSphereAction:
-    probability: 0
-    stopDistance: 0
+    probability: 0.8
+    stopDistance: 4
     targetTransform: {fileID: 0}
     position: {x: 0, y: 0, z: 0}
     rotation: {x: 0, y: 0, z: 0, w: 0}
+    name: lookAtSphereAction
+    place: 0
   alreadyInfected: 0
-  head: {fileID: 0}
-  sociableLevel: 0
+  head: {fileID: 4924908511305285123}
+  sociableLevel: 10
   immunityLevel: 0
-  cautiousLevel: 0
-  viewAngle: 60
-  viewDistance: 30
-  drawLines: 0
-  realSightView: 0
-  inMeeting: 0
-  talking: 0
-  meetingBot: {fileID: 0}
-  offsetMeeting: 5
-  cooldownMeeting: 60
-  talkDuration: 0
-  currentTalkTime: 0
-  randomLocations: 0
+  cautiousLevel: 36
+  infectionDist: 10
+  infectionLevel: 0
+  randomLocations: 1
   randomRange: 10
   stoppingDistance: 3
   patrolPositions: []
   posHolder: {fileID: 0}
-  infectionLevel: 0
   infectionSpeed: 0.1
   growthInterval: 3
+  cured: 0
+  offsetMeeting: 0.5
+  cooldownMeeting: 6
+  inMeeting: 0
+  talking: 0
+  meetingBot: {fileID: 0}
+  talkDuration: 0
+  currentTalkTime: 0
   coughInterval: 0
   currentCoughTime: 0
-  infectionDist: 10
+  viewAngle: 61
+  viewDistance: 12
+  drawLines: 0
+  realSightView: 0
   PlaceHolderInfectedUI: {fileID: 0}
-  cured: 0
-  currentState: 5
-  loadEvent:
-    m_PersistentCalls:
-      m_Calls: []
 --- !u!54 &4924908511305285124
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -1848,11 +1853,11 @@ NavMeshObstacle:
   m_Enabled: 0
   serializedVersion: 3
   m_Shape: 1
-  m_Extents: {x: 0.665, y: 0.5, z: 0.665}
+  m_Extents: {x: 0.25, y: 0.25, z: 0.25}
   m_MoveThreshold: 0.1
   m_Carve: 1
   m_CarveOnlyStationary: 0
-  m_Center: {x: 0, y: 0.5, z: 0}
+  m_Center: {x: 0, y: 0.1, z: 0}
   m_TimeToStationary: 0.5
 --- !u!114 &4924908511305285126
 MonoBehaviour:
@@ -1866,7 +1871,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: df4e7c2dd700a1a42a2db69c10eb7467, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  turnMulitplyer: 5
+  turnMulitplyer: 2
 --- !u!1 &4927356860475837030
 GameObject:
   m_ObjectHideFlags: 0
@@ -2054,6 +2059,7 @@ SkinnedMeshRenderer:
   m_MotionVectors: 1
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -2330,6 +2336,7 @@ SkinnedMeshRenderer:
   m_MotionVectors: 1
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -2445,6 +2452,7 @@ SkinnedMeshRenderer:
   m_MotionVectors: 1
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -2775,6 +2783,7 @@ SkinnedMeshRenderer:
   m_MotionVectors: 1
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
