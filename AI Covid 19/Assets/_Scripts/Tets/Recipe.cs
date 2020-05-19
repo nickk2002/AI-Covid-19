@@ -9,6 +9,7 @@ public class Ingredient
 {
     public string name;
     public int amount = 1;
+
     public IngredientUnit unit;
 }
 

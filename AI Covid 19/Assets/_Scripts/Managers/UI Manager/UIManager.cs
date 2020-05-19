@@ -16,9 +16,12 @@ public class UIManager : MonoBehaviour
         if (Instance == null)
             Instance = this;
         if (canvas == null)
+
+
         {
             Debug.LogError("Canvas not set in UI Manager");
         }
+
     }
 
     // Update is called once per frame
