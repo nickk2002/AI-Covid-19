@@ -4,6 +4,7 @@ using System;
 
 public class Hospital : MonoBehaviour
 {
+    public static List<Hospital> listHospitals = new List<Hospital>();
     public List<Transform> beds = new List<Transform>();
     public bool[] occupiedBeds;
 
@@ -46,7 +47,7 @@ public class Hospital : MonoBehaviour
     {
         if (beds.Count == 0)
             Debug.LogError("Beds not set for hospital");
-        GameManager.instance.listHospitals.Add(this);
+        listHospitals.Add(this);
         occupiedBeds = new bool[beds.Count];
     }
 

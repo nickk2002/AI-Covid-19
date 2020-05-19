@@ -64,7 +64,7 @@ public class Player : MonoBehaviour
     }
     void TryInfectSomeone()
     {
-        foreach(Bot bot in GameManager.instance.listBots)
+        foreach(Bot bot in Bot.listBots)
         {
             /// daca nu este infectat si este in distanta potrivita atunci il infecteaza
             if (bot.infectionLevel == 0 && CanInfect(bot))

@@ -8,11 +8,13 @@ using System.Collections;
 using System.Reflection;
 using System.Linq;
 using UnityEditor;
+using UnityEngine.Scripting;
 using UnityEngine.Events;
 
 [Serializable]
 public enum State
 {
+    None,
     Patrol,
     Meet,
     Typing,
@@ -24,18 +26,20 @@ public enum State
 [Serializable]
 public class BotAction : IEquatable<BotAction>
 {
+
     public float probability;
     public float stopDistance;
     public Transform targetTransform;
     public Vector3 position;
     public Quaternion rotation;
     public string name;
+    public Place place;
 
-    public override int GetHashCode()
+    public bool Equals(BotAction other)
     {
-        return probability.GetHashCode() ^ stopDistance.GetHashCode() ^ targetTransform.GetHashCode() ^ position.GetHashCode();
+        return (probability == other.probability && stopDistance == other.stopDistance && targetTransform == other.targetTransform
+            && name == other.name);
     }
-    public bool Equals(BotAction other) => GetHashCode() == other.GetHashCode();
 }
 
 
@@ -44,27 +48,20 @@ public class BotAction : IEquatable<BotAction>
 // the core component of the AI 400+ lines of code, so it will take a while to read everything
 public class Bot : MonoBehaviour
 {
-    public string actionName = "No Action";
-    public List<bool> toggleList = new List<bool>();
-    public List<BotAction> actionList = new List<BotAction>();
-
     #region public vars
-    public BotAction washHandsAction = new BotAction
-    {
-    };
-    public BotAction typingAction = new BotAction
-    {
-    };
-    public BotAction cookingAction = new BotAction
-    {
-    };
-    public BotAction eatingAction = new BotAction
-    {
-    };
-    public BotAction hospitalAction = new BotAction
-    {
-    };
-    public BotAction lookAtSphereAction = new BotAction();
+    public static List<Bot> listBots = new List<Bot>();
+    [ShowOnly,SerializeField] string actionName = "No Action";
+
+    [NonSerialized] public List<BotAction> reflectionActions /*{ get; private set; }*/ = new List<BotAction>();
+    [NonSerialized] public List<string> reflectionFields /*{ get; private set; }*/ = new List<string>();
+    [HideInInspector] public List<bool> toggleList = new List<bool>();
+    [HideInInspector] public List<BotAction> actionList = new List<BotAction>();
+
+    public State currentState;
+    public BotAction washHandsAction = new BotAction { };
+    public BotAction typingAction = new BotAction { };
+    public BotAction lookAtSphereAction = new BotAction { };
+
     [Header("General")]
     [Tooltip("This is setting can be used for play testing")]
     // I use header to make a nice looking inspector, and SerializeField to make private variables be visible in the inspector
@@ -77,66 +74,62 @@ public class Bot : MonoBehaviour
                                         // develop differently according to the immunityLevel, if it is low(1,2 for ex), then the virus will grow fast, if the immunityLevel is 10
                                         // then the infection will grow slow
     [SerializeField] int cautiousLevel; // how aware he is of the virus -> he avoids others and goes to the doctor when there are symtomps
-    // level 1 means that he behaves normal, he does nothing special to protect him, level 10 -> keeps distance between others.and goes to the doctor
-    // as soon as he has symptoms of the illness (coughing at the moment)
-    // level 5 is in the middle
-    // Quick recap :)
-    // sociability -> Influences the probability of two bots meeting.
-    // Two bots can meet under two conditions : they see each other and their sociableLevel is taken into a probability (see TryMeetBot)
-    // Immunity -> how fast/slow the disease develops
+    [SerializeField] float infectionDist = 10; // if this bot coughs, the distance of the virus transmission
+                                               // level 1 means that he behaves normal, he does nothing special to protect him, level 10 -> keeps distance between others.and goes to the doctor
+                                               // as soon as he has symptoms of the illness (coughing at the moment)
+                                               // level 5 is in the middle
+                                               // Quick recap :)
+                                               // sociability -> Influences the probability of two bots meeting.
+                                               // Two bots can meet under two conditions : they see each other and their sociableLevel is taken into a probability (see TryMeetBot)
+                                               // Immunity -> how fast/slow the disease develops
+    [ShowOnly] public float infectionLevel;// from 1 to 10
 
-    [Header("Bot view")] 
-    [SerializeField] int viewAngle = 60; /// the angle a bot can see
-    [SerializeField] float viewDistance = 30; // the distance(TODO : sociabalLevel should influence viewDistance) (rezolvat in Start())
-
-
-    [Header("Line drawing gizmos")]
-    [SerializeField] bool drawLines = false;// if you want to draw in the scene the line of sight for each bot
-    [SerializeField] bool realSightView = false;// if you want to draw in the scene the accurate line of sight(influenced by walls etc)
-
-    [Header("Meeting Settings")]
-    [SerializeField] bool inMeeting = false;// if this bot is currently on the way to meet another bot
-    [SerializeField] bool talking = false;// if the bot is talking (no animations yet)
-    [SerializeField] Bot meetingBot; // shows in the inspector who is the dialog partner, there is no need to modify it in the inspector
-    [SerializeField] float offsetMeeting = 5;// an offset which says the distance between them when they are talking
-    [SerializeField] float cooldownMeeting = 60;// after this bot has left the meeting he has a cooldown untill he finds another meeting
-                                                // TODO : make cooldownMeeting be determined by sociableLevel ( rezolvat in Start)
-                                                // is set by the AIManger initially, can be modified in inspector
-    
-    [Header("Talk Seetings")]
-    [SerializeField] int talkDuration = 0; // talk duration
-    [SerializeField] float currentTalkTime = 0; // the current elasped time of talking (here for debugging)
-    
-    [Header("Patrol type")]
+    // you create an empty object with any name you want, then create empty children that represent actual patrol positions
+    // assign you empty object to posHolder in the inspector (see BasicScene.unity for details)
+    [Header("Patrol Settings")]
     [SerializeField] bool randomLocations = false; // if he uses randomLocations
     [SerializeField] float randomRange = 10f;// the range of the random
     [SerializeField] float stoppingDistance = 3f;// the distance in which the agent stops and moves to the next position
     [SerializeField] GameObject[] patrolPositions;// array holding patrol positions
     [SerializeField] GameObject posHolder; // This is used for an easier way to set patrol points
-    // you create an empty object with any name you want, then create empty children that represent actual patrol positions
-    // assign you empty object to posHolder in the inspector (see BasicScene.unity for details)
 
     [Header("Infection")]
-    public float infectionLevel;// from 1 to 10
     [SerializeField] float infectionSpeed = 0.1f;
     [SerializeField] float growthInterval = 3; /// infection grows by 1 unit every three seconds
+    [ShowOnly] public bool cured = false;
+
+    [Header("Meeting Settings")]
+    [SerializeField] float offsetMeeting = 5;// an offset which says the distance between them when they are talking
+    [SerializeField] float cooldownMeeting = 60;// after this bot has left the meeting he has a cooldown untill he finds another meeting
+                                                // TODO : make cooldownMeeting be determined by sociableLevel ( rezolvat in Start)
+                                                // is set by the AIManger initially, can be modified in inspector
+    [ShowOnly,SerializeField] bool inMeeting = false;// if this bot is currently on the way to meet another bot
+    [ShowOnly,SerializeField] bool talking = false;// if the bot is talking (no animations yet)
+    [ShowOnly,SerializeField] Bot meetingBot; // shows in the inspector who is the dialog partner, there is no need to modify it in the inspector
+
+    [Header("Talk Seetings")]
+    [ShowOnly,SerializeField] int talkDuration = 0; // talk duration
+    [ShowOnly,SerializeField] float currentTalkTime = 0; // the current elasped time of talking (here for debugging)
+    
 
     [Header("Coughing")]
-    [SerializeField] float coughInterval; // random value between [maxCoughInverval,minCoughInterval]
-    [SerializeField] float currentCoughTime = 0; // do not change
-    [SerializeField] float infectionDist = 10; // if this bot coughs, the distance of the virus transmission
-    
+    [ShowOnly,SerializeField] float coughInterval; // random value between [maxCoughInverval,minCoughInterval]
+    [ShowOnly,SerializeField] float currentCoughTime = 0; // do not change
+
+    [Header("Bot view")]
+
+    [ShowOnly, SerializeField] int viewAngle = 60; /// the angle a bot can see
+    [ShowOnly, SerializeField] float viewDistance = 30; // the distance(TODO : sociabalLevel should influence viewDistance) (rezolvat in Start())
+    [SerializeField] bool drawLines = false;// if you want to draw in the scene the line of sight for each bot
+    [SerializeField] bool realSightView = false;// if you want to draw in the scene the accurate line of sight(influenced by walls etc)
     // if bot1 coughs and bot2 is in 10m distance then bot2 gets infected too
 
     [Header("UI")]
-    public GameObject PlaceHolderInfectedUI; // for the circle UI
+    [SerializeField] GameObject PlaceHolderInfectedUI; // for the circle UI
     
 
-
-    public bool cured = false;
-    public State currentState;
     #endregion
-
+    private State lastState = State.None;
     private NavMeshObstacle obstacle;
     private Animator animator;// animator
     private NavMeshAgent agent;// navmeshagent (if you don't know much about it it's easy) . all the functions are intuitive
@@ -149,7 +142,7 @@ public class Bot : MonoBehaviour
     private bool startPatroling;
     
     private int bedIndex;
-    private Vector3 bedPosition;
+    private Vector3 bedPosition;    
     private Hospital hospital;
     private ActionPlace lastPlace;
 
@@ -158,15 +151,90 @@ public class Bot : MonoBehaviour
     float lastFinishedAnyActionTime = 0;
     private BotAction currentAction = null;
 
-
     private bool startAction;
-    private bool actionPending;
+    private bool actionPathPending;
 
     private InfectedUI ui;
 
-    #region actionList
+    public static int CountNumberInfected()
+    {
+        int cnt = 0;
+        foreach(Bot bot in listBots)
+        {
+            if (bot.infectionLevel > 0)
+                cnt++;
+        }
+        return cnt;
+    }
+
+    #region actionList save/update add clear
     public void ClearList() { 
         actionList.Clear();
+    }
+    public void SetUpReflection()
+    {
+        if (toggleList.Count < reflectionActions.Count)
+        {
+            int dif = reflectionActions.Count - toggleList.Count;
+            for (int i = 1; i <= dif; i++)
+            {
+                toggleList.Add(false);
+            }
+        }
+        foreach (FieldInfo field in typeof(Bot).GetFields(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Default))
+        {
+            string nume = field.Name;
+            if (nume.EndsWith("Action") && field.FieldType == typeof(BotAction) && field.IsPrivate == false)
+            {
+                BotAction action = field.GetValue(this) as BotAction;
+                action.name = nume;
+                field.SetValue(this, action);
+                
+                if (reflectionActions.Contains(action) == false)
+                {
+                    
+                    reflectionActions.Add(action);
+                }
+            }
+            else
+            {
+                if(reflectionFields.Contains(nume) == false)
+                    reflectionFields.Add(nume);
+            }
+        }
+        Debug.Log("There are " + reflectionActions.Count);
+    }
+    public void SavePreset()
+    {
+        SaveSystem.SaveBotAsJson(reflectionActions);
+    }
+    public void UpdatePreset()
+    {
+        reflectionActions = SaveSystem.LoadBotActions();
+        FieldInfo[] fields = typeof(Bot).GetFields(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Default);
+        int i = 0;
+        foreach (FieldInfo field in fields)
+        {
+            if (field.Name.EndsWith("Action") && field.FieldType == typeof(BotAction) && field.IsPrivate == false)
+            {
+                BotAction action = field.GetValue(this) as BotAction;
+                field.SetValue(this, reflectionActions[i++]);
+                if (PrefabUtility.GetPrefabInstanceHandle(gameObject) != null)
+                    PrefabUtility.ApplyPrefabInstance(gameObject, InteractionMode.UserAction);
+            }
+        }
+    }
+    public void UpdateAllOthers()
+    {
+        var list = FindObjectsOfType<Bot>();
+        foreach (var item in list)
+        {
+            if (item != null && item != this)
+            {
+                item.UpdatePreset();
+
+            }
+        }
     }
     public void AddAction(BotAction action)
     {
@@ -187,16 +255,20 @@ public class Bot : MonoBehaviour
     }
     private int CompareAction(BotAction a, BotAction b)
     {
+       
         // pt a compara botii a si b in functie de distanta. returneaza bot-ul cel mai apropiat de cel curent
         float pa = a.probability;
         float pb = b.probability;
         if (pa == pb)
             return 0;
-        if (pa > pb)
+        if (pa < pb)
             return -1; // botul a
         else
             return 1; // botul b
     }
+
+
+
     #endregion
     void SetUpPosHolder()
     {
@@ -220,40 +292,11 @@ public class Bot : MonoBehaviour
             randomLocations = true;
         }
     }
-
-    // Start is called before the first frame update
-    void Start()
+    public static void ClearBots()
     {
-        currentState = State.AnyAction;
-        GameManager.instance.AddBot(this); // pun in Gamemanager bot-ul
-
-        cooldownMeeting = AIManager.instance.maxMeetingCooldown / sociableLevel;
-        float ratie = (AIManager.instance.maxViewDistance - AIManager.instance.minViewDistance) / 9f; 
-        viewDistance = AIManager.instance.minViewDistance + (sociableLevel - 1) * ratie;
-
-        agent = GetComponent<NavMeshAgent>(); // iau Navmesh Agentul
-        animator = GetComponent<Animator>(); // iau animatorul
-        obstacle = GetComponent<NavMeshObstacle>(); // iau obstacolul ca sa il activez atunci cand vorbesc si se opresc
-        obstacle.enabled = false;
-        agent.autoBraking = false; // sa nu se opreasca cand se aproprie de destinatie
-
-        if (head == null)
-            head = gameObject;
-        if(PlaceHolderInfectedUI != null)
-            ui = PlaceHolderInfectedUI.GetComponent<InfectedUI>();
-        SetUpPosHolder();
-        if (alreadyInfected == true)
-        {
-            StartInfection();
-        }
+        listBots.Clear();
     }
-    public static int GetListenerNumber(UnityEventBase unityEvent)
-    {
-        var field = typeof(UnityEventBase).GetField("m_Calls", BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.DeclaredOnly);
-        var invokeCallList = field.GetValue(unityEvent);
-        var property = invokeCallList.GetType().GetProperty("Count");
-        return (int)property.GetValue(invokeCallList);
-    }
+
     Vector3 RandomLoc()
     {
         // locatie random pentru mapa mare.de 1000 * 1000 Scena : AISimulations
@@ -307,6 +350,7 @@ public class Bot : MonoBehaviour
     {
         // pt a compara botii a si b in functie de distanta. returneaza bot-ul cel mai apropiat de cel curent
         float dista = Vector3.Distance(transform.position, a.gameObject.transform.position);
+
         float distb = Vector3.Distance(transform.position, b.gameObject.transform.position);
         if (dista == distb)
             return 0;
@@ -319,7 +363,7 @@ public class Bot : MonoBehaviour
     {
         
         List<Bot> possibleBots = new List<Bot>(); /// lista cu toti botii posibili
-        foreach(Bot partnerBot in GameManager.instance.listBots)
+        foreach(Bot partnerBot in Bot.listBots)
         {
             if(listIgnoredBots.Find(bot => bot.Item1 == partnerBot) != null)// daca botul partner bot este ignorat
             {
@@ -342,12 +386,13 @@ public class Bot : MonoBehaviour
                 && CanSeeObject(head.transform,partnerBot.head.transform,viewDistance,viewAngle) 
                 && CanSeeObject(partnerBot.head.transform,head.transform,partnerBot.viewDistance,partnerBot.viewAngle))
             {
+                Debug.Log("<color=red>Can see each other</color>");
                 possibleBots.Add(partnerBot);
             }
         }
         if (possibleBots.Count == 0)
             return; /// nu a vazut pe nimeni care sa fie disponibil
-        
+        Debug.Log("sunt : " + possibleBots.Count);
         possibleBots.Sort(CompareBot); /// sortez botii dupa distanta
 
         foreach (Bot partnerBot in possibleBots)
@@ -404,7 +449,7 @@ public class Bot : MonoBehaviour
         if (PlaceHolderInfectedUI != null /* && Vector3.Distance(transform.position,Player.Instance.mainCamera.transform.position) < 30f*/)
         {
             Vector3 desiredPos = transform.position + new Vector3(0,10,0);
-            Vector3 actualPos = Player.Instance.mainCamera.WorldToScreenPoint(desiredPos);
+            Vector3 actualPos = Camera.main.WorldToScreenPoint(desiredPos);
             if (actualPos.z > 0)
             {
                 ui.panel.transform.position = actualPos;
@@ -428,19 +473,11 @@ public class Bot : MonoBehaviour
 
     void TryInfectOtherBot()
     {
-        foreach(Bot possibleTarget in GameManager.instance.listBots)
+        foreach(Bot possibleTarget in Bot.listBots)
         {
             if (possibleTarget == this || possibleTarget.cured == true) // daca botul possibleTarget nu este botul curent si daca nu e vindecat deja  
                 continue;
-            /// daca botul este infectat momentan poate sa infecteze alt bot care nu este infectat intr-o anumita distanta
-            /// TODO : si daca il vede. de vazut cum functioneaza
-            // Varianta vechie bazzata doar pe distanta:
-            //float dist = Vector3.Distance(transform.position, possibleTarget.gameObject.transform.position);
-            //if(possibleTarget.infectionLevel == 0 && dist <= infectDist)
-            //{
-            //    possibleTarget.StartInfection();// incep infectia 
-            //}
-            // varianta noua:
+            // varianta noua bazata doar daca il vede
             if(possibleTarget.infectionLevel == 0 && CanSeeObject(transform,possibleTarget.transform, infectionDist, viewAngle))
             {
                 possibleTarget.StartInfection();
@@ -459,7 +496,7 @@ public class Bot : MonoBehaviour
         // daca coughInterval este 0, adica inainte era 0 acum il initalizez cu un random intre valmin si valmax
         if (coughInterval == 0)
         {
-            float coughVal = GameManager.instance.coughCurve.Evaluate(infectionLevel);// evaluate from gamemanager  function
+            float coughVal = AIManager.instance.coughCurve.Evaluate(infectionLevel);// evaluate from gamemanager  function
             coughInterval = UnityEngine.Random.Range(coughVal - 1, coughVal);// add a bit of random 
         }
         // if the bot is not currently coughing
@@ -468,7 +505,7 @@ public class Bot : MonoBehaviour
             // daca coughTime > coughInterval ( a trecut timpul de asteptat) 
             if (currentCoughTime > coughInterval)
             {
-                float coughVal = GameManager.instance.coughCurve.Evaluate(infectionLevel);// evaluate from a function
+                float coughVal = AIManager.instance.coughCurve.Evaluate(infectionLevel);// evaluate from a function
                 coughInterval = UnityEngine.Random.Range(coughVal - 1, coughVal);// add a bit of random 
                 currentCoughTime = 0; // reinitializez cronometrul          
                 animator.SetTrigger("cough");// vezi animator 
@@ -477,11 +514,10 @@ public class Bot : MonoBehaviour
             currentCoughTime += Time.deltaTime;// cronometrul creste cu Time.deltaTime
         }
     }
-    #endregion
     void EndMeeting(Bot bot)
     {
         // trebuie sa am grija sa resetez toate variabilele pentru amandoi botii, nu doar pentru unul dintr ei
-        bot.obstacle.enabled = false;
+        bot.obstacle.enabled = false;// obstacolul este fals
         bot.agent.enabled = true;
         bot.agent.isStopped = false;// ma asiugur ca navmeshagentul este activ si poate merge
         bot.inMeeting = false; // nu mai este in intalnire
@@ -536,32 +572,25 @@ public class Bot : MonoBehaviour
                 currentInfectionTime += Time.deltaTime;
         }
     }
+#endregion
+
     void EndAction()
     {
+        Debug.Log("ended action of whatever");
         lastFinishedAnyActionTime = Time.time;
         agent.isStopped = false;
         startAction = false;
-        actionPending = false;
+        actionPathPending = false;
         lastPlace.occupied = false;
+        lastPlace.bot = null;
     }
-    IEnumerator TypingCoroutine()
+    IEnumerator AbstractCoroutine(System.Action OnStart, System.Action OnEnd, float waitTime)
     {
-        int waitTime = UnityEngine.Random.Range(10, 15);
-        Debug.Log("start typing");
-        animator.SetBool("typing",true);
+        OnStart?.Invoke();
+        agent.isStopped = true;
         yield return new WaitForSeconds(waitTime);
-        animator.SetBool("typing", false);
-        EndAction();
-    }
-    IEnumerator WashingCoroutine()
-    {
-        yield return new WaitForSeconds(3f);
-        EndAction();
-    }
-    IEnumerator LookCoroutine()
-    {
-        transform.LookAt(currentAction.targetTransform);
-        yield return new WaitForSeconds(10f);
+        agent.isStopped = false;
+        OnEnd?.Invoke();
         EndAction();
     }
 
@@ -577,34 +606,109 @@ public class Bot : MonoBehaviour
             lista[n] = value;
         }
     }
+    bool FindNewAction()
+    {
+        if (actionList.Count > 0 && actionPathPending == false)
+        {
+            for (int i = 0; i < actionList.Count; i++)
+                Debug.Assert(actionList[i] != null,"actiunea este nula");
+            float random = 0.3f; // sa schimb in random mai incolo
+            actionList.Sort(CompareAction);
+
+            for (int i = 0; i < actionList.Count; i++)
+            {
+                BotAction action = actionList[i];
+                if (random < action.probability)
+                {
+                    Place place = action.place;
+                    Debug.Log("trying to go to place <color=green>" + place);
+                    RandomShuffle(ActionPlace.dictionary[place]);
+                    foreach (ActionPlace possiblePlace in ActionPlace.dictionary[place])
+                    {
+                        Debug.Assert(possiblePlace != null);
+                        if (possiblePlace.occupied == false && possiblePlace.bot == null && possiblePlace != lastPlace)
+                        {
+                            currentState = State.AnyAction;
+                            possiblePlace.occupied = true;
+                            possiblePlace.bot = this;
+                            lastPlace = possiblePlace;
+                            currentAction = action;
+
+                            currentDestination = action.position + possiblePlace.transform.position;
+                            agent.SetDestination(currentDestination);
+                            Debug.Log("<color=red>destinatia este</color>" +currentDestination, possiblePlace);
+                            actionPathPending = true;
+                            return true;
+                        }
+                    }
+                }
+                else
+                {
+                    //Debug.Log($"<color=red> " + action.name + "X</color>");
+                }
+            }
+        }
+        return false;
+    }
+
+    void Start()
+    {
+
+        currentState = State.Patrol;
+        listBots.Add(this);
+
+        cooldownMeeting = AIManager.instance.maxMeetingCooldown / sociableLevel;
+        float ratie = (AIManager.instance.maxViewDistance - AIManager.instance.minViewDistance) / 9f;
+        viewDistance = AIManager.instance.minViewDistance + (sociableLevel - 1) * ratie;
+
+        agent = GetComponent<NavMeshAgent>(); // iau Navmesh Agentul
+        animator = GetComponent<Animator>(); // iau animatorul
+
+        obstacle = GetComponent<NavMeshObstacle>(); // iau obstacolul ca sa il activez atunci cand vorbesc si se opresc
+        obstacle.enabled = false;
+
+        agent.autoBraking = false; // sa nu se opreasca cand se aproprie de destinatie
+
+        if (head == null)
+            head = gameObject;
+        if (PlaceHolderInfectedUI != null)
+            ui = PlaceHolderInfectedUI.GetComponent<InfectedUI>();
+        SetUpPosHolder();
+        if (alreadyInfected == true)
+        {
+            StartInfection();
+        }
+        UnityEngine.Random.InitState(10);
+    }
 
     // Update is called once per frame
     void Update()
     {
-        if(currentAction != null)
-        {
-            Debug.Log("<color=yellow>hei action</color>" + " " +  currentAction.name);
+        if (currentAction != null)
             actionName = currentAction.name;
-        }
+        if (currentState == State.Patrol)
+            actionName = "Noname";
         if (currentState == State.Patrol)
         {
-            if(agent.isStopped == true)
+            if (agent.isOnNavMesh == false)
+                Debug.LogError("nu este pe navmesh",this);
+            if (agent.isStopped == true)
                 agent.isStopped = false;
             if (agent.enabled == false)
                 agent.enabled = true;
             // in caz ca pe viitor
             // aleg destinatia
-            if(startPatroling == false || Vector3.Distance(a: transform.position,b: currentDestination) < stoppingDistance)
+            if (startPatroling == false || Vector3.Distance(a: transform.position, b: currentDestination) < stoppingDistance)
             {
                 if (randomLocations)
                 {
                     Vector3 randomLocation = RandomLoc();
                     currentDestination = randomLocation;
                     agent.SetDestination(target: currentDestination);
-                    
+
                 }
                 else
-                {    
+                {
                     agent.destination = patrolPositions[currentIndexPatrol].transform.position;
                     currentDestination = patrolPositions[currentIndexPatrol].transform.position;
                     currentIndexPatrol++;
@@ -613,29 +717,34 @@ public class Bot : MonoBehaviour
                 }
                 startPatroling = true;
             }
-
-
-            
+            if (FindNewAction() == true)
+            {
+                currentState = State.AnyAction;
+                Debug.Log("entered any action");
+                return;
+            }
             // Tranzitia 1 in starea de MEET
             /// daca cooldown-ul a trecut de la ultima intalnire sau daca initial nu am avut nicio intalnire
             if (Time.time - lastFinishedMeetingTime >= cooldownMeeting || lastFinishedMeetingTime == 0)
             {
-                if(!cured || (cured == true && Vector3.Distance(transform.position,bedPosition) > 100f)) // daca nu e vindecat sau daca e vindecat si e departe de spital
+                if (!cured || (cured == true && Vector3.Distance(transform.position, bedPosition) > 100f))
+                {   // daca nu e vindecat sau daca e vindecat si e departe de spital{
                     TryMeetBot(); /// incearca sa gaseasca partener 
+                }
             }
             /// Tranzitia 2 in starea de GOTOHOSPITAL
             if (infectionLevel > 5) // un anumit nivel
             {
                 // find a free hospital place
-                for (int i = 0; i < GameManager.instance.listHospitals.Count; i++)
+                for (int i = 0; i < Hospital.listHospitals.Count; i++)
                 {
-                    Hospital currentHospital = GameManager.instance.listHospitals[index: i];
+                    Hospital currentHospital = Hospital.listHospitals[index: i];
                     if (currentHospital.Free())
                     {
                         Tuple<Vector3, int> tuple = currentHospital.BedPosition();
                         if (tuple.Item2 != -1)
                         {
-                            currentDestination = tuple.Item1; 
+                            currentDestination = tuple.Item1;
                             bedIndex = tuple.Item2;
                             hospital = currentHospital;
                             bedPosition = currentDestination;
@@ -646,128 +755,82 @@ public class Bot : MonoBehaviour
                     }
                 }
             }
-            if (actionPending == false && actionList.Count > 0 && Time.time - lastFinishedAnyActionTime > 5)
-            {
-                float random = UnityEngine.Random.value;
-                actionList.Sort(CompareAction);
 
-                for (int i = 0; i < actionList.Count; i++)
-                {
-                    BotAction action = actionList[i];
-                    if (random < action.probability)
-                    {
-                        RandomShuffle(GameManager.instance.desks);
-                        foreach (ActionPlace possiblePlace in GameManager.instance.desks)
-                        {
-                            if (possiblePlace.occupied == false && possiblePlace != lastPlace)
-                            {
-                                Debug.Log($"<color=red> found action </color>");
-                                possiblePlace.occupied = true;
-                                lastPlace = possiblePlace;
-                                
-                                actionPending = true;
-                                currentAction = action;
-
-                                Debug.Log("found desk : " + possiblePlace.name);
-                                // sets destination
-                                currentDestination = action.position + possiblePlace.transform.position;
-                                agent.SetDestination(currentDestination);
-
-                                currentState = State.AnyAction;
-                                return;
-                            }
-                        }
-                    }
-                }
-            }
         }
-        else if(currentState == State.Meet)
+        else if (currentState == State.Meet)
         {
             if (Vector3.Distance(a: transform.position, b: meetingPoint) < 1f)
                 agent.enabled = false;
-            if(!agent.enabled  && !meetingBot.agent.enabled)
+            if (!agent.enabled && !meetingBot.agent.enabled)
             {
+                Debug.Log("Enabling obstacle for : " + name);
                 talking = true;
                 obstacle.enabled = true;
                 animator.SetBool(name: "talking", value: true);
                 Talk();
             }
-        }else if(currentState == State.Hospital)
+        }
+        else if (currentState == State.Hospital)
         {
-            if(Vector3.Distance(a: transform.position, b: currentDestination) < 5f)
+            if (Vector3.Distance(a: transform.position, b: currentDestination) < 5f)
             {
                 infectionLevel = 0;
                 hospital.LeaveBed(index: bedIndex);
                 startPatroling = false;
-                cured = true; 
+                cured = true;
                 currentState = State.Patrol;
             }
-        }else if(currentState == State.AnyAction)
+        }
+        else if (currentState == State.AnyAction)
         {
-            if (actionPending == false && actionList.Count > 0)
+            if (startAction == false && actionPathPending == false)
             {
-                float random = UnityEngine.Random.value;
-                actionList.Sort(CompareAction);
-
-                for (int i = 0; i < actionList.Count; i++)
+                if (FindNewAction() == false)
                 {
-                    BotAction action = actionList[i];
-                    if (random < action.probability)
-                    {
-                        RandomShuffle(GameManager.instance.desks);
-                        foreach (ActionPlace possiblePlace in GameManager.instance.desks)
-                        {
-                            if (possiblePlace.occupied == false && possiblePlace != lastPlace)
-                            {
-                                Debug.Log($"<color=red> found action </color>");
-                                possiblePlace.occupied = true;
-                                lastPlace = possiblePlace;
-
-                                actionPending = true;
-                                currentAction = action;
-
-                                Debug.Log("found desk : " + possiblePlace.name);
-                                // sets destination
-                                currentDestination = action.position + possiblePlace.transform.position;
-                                agent.SetDestination(currentDestination);
-
-                                break;
-                            }
-                        }
-                    }
+                    currentState = State.Patrol;
+                    startPatroling = true;
                 }
-            }   
-            if(actionPending == false)
-            {
-                Debug.Log("<color=red> failed </color> to find any good action");
-                startPatroling = false;
-                currentState = State.Patrol;
-                return;
             }
-
-            if (actionPending == true && Vector3.Distance(transform.position, currentDestination) < currentAction.stopDistance + 0.1f)
+            if (actionPathPending == true)
             {
-                if (startAction == false)
+                // if the bot is going towards the action destination
+                if (startAction == false && Vector3.Distance(transform.position, currentDestination) < currentAction.stopDistance + 0.1f)
                 {
+                    startAction = true; // now the action starts!
                     startAction = true;
                     transform.position = currentDestination;
                     transform.rotation = currentAction.rotation;
                     agent.isStopped = true;
-                    Debug.Log("<color=green> Start Action </color>");
+                    System.Action start = null;
+                    System.Action end = null;
+                    int waitTime;
+
+
+                    Debug.Log("<color=green> Start Action " + currentAction.name + "</color>");
                     if (currentAction.Equals(typingAction))
                     {
-                        Debug.Log("it is typing action");
-                        StartCoroutine(TypingCoroutine());
+                        Debug.Log("<color=green>entered typing</color>");
+                        start = () => animator.SetBool("typing", true);
+                        end = () => animator.SetBool("typing", false);
+                        waitTime = UnityEngine.Random.Range(10, 15);
                     }
                     else if (currentAction.Equals(lookAtSphereAction))
                     {
-                        StartCoroutine(LookCoroutine());
+                        Debug.Log("<color=green>entered looking</color>");
+                        start = () =>
+                        {
+                            Debug.Assert(transform != null, "Cum poate sa fie transformul null?");
+                            transform.LookAt(currentAction.targetTransform);
+                        };
+                        waitTime = 5;
                     }
                     else
                     {
-                        Debug.Log("stating washing coroutine");
-                        StartCoroutine(WashingCoroutine());
+                        Debug.Log("<color=green>entered other</color>");
+                        waitTime = 8;
                     }
+                    StartCoroutine(AbstractCoroutine(start, end, waitTime));
+
                 }
             }
         }
@@ -811,22 +874,18 @@ public class Bot : MonoBehaviour
             if (inMeeting == true)
             {
                 Gizmos.color = Color.red;
-                Gizmos.DrawSphere(agent.destination, 1f);
+                Gizmos.DrawSphere(agent.destination, 0.2f);
                 Gizmos.color = Color.magenta;
             }
             else
             {
                 Gizmos.DrawLine(transform.position, agent.destination);
-                Gizmos.DrawSphere(agent.destination, 1f);
+                Gizmos.DrawSphere(agent.destination, 0.2f);
             }
         }
         //Debug.Log("event has in gizmos for " + name + " : " + GetListenerNumber(loadEvent) + "listeners");
         if (drawLines)
             DrawLineOfSight();
-        AssemblyReloadEvents.beforeAssemblyReload += ClearList;
-    }
-    private void OnDisable()
-    {
-        AssemblyReloadEvents.beforeAssemblyReload -= ClearList;
+
     }
 }
