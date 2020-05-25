@@ -29,6 +29,7 @@ public class GameManager : MonoBehaviour
         coughCurve = new AnimationCurve();
         ActionPlace.ClearDict();
         Bot.ClearBots();
+        MeetPoint.ClearList();
         
     }
 
