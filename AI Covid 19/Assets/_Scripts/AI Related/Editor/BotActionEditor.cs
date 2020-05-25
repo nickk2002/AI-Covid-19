@@ -81,7 +81,9 @@ public class BotActionEditor : PropertyDrawer
             lungime += aduna;
             if (action.targetTransform != null)
             {
+                Debug.Log(action.targetTransform);
                 GameObject targetGameobject = action.targetTransform.gameObject;
+               
                 if (targetGameobject.GetComponent<ActionPlace>() == null)
                 {
                     targetGameobject.AddComponent<ActionPlace>();
