@@ -17,7 +17,6 @@ public class CustomBot : Editor
     Bot bot;
     bool upToDate;
 
-
     private void OnEnable()
     {
         bot = (Bot)target; // set the bot target
@@ -31,7 +30,6 @@ public class CustomBot : Editor
         foldout = EditorPrefs.GetBool("foldout");
         generalSettings = EditorPrefs.GetBool("general");
 
-        Debug.Log(bot.name);
         bot.SetUpReflection();
     }
     void ListLoading()
@@ -64,14 +62,20 @@ public class CustomBot : Editor
                 {
                     // draw the expandable action
                     bot.AddAction(action);
-                    Debug.Log("serializing : " + action.name);
+#if UNITY_EDITOR
+                    if (!EditorApplication.isPlaying)
+                        Debug.Log("serializing : " + action.name); 
+#endif
                     EditorGUILayout.PropertyField(serializedObject.FindProperty(name), GUILayout.MinWidth(100));
                 }
                 else
                 {
                     // draw a label
                     bot.RemoveAction(action);
-                    Debug.Log(name);
+#if UNITY_EDITOR
+                    if (!EditorApplication.isPlaying)
+                        Debug.Log(name);         
+#endif
                     string actualName = char.ToUpper(name[0]) + name.Substring(1);
                     EditorGUILayout.LabelField(actualName);
                 }
@@ -85,6 +89,7 @@ public class CustomBot : Editor
         // draw Texturee
         Texture texture;
         string text;
+
         if (bot.reflectionActions.SequenceEqual(SaveSystem.LoadBotActions()))
         {
             texture = Resources.Load("tick") as Texture;
@@ -97,6 +102,8 @@ public class CustomBot : Editor
             upToDate = false;
             text = "Not up to date";
         }
+        // update the gameobject icon
+
 
         GUILayout.BeginHorizontal();
         GUILayout.Box(texture);
@@ -112,6 +119,7 @@ public class CustomBot : Editor
     public override void OnInspectorGUI()
     {
         serializedObject.Update();
+        bot.UpdateGizmosUI(upToDate);
 
         // draw script gui
         GUI.enabled = false;
@@ -156,6 +164,5 @@ public class CustomBot : Editor
             }
         }
         serializedObject.ApplyModifiedProperties();
-        //DrawDefaultInspector();
     }
 }
