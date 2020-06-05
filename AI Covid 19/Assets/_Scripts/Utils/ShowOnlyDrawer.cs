@@ -1,6 +1,9 @@
 ﻿using UnityEngine;
 
-public class ShowOnlyAttribute : PropertyAttribute
+namespace Covid19.Utils
 {
+    public class ShowOnlyAttribute : PropertyAttribute
+    {
 
+    }
 }

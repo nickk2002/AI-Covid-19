@@ -1,8 +1,8 @@
-﻿using Covid19.SaveData;
-using NUnit.Framework;
+﻿using NUnit.Framework;
 using System.Linq;
-using UnityEngine;
 using Covid19.AIBehaviour;
+using Covid19.AIBehaviour.SaveData;
+using UnityEngine;
 
 namespace Tests
 {
