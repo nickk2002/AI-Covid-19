@@ -1830,77 +1830,77 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a4377aa04b8e88741a611c0bdf52be12, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  actionName: No Action
+  _actionName: No Action
   toggleList: 01010101
   actionList:
-  - probability: 1.81
+  - probability: 0.5134887
     stopDistance: 2
     targetTransform: {fileID: 0}
-    position: {x: 1.18, y: -0.36, z: -3.1600003}
-    rotation: {x: 0, y: 0, z: 0, w: 1}
-    name: washHandsAction
+    position: {x: 1.2399998, y: 0, z: -3.6800003}
+    rotation: {x: -0, y: -0, z: -0, w: 1}
+    name: _washHandsAction
     place: 3
-  - probability: 0.7
+  - probability: 0.47588354
+    stopDistance: 2
+    targetTransform: {fileID: 0}
+    position: {x: -0.082999945, y: -0.33999997, z: -0.6989999}
+    rotation: {x: -0, y: -0, z: -0, w: 1}
+    name: _typingAction
+    place: 0
+  - probability: 0.5286488
+    stopDistance: 0.1
+    targetTransform: {fileID: 0}
+    position: {x: 0, y: -1.07, z: -2.250001}
+    rotation: {x: -0, y: -0, z: -0, w: 1}
+    name: _lookAtSphereAction
+    place: 4
+  - probability: 0.7193493
     stopDistance: 3
     targetTransform: {fileID: 0}
-    position: {x: -0.045000076, y: -0.356, z: -0.74300003}
-    rotation: {x: 0, y: 0, z: 0, w: 1}
-    name: typingAction
-    place: 0
-  - probability: 0.2
-    stopDistance: 4
-    targetTransform: {fileID: 0}
-    position: {x: 0, y: -0.85, z: -2.38}
-    rotation: {x: 0, y: 0, z: 0, w: 1}
-    name: lookAtSphereAction
-    place: 4
-  - probability: 0.53
-    stopDistance: 0.2
-    targetTransform: {fileID: 0}
-    position: {x: -1.1800003, y: -0.39, z: 0}
-    rotation: {x: 0, y: 0, z: 0, w: 1}
-    name: actiuneAction
+    position: {x: -1.210001, y: -0.56, z: 0}
+    rotation: {x: -0, y: -0, z: -0, w: 1}
+    name: _actiuneAction
     place: 1
-  currentState: 0
-  washHandsAction:
-    probability: 1.81
+  _currentState: 0
+  _washHandsAction:
+    probability: 0.5134887
     stopDistance: 2
     targetTransform: {fileID: 0}
-    position: {x: 1.18, y: -0.36, z: -3.1600003}
-    rotation: {x: 0, y: 0, z: 0, w: 1}
-    name: washHandsAction
+    position: {x: 1.2399998, y: 0, z: -3.6800003}
+    rotation: {x: -0, y: -0, z: -0, w: 1}
+    name: _washHandsAction
     place: 3
-  typingAction:
-    probability: 0.7
+  _typingAction:
+    probability: 0.47588354
+    stopDistance: 2
+    targetTransform: {fileID: 0}
+    position: {x: -0.082999945, y: -0.33999997, z: -0.6989999}
+    rotation: {x: -0, y: -0, z: -0, w: 1}
+    name: _typingAction
+    place: 0
+  _lookAtSphereAction:
+    probability: 0.5286488
+    stopDistance: 0.1
+    targetTransform: {fileID: 0}
+    position: {x: 0, y: -1.07, z: -2.250001}
+    rotation: {x: -0, y: -0, z: -0, w: 1}
+    name: _lookAtSphereAction
+    place: 4
+  _actiuneAction:
+    probability: 0.7193493
     stopDistance: 3
     targetTransform: {fileID: 0}
-    position: {x: -0.045000076, y: -0.356, z: -0.74300003}
-    rotation: {x: 0, y: 0, z: 0, w: 1}
-    name: typingAction
-    place: 0
-  lookAtSphereAction:
-    probability: 0.2
-    stopDistance: 4
-    targetTransform: {fileID: 0}
-    position: {x: 0, y: -0.85, z: -2.38}
-    rotation: {x: 0, y: 0, z: 0, w: 1}
-    name: lookAtSphereAction
-    place: 4
-  actiuneAction:
-    probability: 0.53
-    stopDistance: 0.2
-    targetTransform: {fileID: 0}
-    position: {x: -1.1800003, y: -0.39, z: 0}
-    rotation: {x: 0, y: 0, z: 0, w: 1}
-    name: actiuneAction
+    position: {x: -1.210001, y: -0.56, z: 0}
+    rotation: {x: -0, y: -0, z: -0, w: 1}
+    name: _actiuneAction
     place: 1
   alreadyInfected: 0
-  head: {fileID: 0}
+  _head: {fileID: 0}
   sociableLevel: 0
   immunityLevel: 0
   cautiousLevel: 0
   infectionDist: 10
-  infectionLevel: 0
+  _infectionLevel: 0
   randomLocations: 0
   randomRange: 10
   stoppingDistance: 3
@@ -1923,7 +1923,7 @@ MonoBehaviour:
   drawLines: 0
   realSightView: 0
   uiManager: {fileID: 9039357494315949786}
-  PlaceHolderInfectedUI: {fileID: 5262784029458685319}
+  placeHolderInfectedUI: {fileID: 5262784029458685319}
 --- !u!54 &4924908511305285124
 Rigidbody:
   m_ObjectHideFlags: 0
