@@ -1,8 +1,7 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
-using System;
+using Covid19.AIBehaviour.Actions;
+using Covid19.AIBehaviour;
 
 
 public class GameManager : MonoBehaviour
@@ -18,6 +17,7 @@ public class GameManager : MonoBehaviour
     // draws the grapth of infected people over time
     int currentlyInfected = 0;
     private Text textPercentage;
+    private bool _istextPercentageNotNull;
 
 
     void Awake()
@@ -30,24 +30,25 @@ public class GameManager : MonoBehaviour
         ActionPlace.ClearDict();
         Bot.ClearBots();
         MeetPoint.ClearList();
-        
+
     }
 
 
 
     void Start()
     {
+        _istextPercentageNotNull = textPercentage != null;
         textPercentage = UIManager.Instance.textInfectPercentage;
         DrawFunc();
     }
-    
-    
+
+
 
     // Update is called once per frame
     void Update()
     {
         Time.timeScale = timeScale;
-        if(Time.time > gameDuration)
+        if (Time.time > gameDuration)
             Debug.Break();
         int infected = Bot.CountNumberInfected();
         if (currentlyInfected != infected)
@@ -64,8 +65,8 @@ public class GameManager : MonoBehaviour
             {
                 Keyframe lastKeyFrame = infectionCurve.keys[infectionCurve.keys.Length - 1];
                 float x1 = lastKeyFrame.time;
-                int y1 = (int) lastKeyFrame.value;
-            
+                int y1 = (int)lastKeyFrame.value;
+
                 newKeyFrame.inTangent = Mathf.Atan((y2 - y1) / (x2 - x1));
                 lastKeyFrame.outTangent = Mathf.Atan((y2 - y1) / (x2 - x1));
                 infectionCurve.AddKey(newKeyFrame);
@@ -75,9 +76,9 @@ public class GameManager : MonoBehaviour
 
             currentlyInfected = infected;
             float percentage =
-                currentlyInfected * 1.0f / Bot.listBots.Count *
+                currentlyInfected * 1.0f / Bot.ListBots.Count *
                 100; // 100% means all infected, 50% means half of them are infected
-            if (textPercentage != null)
+            if (_istextPercentageNotNull)
             {
                 textPercentage.text = percentage + "%"; // puts the value in a text
                 if (percentage == 100)

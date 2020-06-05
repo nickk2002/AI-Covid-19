@@ -1,20 +1,19 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEditor;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
 public class MeetPoint : MonoBehaviour
 {
-    static public List<MeetPoint> list = new List<MeetPoint>();
+    static public List<MeetPoint> List = new List<MeetPoint>();
+    private int _weirdName;
     public bool occupied;
 
     public static void ClearList()
     {
-        list.Clear();
+        List.Clear();
     }
     private void Start()
     {
-        list.Add(this);
+        List.Add(this);
     }
 
 
