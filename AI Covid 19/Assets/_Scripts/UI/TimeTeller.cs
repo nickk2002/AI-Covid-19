@@ -1,20 +1,23 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 
-public class TimeTeller : MonoBehaviour
+namespace Covid19.UI
 {
-
-    Text textComp;
-    // Start is called before the first frame update
-    void Start()
+    public class TimeTeller : MonoBehaviour
     {
-        textComp = GetComponent<Text>();
-    }
+        private Text _textComp;
 
-    // Update is called once per frame
-    void Update()
-    {
-        int number = (int)Time.time;
-        textComp.text = number.ToString();
+        // Start is called before the first frame update
+        private void Start()
+        {
+            _textComp = GetComponent<Text>();
+        }
+
+        // Update is called once per frame
+        private void Update()
+        {
+            var number = (int) Time.time;
+            _textComp.text = number.ToString();
+        }
     }
 }

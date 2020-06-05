@@ -1,12 +1,20 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
 using UnityEngine;
 
-namespace Learn
+namespace Covid19.Learn
 {
     public class TestRiderSyntax : MonoBehaviour
     {
-        // ReSharper restore InconsistentNaming
-        private int ComputerTest;
-        List<int>newList = new List<int>();
+        public GameObject cub;
+
+        void Update()
+        {
+            if (Input.GetKeyDown(KeyCode.Space))
+            {
+                GetComponent<Camera>().fieldOfView = 150;
+                Instantiate(cub);
+                cub.transform.position = Random.insideUnitSphere * 100; // [0,100]
+            }
+        }
     }
 }

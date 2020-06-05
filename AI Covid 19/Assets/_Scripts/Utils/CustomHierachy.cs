@@ -1,10 +1,10 @@
 ﻿using System.Linq;
 using System.Reflection;
+using Covid19.AIBehaviour;
 using UnityEditor;
 using UnityEngine;
-using Covid19.AIBehaviour;
 
-namespace Covid19.CustomHierachy
+namespace Covid19.Utils
 {
     [InitializeOnLoad]
     public class CustomHierarchy : MonoBehaviour
