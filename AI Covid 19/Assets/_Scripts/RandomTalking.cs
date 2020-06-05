@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class RandomTalking : StateMachineBehaviour
 {
@@ -40,7 +38,7 @@ public class RandomTalking : StateMachineBehaviour
     override public void OnStateMachineEnter(Animator animator, int stateMachinePathHash)
     {
         int value;
-        if(talkValues.Length == 0)
+        if (talkValues.Length == 0)
         {
             value = 0;
         }

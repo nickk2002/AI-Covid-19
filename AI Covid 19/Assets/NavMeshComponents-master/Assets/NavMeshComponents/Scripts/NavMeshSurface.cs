@@ -19,63 +19,63 @@ namespace UnityEngine.AI
     [HelpURL("https://github.com/Unity-Technologies/NavMeshComponents#documentation-draft")]
     public class NavMeshSurface : MonoBehaviour
     {
-       public
-        int m_AgentTypeID;
+        public
+         int m_AgentTypeID;
         public int agentTypeID { get { return m_AgentTypeID; } set { m_AgentTypeID = value; } }
 
-       public
-        CollectObjects m_CollectObjects = CollectObjects.All;
+        public
+         CollectObjects m_CollectObjects = CollectObjects.All;
         public CollectObjects collectObjects { get { return m_CollectObjects; } set { m_CollectObjects = value; } }
 
-       public
-        Vector3 m_Size = new Vector3(10.0f, 10.0f, 10.0f);
+        public
+         Vector3 m_Size = new Vector3(10.0f, 10.0f, 10.0f);
         public Vector3 size { get { return m_Size; } set { m_Size = value; } }
 
-       public
-        Vector3 m_Center = new Vector3(0, 2.0f, 0);
+        public
+         Vector3 m_Center = new Vector3(0, 2.0f, 0);
         public Vector3 center { get { return m_Center; } set { m_Center = value; } }
 
-       public
-        LayerMask m_LayerMask = ~0;
+        public
+         LayerMask m_LayerMask = ~0;
         public LayerMask layerMask { get { return m_LayerMask; } set { m_LayerMask = value; } }
 
-       public
-        NavMeshCollectGeometry m_UseGeometry = NavMeshCollectGeometry.RenderMeshes;
+        public
+         NavMeshCollectGeometry m_UseGeometry = NavMeshCollectGeometry.RenderMeshes;
         public NavMeshCollectGeometry useGeometry { get { return m_UseGeometry; } set { m_UseGeometry = value; } }
 
-       public
-        int m_DefaultArea;
+        public
+         int m_DefaultArea;
         public int defaultArea { get { return m_DefaultArea; } set { m_DefaultArea = value; } }
 
-       public
-        bool m_IgnoreNavMeshAgent = true;
+        public
+         bool m_IgnoreNavMeshAgent = true;
         public bool ignoreNavMeshAgent { get { return m_IgnoreNavMeshAgent; } set { m_IgnoreNavMeshAgent = value; } }
 
-       public
-        bool m_IgnoreNavMeshObstacle = true;
+        public
+         bool m_IgnoreNavMeshObstacle = true;
         public bool ignoreNavMeshObstacle { get { return m_IgnoreNavMeshObstacle; } set { m_IgnoreNavMeshObstacle = value; } }
 
-       public
-        bool m_OverrideTileSize;
+        public
+         bool m_OverrideTileSize;
         public bool overrideTileSize { get { return m_OverrideTileSize; } set { m_OverrideTileSize = value; } }
-       public
-        int m_TileSize = 256;
+        public
+         int m_TileSize = 256;
         public int tileSize { get { return m_TileSize; } set { m_TileSize = value; } }
-       public
-        bool m_OverrideVoxelSize;
+        public
+         bool m_OverrideVoxelSize;
         public bool overrideVoxelSize { get { return m_OverrideVoxelSize; } set { m_OverrideVoxelSize = value; } }
-       public
-        float m_VoxelSize;
+        public
+         float m_VoxelSize;
         public float voxelSize { get { return m_VoxelSize; } set { m_VoxelSize = value; } }
 
         // Currently not supported advanced options
-       public
-        bool m_BuildHeightMesh;
+        public
+         bool m_BuildHeightMesh;
         public bool buildHeightMesh { get { return m_BuildHeightMesh; } set { m_BuildHeightMesh = value; } }
 
         // Reference to whole scene navmesh data asset.
         [UnityEngine.Serialization.FormerlySerializedAs("m_BakedNavMeshData")]
-       public
+        public
         NavMeshData m_NavMeshData;
         public NavMeshData navMeshData { get { return m_NavMeshData; } set { m_NavMeshData = value; } }
 
@@ -378,18 +378,18 @@ namespace UnityEngine.AI
                 switch (src.shape)
                 {
                     case NavMeshBuildSourceShape.Mesh:
-                    {
-                        var m = src.sourceObject as Mesh;
-                        result.Encapsulate(GetWorldBounds(worldToLocal * src.transform, m.bounds));
-                        break;
-                    }
+                        {
+                            var m = src.sourceObject as Mesh;
+                            result.Encapsulate(GetWorldBounds(worldToLocal * src.transform, m.bounds));
+                            break;
+                        }
                     case NavMeshBuildSourceShape.Terrain:
-                    {
-                        // Terrain pivot is lower/left corner - shift bounds accordingly
-                        var t = src.sourceObject as TerrainData;
-                        result.Encapsulate(GetWorldBounds(worldToLocal * src.transform, new Bounds(0.5f * t.size, t.size)));
-                        break;
-                    }
+                        {
+                            // Terrain pivot is lower/left corner - shift bounds accordingly
+                            var t = src.sourceObject as TerrainData;
+                            result.Encapsulate(GetWorldBounds(worldToLocal * src.transform, new Bounds(0.5f * t.size, t.size)));
+                            break;
+                        }
                     case NavMeshBuildSourceShape.Box:
                     case NavMeshBuildSourceShape.Sphere:
                     case NavMeshBuildSourceShape.Capsule:
