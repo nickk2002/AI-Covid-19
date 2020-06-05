@@ -4,7 +4,7 @@ Bot.cs
 -> defineste actiunile posibile pentru un bot
 -> comunica cu interfata din editor
 
-CustomBot.cs
+BotEditor.cs
 -> responsabil pentru modificare actiunilor in inspector(obiecte de tip BotAction)
 -> are 3 butoane ce permit usurarea muncii unui game designer si a unui programator care testeaza
 -> Odata ce toata actiunile sunt modificate si setate "cum trebuie" se poate apasa butonul

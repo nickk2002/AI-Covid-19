@@ -1,14 +1,12 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using Covid19.SaveData;
 using NUnit.Framework;
-using UnityEngine;
 using System.Linq;
-using UnityEngine.TestTools;
-using UnityEngine.SceneManagement;
+using UnityEngine;
+using Covid19.AIBehaviour;
 
 namespace Tests
 {
-    public class CustomBotTest
+    public class BotEditorTest
     {
         [Test]
         public void BotTestUpdatePreset()
