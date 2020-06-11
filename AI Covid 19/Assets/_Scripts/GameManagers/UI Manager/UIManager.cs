@@ -1,4 +1,5 @@
 ﻿using Covid19.UI;
+using Covid19.UI.Quests;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -12,7 +13,8 @@ namespace Covid19.GameManagers.UI_Manager
         public Text textInfectPercentage;
         public TextMeshProUGUI coughText;
         public Image coughLoadingBarUI;
-        public PlayerActionsUI playerActionsUI;
+        public ActionsManagerUI actionsManagerUI;
+        
         // Start is called before the first frame update
         void Awake()
         {
