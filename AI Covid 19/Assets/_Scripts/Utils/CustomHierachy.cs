@@ -9,7 +9,7 @@ namespace Covid19.Utils
     [InitializeOnLoad]
     public class CustomHierarchy : MonoBehaviour
     {
-
+        private int _nic;
         private static Texture _botIcon = Resources.Load("Bot_icon") as Texture;
         private static Texture _botIconSelected = Resources.Load("Bot_icon_selected") as Texture;
         private static Texture _meetingPoint = Resources.Load("meet") as Texture;
