@@ -1977,49 +1977,52 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a4377aa04b8e88741a611c0bdf52be12, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _actionName: No Action
+  ceva: 0
+  actionName: No Action
+  reflectionActions: []
+  reflectionFields: []
   toggleList: 00000000
   actionList: []
-  _currentState: 0
-  _washHandsAction:
-    probability: 0.5134887
-    stopDistance: 2
-    targetTransform: {fileID: 1328051616}
-    position: {x: 1.2399998, y: 0, z: -3.6800003}
-    rotation: {x: -0, y: -0, z: -0, w: 1}
-    name: _washHandsAction
-    place: 3
-  _typingAction:
-    probability: 0.47588354
-    stopDistance: 2
-    targetTransform: {fileID: 1732269828}
-    position: {x: -0.082999945, y: -0.33999997, z: -0.6989999}
-    rotation: {x: -0, y: -0, z: -0, w: 1}
-    name: _typingAction
+  currentState: 0
+  washHandsAction:
+    probability: 0
+    stopDistance: 0
+    targetTransform: {fileID: 0}
+    position: {x: 0, y: 0, z: 0}
+    rotation: {x: 0, y: 0, z: 0, w: 0}
+    name: 
     place: 0
-  _lookAtSphereAction:
-    probability: 0.5286488
-    stopDistance: 0.1
-    targetTransform: {fileID: 1485386758}
-    position: {x: 0, y: -1.07, z: -2.250001}
-    rotation: {x: -0, y: -0, z: -0, w: 1}
-    name: _lookAtSphereAction
-    place: 4
-  _actiuneAction:
-    probability: 0.7193493
-    stopDistance: 3
-    targetTransform: {fileID: 1627810390}
-    position: {x: -1.210001, y: -0.56, z: 0}
-    rotation: {x: -0, y: -0, z: -0, w: 1}
-    name: _actiuneAction
-    place: 1
+  typingAction:
+    probability: 0
+    stopDistance: 0
+    targetTransform: {fileID: 0}
+    position: {x: 0, y: 0, z: 0}
+    rotation: {x: 0, y: 0, z: 0, w: 0}
+    name: 
+    place: 0
+  lookAtSphereAction:
+    probability: 0
+    stopDistance: 0
+    targetTransform: {fileID: 0}
+    position: {x: 0, y: 0, z: 0}
+    rotation: {x: 0, y: 0, z: 0, w: 0}
+    name: 
+    place: 0
+  actiuneAction:
+    probability: 0
+    stopDistance: 0
+    targetTransform: {fileID: 0}
+    position: {x: 0, y: 0, z: 0}
+    rotation: {x: 0, y: 0, z: 0, w: 0}
+    name: 
+    place: 0
   alreadyInfected: 0
-  _head: {fileID: 0}
+  head: {fileID: 0}
   sociableLevel: 0
   immunityLevel: 0
   cautiousLevel: 0
   infectionDist: 10
-  _infectionLevel: 0
+  infectionLevel: 0
   randomLocations: 0
   randomRange: 10
   stoppingDistance: 3
@@ -6307,46 +6310,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: bot autentic
       objectReference: {fileID: 0}
-    - target: {fileID: 5262784027839207880, guid: e90b75abd17ad804bb8c42ab432c259b,
-        type: 3}
-      propertyPath: actionList.Array.data[0].targetTransform
-      value: 
-      objectReference: {fileID: 1328051616}
-    - target: {fileID: 5262784027839207880, guid: e90b75abd17ad804bb8c42ab432c259b,
-        type: 3}
-      propertyPath: actionList.Array.data[1].targetTransform
-      value: 
-      objectReference: {fileID: 1732269828}
-    - target: {fileID: 5262784027839207880, guid: e90b75abd17ad804bb8c42ab432c259b,
-        type: 3}
-      propertyPath: actionList.Array.data[2].targetTransform
-      value: 
-      objectReference: {fileID: 1485386758}
-    - target: {fileID: 5262784027839207880, guid: e90b75abd17ad804bb8c42ab432c259b,
-        type: 3}
-      propertyPath: actionList.Array.data[3].targetTransform
-      value: 
-      objectReference: {fileID: 1627810390}
-    - target: {fileID: 5262784027839207880, guid: e90b75abd17ad804bb8c42ab432c259b,
-        type: 3}
-      propertyPath: _washHandsAction.targetTransform
-      value: 
-      objectReference: {fileID: 1328051616}
-    - target: {fileID: 5262784027839207880, guid: e90b75abd17ad804bb8c42ab432c259b,
-        type: 3}
-      propertyPath: _typingAction.targetTransform
-      value: 
-      objectReference: {fileID: 1732269828}
-    - target: {fileID: 5262784027839207880, guid: e90b75abd17ad804bb8c42ab432c259b,
-        type: 3}
-      propertyPath: _lookAtSphereAction.targetTransform
-      value: 
-      objectReference: {fileID: 1485386758}
-    - target: {fileID: 5262784027839207880, guid: e90b75abd17ad804bb8c42ab432c259b,
-        type: 3}
-      propertyPath: _actiuneAction.targetTransform
-      value: 
-      objectReference: {fileID: 1627810390}
     - target: {fileID: 5262784029458685337, guid: e90b75abd17ad804bb8c42ab432c259b,
         type: 3}
       propertyPath: panel
@@ -7046,7 +7009,7 @@ MonoBehaviour:
   textInfectPercentage: {fileID: 1921472201}
   coughText: {fileID: 1706894003}
   coughLoadingBarUI: {fileID: 488184577}
-  playerActionsUI: {fileID: 1666193947}
+  actionsManagerUI: {fileID: 1666193947}
 --- !u!1 &1627810385
 GameObject:
   m_ObjectHideFlags: 0
@@ -7256,6 +7219,99 @@ MonoBehaviour:
   m_ChildControlHeight: 1
   m_ChildScaleWidth: 0
   m_ChildScaleHeight: 0
+--- !u!1 &1669748769
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1669748773}
+  - component: {fileID: 1669748772}
+  - component: {fileID: 1669748771}
+  - component: {fileID: 1669748770}
+  m_Layer: 0
+  m_Name: Cube
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!65 &1669748770
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1669748769}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 1, y: 1, z: 1}
+  m_Center: {x: 0, y: 0, z: 0}
+--- !u!23 &1669748771
+MeshRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1669748769}
+  m_Enabled: 1
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 10303, guid: 0000000000000000f000000000000000, type: 0}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+--- !u!33 &1669748772
+MeshFilter:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1669748769}
+  m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!4 &1669748773
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1669748769}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 2.1, y: 1.01, z: 2.6}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 8
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &1703950083
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -7266,7 +7322,7 @@ PrefabInstance:
     - target: {fileID: 3403738022476380986, guid: e90b75abd17ad804bb8c42ab432c259b,
         type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 4924908511305285123, guid: e90b75abd17ad804bb8c42ab432c259b,
         type: 3}
@@ -7763,6 +7819,106 @@ PrefabInstance:
       propertyPath: _actiuneAction.position.y
       value: -0.56
       objectReference: {fileID: 0}
+    - target: {fileID: 5262784027839207880, guid: e90b75abd17ad804bb8c42ab432c259b,
+        type: 3}
+      propertyPath: reflectionActions.Array.data[0].probability
+      value: 0.6175609
+      objectReference: {fileID: 0}
+    - target: {fileID: 5262784027839207880, guid: e90b75abd17ad804bb8c42ab432c259b,
+        type: 3}
+      propertyPath: reflectionActions.Array.data[0].targetTransform
+      value: 
+      objectReference: {fileID: 1328051616}
+    - target: {fileID: 5262784027839207880, guid: e90b75abd17ad804bb8c42ab432c259b,
+        type: 3}
+      propertyPath: reflectionActions.Array.data[0].position.x
+      value: 1.42
+      objectReference: {fileID: 0}
+    - target: {fileID: 5262784027839207880, guid: e90b75abd17ad804bb8c42ab432c259b,
+        type: 3}
+      propertyPath: reflectionActions.Array.data[0].position.y
+      value: -0.36
+      objectReference: {fileID: 0}
+    - target: {fileID: 5262784027839207880, guid: e90b75abd17ad804bb8c42ab432c259b,
+        type: 3}
+      propertyPath: reflectionActions.Array.data[1].probability
+      value: 0.13828434
+      objectReference: {fileID: 0}
+    - target: {fileID: 5262784027839207880, guid: e90b75abd17ad804bb8c42ab432c259b,
+        type: 3}
+      propertyPath: reflectionActions.Array.data[1].stopDistance
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 5262784027839207880, guid: e90b75abd17ad804bb8c42ab432c259b,
+        type: 3}
+      propertyPath: reflectionActions.Array.data[1].targetTransform
+      value: 
+      objectReference: {fileID: 2145556339}
+    - target: {fileID: 5262784027839207880, guid: e90b75abd17ad804bb8c42ab432c259b,
+        type: 3}
+      propertyPath: reflectionActions.Array.data[1].position.x
+      value: -0.045000076
+      objectReference: {fileID: 0}
+    - target: {fileID: 5262784027839207880, guid: e90b75abd17ad804bb8c42ab432c259b,
+        type: 3}
+      propertyPath: reflectionActions.Array.data[1].position.y
+      value: -0.356
+      objectReference: {fileID: 0}
+    - target: {fileID: 5262784027839207880, guid: e90b75abd17ad804bb8c42ab432c259b,
+        type: 3}
+      propertyPath: reflectionActions.Array.data[1].position.z
+      value: -0.74300003
+      objectReference: {fileID: 0}
+    - target: {fileID: 5262784027839207880, guid: e90b75abd17ad804bb8c42ab432c259b,
+        type: 3}
+      propertyPath: reflectionActions.Array.data[2].probability
+      value: 0.5172743
+      objectReference: {fileID: 0}
+    - target: {fileID: 5262784027839207880, guid: e90b75abd17ad804bb8c42ab432c259b,
+        type: 3}
+      propertyPath: reflectionActions.Array.data[2].stopDistance
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 5262784027839207880, guid: e90b75abd17ad804bb8c42ab432c259b,
+        type: 3}
+      propertyPath: reflectionActions.Array.data[2].targetTransform
+      value: 
+      objectReference: {fileID: 1485386758}
+    - target: {fileID: 5262784027839207880, guid: e90b75abd17ad804bb8c42ab432c259b,
+        type: 3}
+      propertyPath: reflectionActions.Array.data[2].position.y
+      value: -0.85
+      objectReference: {fileID: 0}
+    - target: {fileID: 5262784027839207880, guid: e90b75abd17ad804bb8c42ab432c259b,
+        type: 3}
+      propertyPath: reflectionActions.Array.data[2].position.z
+      value: -2.38
+      objectReference: {fileID: 0}
+    - target: {fileID: 5262784027839207880, guid: e90b75abd17ad804bb8c42ab432c259b,
+        type: 3}
+      propertyPath: reflectionActions.Array.data[2].rotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5262784027839207880, guid: e90b75abd17ad804bb8c42ab432c259b,
+        type: 3}
+      propertyPath: reflectionActions.Array.data[3].probability
+      value: 0.98078895
+      objectReference: {fileID: 0}
+    - target: {fileID: 5262784027839207880, guid: e90b75abd17ad804bb8c42ab432c259b,
+        type: 3}
+      propertyPath: reflectionActions.Array.data[3].stopDistance
+      value: 0.2
+      objectReference: {fileID: 0}
+    - target: {fileID: 5262784027839207880, guid: e90b75abd17ad804bb8c42ab432c259b,
+        type: 3}
+      propertyPath: reflectionActions.Array.data[3].targetTransform
+      value: 
+      objectReference: {fileID: 973218505}
+    - target: {fileID: 5262784027839207880, guid: e90b75abd17ad804bb8c42ab432c259b,
+        type: 3}
+      propertyPath: reflectionActions.Array.data[3].position.y
+      value: -0.39
+      objectReference: {fileID: 0}
     - target: {fileID: 5262784029458685337, guid: e90b75abd17ad804bb8c42ab432c259b,
         type: 3}
       propertyPath: panel
@@ -7771,7 +7927,7 @@ PrefabInstance:
     - target: {fileID: 6179131970744343741, guid: e90b75abd17ad804bb8c42ab432c259b,
         type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8215572780367793168, guid: e90b75abd17ad804bb8c42ab432c259b,
         type: 3}
@@ -8571,7 +8727,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: 5e9e851c0e142814dac026a256ba2ac0, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -15.54
+      value: -2.85
       objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: 5e9e851c0e142814dac026a256ba2ac0, type: 3}
       propertyPath: m_LocalPosition.y
@@ -8631,7 +8787,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 11400000, guid: 5e9e851c0e142814dac026a256ba2ac0, type: 3}
       propertyPath: m_RunSpeed
-      value: 5
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 11400000, guid: 5e9e851c0e142814dac026a256ba2ac0, type: 3}
       propertyPath: m_JumpSpeed
@@ -10407,7 +10563,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a4377aa04b8e88741a611c0bdf52be12, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _actionName: No Action
+  ceva: 0
+  actionName: No Action
+  reflectionActions: []
+  reflectionFields: []
   toggleList: 01010100
   actionList:
   - probability: 0.5134887
@@ -10431,46 +10590,46 @@ MonoBehaviour:
     rotation: {x: -0, y: -0, z: -0, w: 1}
     name: _lookAtSphereAction
     place: 4
-  _currentState: 0
-  _washHandsAction:
-    probability: 0.5134887
-    stopDistance: 2
-    targetTransform: {fileID: 1328051616}
-    position: {x: 1.2399998, y: 0, z: -3.6800003}
-    rotation: {x: -0, y: -0, z: -0, w: 1}
-    name: _washHandsAction
-    place: 3
-  _typingAction:
-    probability: 0.47588354
-    stopDistance: 2
-    targetTransform: {fileID: 1732269828}
-    position: {x: -0.082999945, y: -0.33999997, z: -0.6989999}
-    rotation: {x: -0, y: -0, z: -0, w: 1}
-    name: _typingAction
+  currentState: 0
+  washHandsAction:
+    probability: 0
+    stopDistance: 0
+    targetTransform: {fileID: 0}
+    position: {x: 0, y: 0, z: 0}
+    rotation: {x: 0, y: 0, z: 0, w: 0}
+    name: 
     place: 0
-  _lookAtSphereAction:
-    probability: 0.5286488
-    stopDistance: 0.1
-    targetTransform: {fileID: 1485386758}
-    position: {x: 0, y: -1.07, z: -2.250001}
-    rotation: {x: -0, y: -0, z: -0, w: 1}
-    name: _lookAtSphereAction
-    place: 4
-  _actiuneAction:
-    probability: 0.7193493
-    stopDistance: 3
-    targetTransform: {fileID: 1627810390}
-    position: {x: -1.210001, y: -0.56, z: 0}
-    rotation: {x: -0, y: -0, z: -0, w: 1}
-    name: _actiuneAction
-    place: 1
+  typingAction:
+    probability: 0
+    stopDistance: 0
+    targetTransform: {fileID: 0}
+    position: {x: 0, y: 0, z: 0}
+    rotation: {x: 0, y: 0, z: 0, w: 0}
+    name: 
+    place: 0
+  lookAtSphereAction:
+    probability: 0
+    stopDistance: 0
+    targetTransform: {fileID: 0}
+    position: {x: 0, y: 0, z: 0}
+    rotation: {x: 0, y: 0, z: 0, w: 0}
+    name: 
+    place: 0
+  actiuneAction:
+    probability: 0
+    stopDistance: 0
+    targetTransform: {fileID: 0}
+    position: {x: 0, y: 0, z: 0}
+    rotation: {x: 0, y: 0, z: 0, w: 0}
+    name: 
+    place: 0
   alreadyInfected: 0
-  _head: {fileID: 0}
+  head: {fileID: 0}
   sociableLevel: 0
   immunityLevel: 0
   cautiousLevel: 0
   infectionDist: 10
-  _infectionLevel: 0
+  infectionLevel: 0
   randomLocations: 0
   randomRange: 10
   stoppingDistance: 3
@@ -10734,9 +10893,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d6872d1362ca44a4f9ec4f262b14cec2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  circleImagePrefab: {fileID: 5146186573582581969, guid: ae363a8f511efbb4fbcf180b77633b36,
-    type: 3}
   botPanel: {fileID: 4102877581755450029, guid: 2be896c287202614eb8781f6d27f68f2,
+    type: 3}
+  circleImagePrefab: {fileID: 5146186573582581969, guid: ae363a8f511efbb4fbcf180b77633b36,
     type: 3}
   imageDisplay: {fileID: 0}
   panel: {fileID: 0}
