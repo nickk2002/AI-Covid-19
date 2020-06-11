@@ -1357,7 +1357,7 @@ GameObject:
   m_Icon: {fileID: 5132851093641282708, guid: 0000000000000000d000000000000000, type: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &8920817275453083572
 Transform:
   m_ObjectHideFlags: 0
@@ -1830,77 +1830,167 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a4377aa04b8e88741a611c0bdf52be12, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _actionName: No Action
+  ceva: 0
+  actionName: No Action
+  reflectionActions:
+  - probability: 0
+    stopDistance: 0
+    targetTransform: {fileID: 0}
+    position: {x: 0, y: 0, z: 0}
+    rotation: {x: 0, y: 0, z: 0, w: 0}
+    name: washHandsAction
+    place: 0
+  - probability: 0
+    stopDistance: 0
+    targetTransform: {fileID: 0}
+    position: {x: 0, y: 0, z: 0}
+    rotation: {x: 0, y: 0, z: 0, w: 0}
+    name: typingAction
+    place: 0
+  - probability: 0
+    stopDistance: 0
+    targetTransform: {fileID: 0}
+    position: {x: 0, y: 0, z: 0}
+    rotation: {x: 0, y: 0, z: 0, w: 0}
+    name: lookAtSphereAction
+    place: 0
+  - probability: 0
+    stopDistance: 0
+    targetTransform: {fileID: 0}
+    position: {x: 0, y: 0, z: 0}
+    rotation: {x: 0, y: 0, z: 0, w: 0}
+    name: actiuneAction
+    place: 0
+  reflectionFields:
+  - ceva
+  - actionName
+  - reflectionActions
+  - reflectionFields
+  - toggleList
+  - actionList
+  - currentState
+  - alreadyInfected
+  - head
+  - sociableLevel
+  - immunityLevel
+  - cautiousLevel
+  - infectionDist
+  - infectionLevel
+  - randomLocations
+  - randomRange
+  - stoppingDistance
+  - patrolPositions
+  - posHolder
+  - infectionSpeed
+  - growthInterval
+  - cured
+  - offsetMeeting
+  - cooldownMeeting
+  - inMeeting
+  - talking
+  - meetingBot
+  - talkDuration
+  - currentTalkTime
+  - coughInterval
+  - currentCoughTime
+  - viewAngle
+  - viewDistance
+  - drawLines
+  - realSightView
+  - uiManager
+  - placeHolderInfectedUI
+  - <CurrentDestination>k__BackingField
+  - _lastState
+  - _obstacle
+  - _animator
+  - _agent
+  - _currentIndexPatrol
+  - _currentDestination
+  - _meetingPoint
+  - _listIgnoredBots
+  - _startPatroling
+  - _bedIndex
+  - _bedPosition
+  - _hospital
+  - _lastPlace
+  - _currentInfectionTime
+  - _lastFinishedMeetingTime
+  - _lastFinishedAnyActionTime
+  - _currentAction
+  - _startAction
+  - _actionPathPending
+  - _ui
+  - _stateMachine
   toggleList: 01010101
   actionList:
-  - probability: 0.5134887
-    stopDistance: 2
+  - probability: 0
+    stopDistance: 0
     targetTransform: {fileID: 0}
-    position: {x: 1.2399998, y: 0, z: -3.6800003}
-    rotation: {x: -0, y: -0, z: -0, w: 1}
-    name: _washHandsAction
-    place: 3
-  - probability: 0.47588354
-    stopDistance: 2
-    targetTransform: {fileID: 0}
-    position: {x: -0.082999945, y: -0.33999997, z: -0.6989999}
-    rotation: {x: -0, y: -0, z: -0, w: 1}
-    name: _typingAction
+    position: {x: 0, y: 0, z: 0}
+    rotation: {x: 0, y: 0, z: 0, w: 0}
+    name: washHandsAction
     place: 0
-  - probability: 0.5286488
-    stopDistance: 0.1
+  - probability: 0
+    stopDistance: 0
     targetTransform: {fileID: 0}
-    position: {x: 0, y: -1.07, z: -2.250001}
-    rotation: {x: -0, y: -0, z: -0, w: 1}
-    name: _lookAtSphereAction
-    place: 4
-  - probability: 0.7193493
-    stopDistance: 3
-    targetTransform: {fileID: 0}
-    position: {x: -1.210001, y: -0.56, z: 0}
-    rotation: {x: -0, y: -0, z: -0, w: 1}
-    name: _actiuneAction
-    place: 1
-  _currentState: 0
-  _washHandsAction:
-    probability: 0.5134887
-    stopDistance: 2
-    targetTransform: {fileID: 0}
-    position: {x: 1.2399998, y: 0, z: -3.6800003}
-    rotation: {x: -0, y: -0, z: -0, w: 1}
-    name: _washHandsAction
-    place: 3
-  _typingAction:
-    probability: 0.47588354
-    stopDistance: 2
-    targetTransform: {fileID: 0}
-    position: {x: -0.082999945, y: -0.33999997, z: -0.6989999}
-    rotation: {x: -0, y: -0, z: -0, w: 1}
-    name: _typingAction
+    position: {x: 0, y: 0, z: 0}
+    rotation: {x: 0, y: 0, z: 0, w: 0}
+    name: typingAction
     place: 0
-  _lookAtSphereAction:
-    probability: 0.5286488
-    stopDistance: 0.1
+  - probability: 0
+    stopDistance: 0
     targetTransform: {fileID: 0}
-    position: {x: 0, y: -1.07, z: -2.250001}
-    rotation: {x: -0, y: -0, z: -0, w: 1}
-    name: _lookAtSphereAction
-    place: 4
-  _actiuneAction:
-    probability: 0.7193493
-    stopDistance: 3
+    position: {x: 0, y: 0, z: 0}
+    rotation: {x: 0, y: 0, z: 0, w: 0}
+    name: lookAtSphereAction
+    place: 0
+  - probability: 0
+    stopDistance: 0
     targetTransform: {fileID: 0}
-    position: {x: -1.210001, y: -0.56, z: 0}
-    rotation: {x: -0, y: -0, z: -0, w: 1}
-    name: _actiuneAction
-    place: 1
+    position: {x: 0, y: 0, z: 0}
+    rotation: {x: 0, y: 0, z: 0, w: 0}
+    name: actiuneAction
+    place: 0
+  currentState: 0
+  washHandsAction:
+    probability: 0
+    stopDistance: 0
+    targetTransform: {fileID: 0}
+    position: {x: 0, y: 0, z: 0}
+    rotation: {x: 0, y: 0, z: 0, w: 0}
+    name: washHandsAction
+    place: 0
+  typingAction:
+    probability: 0
+    stopDistance: 0
+    targetTransform: {fileID: 0}
+    position: {x: 0, y: 0, z: 0}
+    rotation: {x: 0, y: 0, z: 0, w: 0}
+    name: typingAction
+    place: 0
+  lookAtSphereAction:
+    probability: 0
+    stopDistance: 0
+    targetTransform: {fileID: 0}
+    position: {x: 0, y: 0, z: 0}
+    rotation: {x: 0, y: 0, z: 0, w: 0}
+    name: lookAtSphereAction
+    place: 0
+  actiuneAction:
+    probability: 0
+    stopDistance: 0
+    targetTransform: {fileID: 0}
+    position: {x: 0, y: 0, z: 0}
+    rotation: {x: 0, y: 0, z: 0, w: 0}
+    name: actiuneAction
+    place: 0
   alreadyInfected: 0
-  _head: {fileID: 0}
+  head: {fileID: 0}
   sociableLevel: 0
   immunityLevel: 0
   cautiousLevel: 0
   infectionDist: 10
-  _infectionLevel: 0
+  infectionLevel: 0
   randomLocations: 0
   randomRange: 10
   stoppingDistance: 3
@@ -2105,9 +2195,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d6872d1362ca44a4f9ec4f262b14cec2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  circleImagePrefab: {fileID: 5146186573582581969, guid: ae363a8f511efbb4fbcf180b77633b36,
-    type: 3}
   botPanel: {fileID: 4102877581755450029, guid: 2be896c287202614eb8781f6d27f68f2,
+    type: 3}
+  circleImagePrefab: {fileID: 5146186573582581969, guid: ae363a8f511efbb4fbcf180b77633b36,
     type: 3}
   imageDisplay: {fileID: 0}
   panel: {fileID: 0}
@@ -2341,7 +2431,7 @@ GameObject:
   m_Icon: {fileID: 3936346786652291628, guid: 0000000000000000d000000000000000, type: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &4458512253131505750
 Transform:
   m_ObjectHideFlags: 0
