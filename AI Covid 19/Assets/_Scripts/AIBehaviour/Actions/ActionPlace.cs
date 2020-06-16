@@ -43,7 +43,7 @@ namespace Covid19.AIBehaviour.Actions
             var all = "";
             foreach (var key in Dictionary)
                 all += key.Key + " ";
-            Debug.Log("<color=blue>" + all + "</color>");
+            // Debug.Log("<color=blue>" + all + "</color>");
         }
 
         private void OnDrawGizmos()
