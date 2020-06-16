@@ -1,18 +1,24 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+[DisallowMultipleComponent]
+[RequireComponent(typeof(Collider))]
 public class BehaviourPlace : MonoBehaviour
 {
-    // Start is called before the first frame update
-    void Start()
+    [SerializeField] private GameObject chair;
+    
+    private void OnTriggerEnter(Collider other)
     {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
+        AgentNPC npc = other.gameObject.GetComponent<AgentNPC>();
+        if (npc != null)
+        {
+            Debug.Log("On trigger enter");
+            TypingBehaviour typingBehaviour = npc.gameObject.AddComponent<TypingBehaviour>();
+            typingBehaviour.chairTarget = chair;
+            Debug.Log(typingBehaviour.chairTarget);
+            npc.SetBehaviour(typingBehaviour);
+        }
     }
 }
