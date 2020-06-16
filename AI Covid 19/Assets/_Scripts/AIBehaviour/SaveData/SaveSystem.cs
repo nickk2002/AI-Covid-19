@@ -77,7 +77,7 @@ namespace Covid19.AIBehaviour.SaveData
             {
                 Debug.LogError("Nu exista jsonPath " + jsonPath);
                 return null;
-            }
+            }    
         }
     }
 }
