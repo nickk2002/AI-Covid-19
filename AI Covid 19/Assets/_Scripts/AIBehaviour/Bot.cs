@@ -397,8 +397,7 @@ namespace Covid19.AIBehaviour
             var possibleBots = new List<Bot>(); /// lista cu toti botii posibili
             foreach (var partnerBot in ListBots)
             {
-                if (_listIgnoredBots.Find(bot => bot.Item1 == partnerBot) != null
-                ) // daca botul partner bot este ignorat
+                if (_listIgnoredBots.Find(bot => bot.Item1 == partnerBot) != null) // daca botul partner bot este ignorat
                 {
                     var startIgnoringTime = _listIgnoredBots.Find(bot => bot.Item1 == partnerBot).Item2;
                     /// daca sa zicem bot1 si bot2 incearca sa se intalneasca dar nu reusesc din cauza probabilitatii
@@ -433,18 +432,14 @@ namespace Covid19.AIBehaviour
                     partnerBot._listIgnoredBots.Find(bot => this == bot.Item1) == null &&
                     currentState != State.AnyAction && partnerBot.currentState != State.AnyAction)
                 {
-                    var randomValueBetweenRange =
-                        UnityEngine.Random.Range(1,
-                            10); // trebuie verificat sa fie la fel cu Range[1,10] sau daca e modificat in viitor
+                    var randomValueBetweenRange = UnityEngine.Random.Range(1,10); // trebuie verificat sa fie la fel cu Range[1,10] sau daca e modificat in viitor
                     // daca randomul este mai mic decat nivelul social al primului si este mai mic decat nivelul social al ceiluilat
                     // atunci se pot intalni
                     if (randomValueBetweenRange <= sociableLevel && randomValueBetweenRange <= partnerBot.sociableLevel)
                     {
                         //Debug.Log("se intalnesc cei doi boti: " + this.name + "si" + partnerBot.name);
 
-                        var diferenta =
-                            partnerBot.transform.position -
-                            transform.position; /// vectorul de la botul curent la celelalt
+                        var diferenta = partnerBot.transform.position - transform.position; /// vectorul de la botul curent la celelalt
                         diferenta /= 2; // jumatatea vectorului
                         var meetingPointHalf = transform.position + diferenta; // punctul de intalnire la jumatate
                         var offset = diferenta.normalized * offsetMeeting / 2; // offset pt inalnire
