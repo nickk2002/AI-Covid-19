@@ -14,4 +14,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   randomLocations: 1
   randomRange: 10
-  stoppingDistance: 3
+  stoppingDistance: 0.1
