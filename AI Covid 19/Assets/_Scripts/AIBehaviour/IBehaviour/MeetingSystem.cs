@@ -1,15 +1,18 @@
 ﻿using Covid19.Utils;
 using UnityEngine;
+using System.Collections.Generic;
+using System;
 
 namespace Covid19.AIBehaviour.Behaviour
 {
+    [Serializable]
     public class MeetingSystem
     {
         private AgentNPC _ownerNPC;
         private Transform _transform;
-
-        public int ceva;
-        public float lastMeetingTime = 0;
+        
+        public float lastMeetingTime = 0; // TODO : don't make it public
+        private List<Tuple<AgentNPC, float>> _ignoredAgents = new List<Tuple<AgentNPC, float>>();
 
         public MeetingSystem(AgentNPC ownerOwnerNPC)
         {
@@ -20,12 +23,38 @@ namespace Covid19.AIBehaviour.Behaviour
         private bool AcceptsMeeting(AgentNPC agentNPC)
         {
             // TODO : Modify to make the list of ignored bots etc.
-            if (lastMeetingTime == 0 || (Time.time - lastMeetingTime) > _ownerNPC.cooldownMeeting)
+            
+            // check to prevent two agents meeting without having time to turn around and walk away
+            if (lastMeetingTime != 0 && !(Time.time - lastMeetingTime > _ownerNPC.cooldownMeeting)) 
+                return false;
+            
+            var found = _ignoredAgents.Find(tuple => tuple.Item1 == agentNPC);
+            // if we found an agent ignored and 
+            if (found != null)
+            {
+                // if 10 seconds had not still passed, then we simply cancel the meeting
+                if (Time.time - found.Item2 < 10f)
+                {
+                    Debug.Log("Failed due to ignored list");
+                    return false;
+                }
+                // if 10 seconds passed than remove the bot is no longer ignored
+                _ignoredAgents.Remove(found);
+            }
+            
+            // check if the probabilites and the sociable level are satisfed
+            int randomValue = UnityEngine.Random.Range(1, 10);
+            if (randomValue <= _ownerNPC.sociabalLevel)
             {
                 if (AIUtils.CanSeeObject(_transform, agentNPC.transform, agentNPC.viewDist, agentNPC.viewAngle))
                 {
                     return true;
                 }
+            }
+            else
+            {
+                // failed due to probability, than we prevent this two agents to try again, in order to mentain math probability
+                _ignoredAgents.Add(new Tuple<AgentNPC,float>(agentNPC,Time.time));
             }
 
             return false;
