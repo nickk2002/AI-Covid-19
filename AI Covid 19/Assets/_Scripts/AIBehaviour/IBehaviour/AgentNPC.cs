@@ -13,6 +13,7 @@ namespace Covid19.AIBehaviour.Behaviour
         public MeetingSystem MeetingSystem => _meetingSystem;
         [SerializeField] private List<AgentNPC> listAgents;
 
+        [Header("Patrol")]
         public GameObject[] patrolPositions; // array holding patrol positions
         public GameObject posHolder; // This is used for an easier way to set patrol points
         public NavMeshAgent Agent { get; private set; }
@@ -22,10 +23,16 @@ namespace Covid19.AIBehaviour.Behaviour
         [SerializeField]
         private float stoppingDistance = 3f; // the distance in which the agent stops and moves to the next position
 
+        [Header("Meeting")]
+        [Range(1,10)]
+        public float sociabalLevel;
+        [Range(1,5)]
         [SerializeField] public int offsetMeeting;
         [SerializeField] public float viewDist;
         [SerializeField] public float viewAngle;
         public float cooldownMeeting;
+        
+        // TODO : add a scriptable object to set up all the Meeting settings for a bot
 
         private Stack<IBehaviour> _behaviours = new Stack<IBehaviour>();
         private Dictionary<IBehaviour, Coroutine> _dictionary = new Dictionary<IBehaviour, Coroutine>();
