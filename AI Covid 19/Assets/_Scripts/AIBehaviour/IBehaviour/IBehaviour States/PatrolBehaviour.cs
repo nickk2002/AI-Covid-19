@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 
-namespace Covid19.AIBehaviour.Behaviour
+namespace Covid19.AIBehaviour.Behaviour.States
 {
     public class PatrolBehaviour : MonoBehaviour, IBehaviour
     {
@@ -52,7 +52,7 @@ namespace Covid19.AIBehaviour.Behaviour
             while (true)
             {
                 Debug.Log($"In patrol {name}");
-                if (_startPatroling == false || _npc.Agent.remainingDistance < 0.2f)
+                if (_startPatroling == false || _npc.Agent.remainingDistance < _npc.patrolConfiguration.stoppingDistance)
                 {
                     _startPatroling = true;
                     _npc.Agent.SetDestination(_npc.patrolPositions[_indexPatrol].transform.position);
@@ -64,11 +64,11 @@ namespace Covid19.AIBehaviour.Behaviour
 
                 yield return null;
                 
-                AgentNPC partnerNPC = _npc.MeetingSystem.FindNPCToMeet();
+                AgentNPC partnerNPC = _npc.MeetSystem.FindNPCToMeet();
                 if (partnerNPC)
                 {
                     // TODO : make the two agents wait the same random amount of time
-                    Vector3 meetingPosition = _npc.MeetingSystem.GetMeetingPosition(partnerNPC);
+                    Vector3 meetingPosition = _npc.MeetSystem.GetMeetingPosition(partnerNPC);
                     MeetBehaviour meetBehaviour = _npc.gameObject.AddComponent<MeetBehaviour>();
                     meetBehaviour.MeetPosition = meetingPosition;
                     _npc.SetBehaviour(meetBehaviour);
