@@ -36,7 +36,7 @@ namespace Covid19.AIBehaviour.Behaviour
 
         public void Enable()
         {
-            Debug.Log("Entered patrol");
+            Debug.Log($"Entered patrol {name}");
             _npc = GetComponent<AgentNPC>();
             _agent = GetComponent<NavMeshAgent>();
             SetUpPosHolder();
@@ -51,7 +51,7 @@ namespace Covid19.AIBehaviour.Behaviour
         {
             while (true)
             {
-                Debug.Log("In coroutine OnUpdate() of patrol Behaviour");
+                Debug.Log($"In patrol {name}");
                 if (_startPatroling == false || _npc.Agent.remainingDistance < 0.2f)
                 {
                     _startPatroling = true;
@@ -66,6 +66,7 @@ namespace Covid19.AIBehaviour.Behaviour
                 AgentNPC partnerNPC = _npc.MeetingSystem.FindNPCToMeet();
                 if (partnerNPC)
                 {
+                    // TODO : make the two agents wait the same random amount of time
                     Vector3 meetingPosition = _npc.MeetingSystem.GetMeetingPosition(partnerNPC);
                     MeetBehaviour meetBehaviour = _npc.gameObject.AddComponent<MeetBehaviour>();
                     meetBehaviour.MeetPosition = meetingPosition;

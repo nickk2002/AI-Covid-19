@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using Covid19.AIBehaviour.Behaviour;
 using UnityEngine;
 
 [DisallowMultipleComponent]

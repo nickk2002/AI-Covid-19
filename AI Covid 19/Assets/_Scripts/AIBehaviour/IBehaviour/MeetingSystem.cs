@@ -8,18 +8,36 @@ namespace Covid19.AIBehaviour.Behaviour
         private AgentNPC _ownerNPC;
         private Transform _transform;
 
+        public int ceva;
+        public float lastMeetingTime = 0;
+
         public MeetingSystem(AgentNPC ownerOwnerNPC)
         {
             _ownerNPC = ownerOwnerNPC;
             _transform = _ownerNPC.transform;
         }
+
+        private bool AcceptsMeeting(AgentNPC agentNPC)
+        {
+            // TODO : Modify to make the list of ignored bots etc.
+            if (lastMeetingTime == 0 || (Time.time - lastMeetingTime) > _ownerNPC.cooldownMeeting)
+            {
+                if (AIUtils.CanSeeObject(_transform, agentNPC.transform, agentNPC.viewDist, agentNPC.viewAngle))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
         public AgentNPC FindNPCToMeet()
         {
             foreach (AgentNPC partnerNPC in _ownerNPC.ListAgents)
             {
                 if (_ownerNPC != partnerNPC &&
-                    AIUtils.CanSeeObject(_transform, partnerNPC.transform, _ownerNPC.viewDist, _ownerNPC.viewAngle) &&
-                    partnerNPC.AcceptsMeeting(_ownerNPC))
+                    _ownerNPC.MeetingSystem.AcceptsMeeting(partnerNPC) &&
+                    partnerNPC.MeetingSystem.AcceptsMeeting(_ownerNPC))
                 {
                     return partnerNPC;
                 }
