@@ -12,3 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ebcf63fa564ff1147ba5af21b9b97ad7, type: 3}
   m_Name: Patrol
   m_EditorClassIdentifier: 
+  randomLocations: 1
+  randomRange: 10
+  stoppingDistance: 3
