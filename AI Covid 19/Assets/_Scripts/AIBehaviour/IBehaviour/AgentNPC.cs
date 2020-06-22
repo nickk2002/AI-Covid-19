@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using Covid19.Utils;
+﻿using System.Collections.Generic;
+using Covid19.AIBehaviour.Behaviour.States;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -9,41 +7,30 @@ namespace Covid19.AIBehaviour.Behaviour
 {
     public class AgentNPC : MonoBehaviour
     {
+        public NavMeshAgent Agent { get; private set; }
         public List<AgentNPC> ListAgents => listAgents;
-        public MeetingSystem MeetingSystem => _meetingSystem;
+        public MeetSystem MeetSystem => _meetSystem;
         [SerializeField] private List<AgentNPC> listAgents;
 
         [Header("Patrol")]
         public GameObject[] patrolPositions; // array holding patrol positions
         public GameObject posHolder; // This is used for an easier way to set patrol points
-        public NavMeshAgent Agent { get; private set; }
-        [SerializeField] private bool randomLocations = false; // if he uses randomLocations
-        [SerializeField] private float randomRange = 10f; // the range of the random
-
-        [SerializeField]
-        private float stoppingDistance = 3f; // the distance in which the agent stops and moves to the next position
-
-        [Header("Meeting")]
-        [Range(1,10)]
-        public float sociabalLevel;
-        [Range(1,5)]
-        [SerializeField] public int offsetMeeting;
-        [SerializeField] public float viewDist;
-        [SerializeField] public float viewAngle;
-        public float cooldownMeeting;
         
-        // TODO : add a scriptable object to set up all the Meeting settings for a bot
-
-        private Stack<IBehaviour> _behaviours = new Stack<IBehaviour>();
-        private Dictionary<IBehaviour, Coroutine> _dictionary = new Dictionary<IBehaviour, Coroutine>();
+        public PatrolConfiguration patrolConfiguration;
+        
+        public MeetConfiguration meetConfiguration;
+        
+        private MeetSystem _meetSystem;
+        
+        private readonly Stack<IBehaviour> _behaviours = new Stack<IBehaviour>();
+        private readonly Dictionary<IBehaviour, Coroutine> _dictionary = new Dictionary<IBehaviour, Coroutine>();
         private IBehaviour _currentBehaviour;
-        private MeetingSystem _meetingSystem;
-
+        
         void Awake()
         {
             Agent = GetComponent<NavMeshAgent>();
             SetBehaviour(GetComponent<IBehaviour>());
-            _meetingSystem = new MeetingSystem(this);
+            _meetSystem = new MeetSystem(this);
         }
 
         public void SetBehaviour(IBehaviour behaviour)
