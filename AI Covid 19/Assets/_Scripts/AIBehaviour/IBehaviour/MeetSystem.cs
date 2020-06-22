@@ -6,7 +6,7 @@ using System;
 namespace Covid19.AIBehaviour.Behaviour
 {
     [Serializable]
-    public class MeetingSystem
+    public class MeetSystem
     {
         private AgentNPC _ownerNPC;
         private Transform _transform;
@@ -14,7 +14,7 @@ namespace Covid19.AIBehaviour.Behaviour
         public float lastMeetingTime = 0; // TODO : don't make it public
         private List<Tuple<AgentNPC, float>> _ignoredAgents = new List<Tuple<AgentNPC, float>>();
 
-        public MeetingSystem(AgentNPC ownerOwnerNPC)
+        public MeetSystem(AgentNPC ownerOwnerNPC)
         {
             _ownerNPC = ownerOwnerNPC;
             _transform = _ownerNPC.transform;
@@ -22,10 +22,8 @@ namespace Covid19.AIBehaviour.Behaviour
 
         private bool AcceptsMeeting(AgentNPC agentNPC)
         {
-            // TODO : Modify to make the list of ignored bots etc.
-            
             // check to prevent two agents meeting without having time to turn around and walk away
-            if (lastMeetingTime != 0 && !(Time.time - lastMeetingTime > _ownerNPC.cooldownMeeting)) 
+            if (lastMeetingTime != 0 && !(Time.time - lastMeetingTime > _ownerNPC.meetConfiguration.cooldownMeeting)) 
                 return false;
             
             var found = _ignoredAgents.Find(tuple => tuple.Item1 == agentNPC);
@@ -44,9 +42,9 @@ namespace Covid19.AIBehaviour.Behaviour
             
             // check if the probabilites and the sociable level are satisfed
             int randomValue = UnityEngine.Random.Range(1, 10);
-            if (randomValue <= _ownerNPC.sociabalLevel)
+            if (randomValue <= _ownerNPC.meetConfiguration.sociabalLevel)
             {
-                if (AIUtils.CanSeeObject(_transform, agentNPC.transform, agentNPC.viewDist, agentNPC.viewAngle))
+                if (AIUtils.CanSeeObject(_transform, agentNPC.transform, agentNPC.meetConfiguration.viewDist, agentNPC.meetConfiguration.viewAngle))
                 {
                     return true;
                 }
@@ -65,8 +63,8 @@ namespace Covid19.AIBehaviour.Behaviour
             foreach (AgentNPC partnerNPC in _ownerNPC.ListAgents)
             {
                 if (_ownerNPC != partnerNPC &&
-                    _ownerNPC.MeetingSystem.AcceptsMeeting(partnerNPC) &&
-                    partnerNPC.MeetingSystem.AcceptsMeeting(_ownerNPC))
+                    _ownerNPC.MeetSystem.AcceptsMeeting(partnerNPC) &&
+                    partnerNPC.MeetSystem.AcceptsMeeting(_ownerNPC))
                 {
                     return partnerNPC;
                 }
@@ -79,7 +77,7 @@ namespace Covid19.AIBehaviour.Behaviour
             var position = _transform.position;
             Vector3 direction = npc.transform.position - position;
             direction /= 2;
-            Vector3 meetingPosition = position + direction - _ownerNPC.offsetMeeting * direction.normalized;
+            Vector3 meetingPosition = position + direction - _ownerNPC.meetConfiguration.offsetMeeting * direction.normalized;
             
             return meetingPosition;
         }

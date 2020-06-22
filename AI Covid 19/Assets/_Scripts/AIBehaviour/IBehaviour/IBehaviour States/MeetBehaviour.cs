@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using UnityEngine;
 
-namespace Covid19.AIBehaviour.Behaviour
+namespace Covid19.AIBehaviour.Behaviour.States
 {
     public class MeetBehaviour : MonoBehaviour, IBehaviour
     {
@@ -37,7 +37,7 @@ namespace Covid19.AIBehaviour.Behaviour
                     yield return new WaitForSeconds(3);
                     Debug.Log($"Exiting meeting {name}");
                     
-                    _npc.MeetingSystem.lastMeetingTime = Time.time;
+                    _npc.MeetSystem.lastMeetingTime = Time.time;
                     _npc.Agent.isStopped = false;
                     _animator.SetBool(Talking, false);
                     _npc.RemoveBehaviour(this);

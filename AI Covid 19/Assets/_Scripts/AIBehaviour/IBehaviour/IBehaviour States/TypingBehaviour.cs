@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Covid19.AIBehaviour.Behaviour
+namespace Covid19.AIBehaviour.Behaviour.States
 {
     public class TypingBehaviour : MonoBehaviour, IBehaviour
     {
