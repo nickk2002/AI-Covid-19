@@ -3,45 +3,44 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class TypingBehaviour : MonoBehaviour,IBehaviour
+namespace Covid19.AIBehaviour.Behaviour
 {
-    public GameObject chairTarget;
-    private Animator _animator;
-    private AgentNPC _npc;
-    private Coroutine _coroutine;
-    
-    private static readonly int Typing = Animator.StringToHash("typing");
-    
-    
-    public void Enable()
+    public class TypingBehaviour : MonoBehaviour, IBehaviour
     {
-        _animator = GetComponent<Animator>();
-        _npc = GetComponent<AgentNPC>();
-        _coroutine = StartCoroutine(OnUpdate());
-    }
+        public GameObject chairTarget;
+        private Animator _animator;
+        private AgentNPC _npc;
 
-    public void Disable()
-    {
-        StopCoroutine(_coroutine);
-    }
-
-    public IEnumerator OnUpdate()
-    {
-        var position = chairTarget.transform.position;
-        Debug.Log($"in On Update {chairTarget} with position {position}",chairTarget);
-        _npc.Agent.SetDestination(position);
-        while (true)
+        private static readonly int Typing = Animator.StringToHash("typing");
+        
+        public void Enable()
         {
-            if (_npc.Agent.remainingDistance < 1)
+            _animator = GetComponent<Animator>();
+            _npc = GetComponent<AgentNPC>();
+        }
+
+        public void Disable()
+        {
+        }
+
+        public IEnumerator OnUpdate()
+        {
+            var position = chairTarget.transform.position;
+            Debug.Log($"in On Update {chairTarget} with position {position}", chairTarget);
+            _npc.Agent.SetDestination(position);
+            while (true)
             {
-                _npc.Agent.isStopped = true;
-                _animator.SetBool(Typing, true);
-                yield return new WaitForSeconds(3f);
-                _animator.SetBool(Typing, false);
-                _npc.RemoveBehaviour(this);
-                _npc.Agent.isStopped = false;
+                if (_npc.Agent.remainingDistance < 1)
+                {
+                    _npc.Agent.isStopped = true;
+                    _animator.SetBool(Typing, true);
+                    yield return new WaitForSeconds(3f);
+                    _animator.SetBool(Typing, false);
+                    _npc.RemoveBehaviour(this);
+                    _npc.Agent.isStopped = false;
+                }
+                yield return null;    
             }
-            yield return null;
         }
     }
 }
