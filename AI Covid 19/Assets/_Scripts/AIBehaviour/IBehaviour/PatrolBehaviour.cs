@@ -55,10 +55,11 @@ namespace Covid19.AIBehaviour.Behaviour
                 if (_startPatroling == false || _npc.Agent.remainingDistance < 0.2f)
                 {
                     _startPatroling = true;
+                    _npc.Agent.SetDestination(_npc.patrolPositions[_indexPatrol].transform.position);
+                    
                     _indexPatrol++;
                     if (_indexPatrol == _npc.patrolPositions.Length)
                         _indexPatrol = 0;
-                    _npc.Agent.SetDestination(_npc.patrolPositions[_indexPatrol].transform.position);
                 }
 
                 yield return null;
