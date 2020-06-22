@@ -13,7 +13,7 @@ namespace Covid19.AIBehaviour.Behaviour
 
         public void Enable()
         {
-            Debug.Log("Am intrat in enable de la meeting");
+            Debug.Log($"Entered meeting {name}");
             _npc = GetComponent<AgentNPC>();
             _npc.Agent.SetDestination(MeetPosition);
             _animator = GetComponent<Animator>();
@@ -26,16 +26,18 @@ namespace Covid19.AIBehaviour.Behaviour
         }
 
         public IEnumerator OnUpdate()
-        {
+        {    
             while (true)
             {
-                Debug.Assert(_npc.Agent != null,"Assertion failed");
+                Debug.Log($"In meeting {name}");
                 if (_npc.Agent.remainingDistance < 0.1f)
                 {
                     _npc.Agent.isStopped = true;
                     _animator.SetBool(Talking, true);
-                    yield return new WaitForSeconds(UnityEngine.Random.Range(3,5));
-                    Debug.Log("Finished the talking stuff");
+                    yield return new WaitForSeconds(3);
+                    Debug.Log($"Exiting meeting {name}");
+                    
+                    _npc.MeetingSystem.lastMeetingTime = Time.time;
                     _npc.Agent.isStopped = false;
                     _animator.SetBool(Talking, false);
                     _npc.RemoveBehaviour(this);
