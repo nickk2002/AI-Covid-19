@@ -10,8 +10,8 @@ namespace Covid19.AIBehaviour.Behaviour
     {
         private AgentNPC _ownerNPC;
         private Transform _transform;
-        
-        public float lastMeetingTime = 0; // TODO : don't make it public
+
+        public float LastMeetingTime { set; private get; }
         private List<Tuple<AgentNPC, float>> _ignoredAgents = new List<Tuple<AgentNPC, float>>();
 
         public MeetSystem(AgentNPC ownerOwnerNPC)
@@ -23,7 +23,7 @@ namespace Covid19.AIBehaviour.Behaviour
         private bool AcceptsMeeting(AgentNPC agentNPC)
         {
             // check to prevent two agents meeting without having time to turn around and walk away
-            if (lastMeetingTime != 0 && !(Time.time - lastMeetingTime > _ownerNPC.meetConfiguration.cooldownMeeting)) 
+            if (LastMeetingTime != 0 && !(Time.time - LastMeetingTime > _ownerNPC.meetConfiguration.cooldownMeeting)) 
                 return false;
             
             var found = _ignoredAgents.Find(tuple => tuple.Item1 == agentNPC);
@@ -33,7 +33,7 @@ namespace Covid19.AIBehaviour.Behaviour
                 // if 10 seconds had not still passed, then we simply cancel the meeting
                 if (Time.time - found.Item2 < 10f)
                 {
-                    Debug.Log("Failed due to ignored list");
+                    Debug.Log("Meeting Failed due to ignored list");
                     return false;
                 }
                 // if 10 seconds passed than remove the bot is no longer ignored
@@ -42,7 +42,7 @@ namespace Covid19.AIBehaviour.Behaviour
             
             // check if the probabilites and the sociable level are satisfed
             int randomValue = UnityEngine.Random.Range(1, 10);
-            if (randomValue <= _ownerNPC.meetConfiguration.sociabalLevel)
+            if (randomValue <= _ownerNPC.meetConfiguration.sociableLevel)
             {
                 if (AIUtils.CanSeeObject(_transform, agentNPC.transform, agentNPC.meetConfiguration.viewDist, agentNPC.meetConfiguration.viewAngle))
                 {
@@ -52,6 +52,7 @@ namespace Covid19.AIBehaviour.Behaviour
             else
             {
                 // failed due to probability, than we prevent this two agents to try again, in order to mentain math probability
+                Debug.Log($"meeting failed due to probability, expected >= {_ownerNPC.meetConfiguration.sociableLevel} but random was {randomValue}");
                 _ignoredAgents.Add(new Tuple<AgentNPC,float>(agentNPC,Time.time));
             }
 
