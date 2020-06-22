@@ -12,8 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 90445e15ef05c6b4f928084a1f8ee34e, type: 3}
   m_Name: Meet
   m_EditorClassIdentifier: 
-  sociabalLevel: 0
-  offsetMeeting: 0
-  viewDist: 0
-  viewAngle: 0
-  cooldownMeeting: 0
+  sociabalLevel: 10
+  offsetMeeting: 1
+  viewDist: 30
+  viewAngle: 60
+  cooldownMeeting: 5

@@ -14,8 +14,6 @@ namespace Covid19.AIBehaviour
         /// cat de mult poate sa vada maxim un bot in functie de cat de sociabil este
         public float minViewDistance = 10f; // cat de putin poate sa vada un bot
 
-        public float minTalkDuration = 20f; // TODO : sa introduc conditiile astea in Bot.cs in TryMeetBot
-        public float maxTalkDuration = 60f; // un minut
 
         public AnimationCurve coughCurve;
 
