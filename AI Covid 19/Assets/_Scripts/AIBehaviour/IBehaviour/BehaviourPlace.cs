@@ -1,4 +1,5 @@
-﻿using Covid19.AIBehaviour.Behaviour;
+﻿using System;
+using Covid19.AIBehaviour.Behaviour;
 using Covid19.AIBehaviour.Behaviour.States;
 using UnityEngine;
 
@@ -7,17 +8,24 @@ using UnityEngine;
 public class BehaviourPlace : MonoBehaviour
 {
     [SerializeField] private GameObject chair;
+    private bool _occupied = false;
     
     private void OnTriggerEnter(Collider other)
     {
         AgentNPC npc = other.gameObject.GetComponent<AgentNPC>();
-        if (npc != null)
+        
+        if (npc != null && _occupied == false)
         {
-            Debug.Log("On trigger enter");
+            _occupied = true;
             TypingBehaviour typingBehaviour = npc.gameObject.AddComponent<TypingBehaviour>();
             typingBehaviour.chairTarget = chair;
             Debug.Log(typingBehaviour.chairTarget);
             npc.SetBehaviour(typingBehaviour);
         }
+    }
+
+    private void OnTriggerExit(Collider other)
+    {
+        _occupied = false;
     }
 }
