@@ -2,9 +2,12 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public interface IBehaviour
+namespace Covid19.AIBehaviour.Behaviour
 {
-    void Enable();
-    void Disable();
-    IEnumerator OnUpdate();
+    public interface IBehaviour
+    {
+        void Enable();
+        void Disable();
+        IEnumerator OnUpdate();
+    }
 }
