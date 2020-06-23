@@ -9,7 +9,8 @@ namespace Covid19.AIBehaviour.Behaviour.States
         private Animator _animator;
         private AgentNPC _npc;
 
-        private static readonly int Talking = Animator.StringToHash("talking");
+        private static readonly int TalkingBool = Animator.StringToHash("talking");
+        private static readonly int TalkID = Animator.StringToHash("talkID");
 
         public void Enable()
         {
@@ -33,13 +34,14 @@ namespace Covid19.AIBehaviour.Behaviour.States
                 if (_npc.Agent.remainingDistance < 0.1f)
                 {
                     _npc.Agent.isStopped = true;
-                    _animator.SetBool(Talking, true);
-                    yield return new WaitForSeconds(3);
+                    _animator.SetBool(TalkingBool, true);
+                    _animator.SetInteger(TalkID,_npc.MeetSystem.TalkAnimationID);
+                    yield return new WaitForSeconds(_npc.MeetSystem.TalkDuration);
                     Debug.Log($"Exiting meeting {name}");
                     
                     _npc.MeetSystem.LastMeetingTime = Time.time;
                     _npc.Agent.isStopped = false;
-                    _animator.SetBool(Talking, false);
+                    _animator.SetBool(TalkingBool, false);
                     _npc.RemoveBehaviour(this);
                 }
 
