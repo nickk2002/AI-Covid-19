@@ -11,6 +11,7 @@ namespace Covid19.AIBehaviour.Behaviour
         private AgentNPC _ownerNPC;
         private Transform _transform;
 
+        public int TalkAnimationID { get; private set; }
         public float TalkDuration { get; private set; }
         public float LastMeetingTime { set; private get; }
         private List<Tuple<AgentNPC, float>> _ignoredAgents = new List<Tuple<AgentNPC, float>>();
@@ -80,6 +81,14 @@ namespace Covid19.AIBehaviour.Behaviour
             // the issue is that this function will be called two times and the randomDurations will change twice
             TalkDuration = duration;
             partnerNpc.MeetSystem.TalkDuration = duration;
+
+            TalkAnimationID = UnityEngine.Random.Range(0, 3);
+            while (TalkAnimationID == partnerNpc.MeetSystem.TalkAnimationID)
+            {
+                TalkAnimationID = UnityEngine.Random.Range(0, 3);
+            }
+
+            Debug.Log($"Talk Animation ID is {TalkAnimationID}");
         }
         public Vector3 GetMeetingPosition(AgentNPC npc)
         {
