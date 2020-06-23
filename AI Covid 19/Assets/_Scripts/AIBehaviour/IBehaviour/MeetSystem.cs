@@ -11,6 +11,7 @@ namespace Covid19.AIBehaviour.Behaviour
         private AgentNPC _ownerNPC;
         private Transform _transform;
 
+        public float TalkDuration { get; private set; }
         public float LastMeetingTime { set; private get; }
         private List<Tuple<AgentNPC, float>> _ignoredAgents = new List<Tuple<AgentNPC, float>>();
 
@@ -73,6 +74,13 @@ namespace Covid19.AIBehaviour.Behaviour
             return null;
         }
 
+        public void SetTalkDuration(AgentNPC partnerNpc,float duration)
+        {
+            // set both agents the same TalkDuration
+            // the issue is that this function will be called two times and the randomDurations will change twice
+            TalkDuration = duration;
+            partnerNpc.MeetSystem.TalkDuration = duration;
+        }
         public Vector3 GetMeetingPosition(AgentNPC npc)
         {
             var position = _transform.position;

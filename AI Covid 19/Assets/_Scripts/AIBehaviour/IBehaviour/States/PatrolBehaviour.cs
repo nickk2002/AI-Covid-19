@@ -21,15 +21,13 @@ namespace Covid19.AIBehaviour.Behaviour.States
                 // daca se intampla ca cineva sa puna un obiect aleator ca si PosHolder care nu are copii
                 if (_npc.posHolder.transform.childCount == 0) 
                     Debug.LogError("Pos holder of bot : " + name + "has no other children");
-
                 // initializez vectorul de pozitii cu cati copii are posHolder
                 _npc.patrolPositions = new GameObject[_npc.posHolder.transform.childCount];
                 var i = 0;
                 foreach (Transform child in _npc.posHolder.transform)
                 {
-                    // vectorul de pozitii retine gameobject-uri ca .gameobject
                     _npc.patrolPositions[i] = child.gameObject; 
-                    i++; // cresc indexul
+                    i++;
                 }
             }
         }
@@ -62,12 +60,13 @@ namespace Covid19.AIBehaviour.Behaviour.States
                         _indexPatrol = 0;
                 }
 
-                yield return null;
+                yield return null; // VERY IMPORTANT TO PAUSE THE EXECUTION HERE, it will make sure that this coroutine can be stopped
                 
                 AgentNPC partnerNPC = _npc.MeetSystem.FindNPCToMeet();
                 if (partnerNPC)
                 {
-                    // TODO : make the two agents wait the same random amount of time
+                    _npc.MeetSystem.SetTalkDuration(partnerNPC,UnityEngine.Random.Range(8,10));
+
                     Vector3 meetingPosition = _npc.MeetSystem.GetMeetingPosition(partnerNPC);
                     MeetBehaviour meetBehaviour = _npc.gameObject.AddComponent<MeetBehaviour>();
                     meetBehaviour.MeetPosition = meetingPosition;
