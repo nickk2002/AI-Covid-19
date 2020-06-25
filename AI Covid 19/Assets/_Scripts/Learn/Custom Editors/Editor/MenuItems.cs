@@ -48,11 +48,6 @@ namespace Covid19.Learn.Custom_Editors.Editor
         {
 
         }
-        [MenuItem("Assets/Inspect Script", true)]
-        static bool Validate()
-        {
-            return Selection.activeObject.GetType() == typeof(Scene);
-        }
         [MenuItem("CONTEXT/Bot/Randomise Probabilites")]
         static void RandomiseStuff(MenuCommand menuCommand)
         {

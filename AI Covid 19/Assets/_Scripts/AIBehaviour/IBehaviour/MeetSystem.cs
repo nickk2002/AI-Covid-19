@@ -77,10 +77,6 @@ namespace Covid19.AIBehaviour.Behaviour
 
         public void SetTalkDuration(AgentNPC partnerNpc,float duration)
         {
-            // set both agents the same TalkDuration
-            // the issue is that this function will be called two times and the randomDurations will change twice
-            TalkDuration = duration;
-            partnerNpc.MeetSystem.TalkDuration = duration;
 
             TalkAnimationID = UnityEngine.Random.Range(0, 3);
             while (TalkAnimationID == partnerNpc.MeetSystem.TalkAnimationID)
