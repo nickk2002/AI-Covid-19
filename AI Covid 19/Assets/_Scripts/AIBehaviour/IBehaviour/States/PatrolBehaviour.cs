@@ -70,6 +70,7 @@ namespace Covid19.AIBehaviour.Behaviour.States
                     Vector3 meetingPosition = _npc.MeetSystem.GetMeetingPosition(partnerNPC);
                     MeetBehaviour meetBehaviour = _npc.gameObject.AddComponent<MeetBehaviour>();
                     meetBehaviour.MeetPosition = meetingPosition;
+                    meetBehaviour.partnerNPC = partnerNPC;
                     _npc.SetBehaviour(meetBehaviour);
                 }
 
