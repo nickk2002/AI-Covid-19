@@ -27,7 +27,7 @@ namespace Covid19.Utils
             Debug.Log("entered in functie");
             SetIcon(Selection.activeGameObject, _meetingPoint);
         }
-        static void SetIcon(GameObject go, Texture texture)
+        public static void SetIcon(GameObject go, Texture texture)
         {
             var editorGUIUtilityType = typeof(EditorGUIUtility);
             var bindingFlags = BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Public | BindingFlags.InvokeMethod;
