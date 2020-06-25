@@ -1,5 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Covid19.AIBehaviour.Behaviour.States;
+using Covid19.Utils;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -17,7 +20,6 @@ namespace Covid19.AIBehaviour.Behaviour
         public GameObject posHolder; // This is used for an easier way to set patrol points
         
         public PatrolConfiguration patrolConfiguration;
-        
         public MeetConfiguration meetConfiguration;
         
         private MeetSystem _meetSystem;
@@ -65,6 +67,6 @@ namespace Covid19.AIBehaviour.Behaviour
                 _dictionary[_currentBehaviour] = coroutine;
             }
         }
-
+        
     }
 }

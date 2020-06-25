@@ -22,23 +22,22 @@ namespace Tests
         private List<Quest> _questList;
         private List<ActionTextUI> _textList;
         private ActionsManagerUI _actionsManagerUI;
-        private static bool initialized = false;
 
         [UnitySetUp] 
         public IEnumerator SetUpScene()
         {
             
-                Debug.Log("Loading the Scene");
-                SceneManager.LoadScene("_Scenes/BasicScene");
-                yield return new WaitForSeconds(1.5f);
+            Debug.Log("Loading the Scene");
+            SceneManager.LoadScene("_Scenes/BasicScene");
+            yield return new WaitForSeconds(1.5f);
 
-                // arrange stuff that are needed in all the tests
-                _room = Object.FindObjectOfType<Room>();
-                _questList = _room.GetComponentsInChildren<Quest>().ToList();
-                _actionsManagerUI = UIManager.Instance.actionsManagerUI;
-                _actionsManagerUI.Show(_questList);
-                _textList = _actionsManagerUI.Quests;
-                _actionsManagerUI.UnShow();
+            // arrange stuff that are needed in all the tests
+            _room = Object.FindObjectOfType<Room>();
+            _questList = _room.GetComponentsInChildren<Quest>().ToList();
+            _actionsManagerUI = UIManager.Instance.actionsManagerUI;
+            _actionsManagerUI.Show(_questList);
+            _textList = _actionsManagerUI.Quests;
+            _actionsManagerUI.UnShow();
             
         }
  
@@ -82,23 +81,5 @@ namespace Tests
             yield return null;
             Assert.Greater(_textList.Count,0);
         }
-        [UnityTest]
-        public IEnumerator UIDissappearingAfterExitingTheRoom()
-        {
-
-            
-            //UIManager.
-
-            // Player.Instance.JumpAt(initialPosition); // jump all the way up
-            // Debug.Log("the player jumped at position " + position);
-            // yield return new WaitForFixedUpdate();
-            yield return new WaitForSeconds(5f);
-
-            //Assert.AreEqual(_actionsManagerUI.gameObject.activeSelf,false);
-            
-            
-        }
-        
     }
-    
 }
