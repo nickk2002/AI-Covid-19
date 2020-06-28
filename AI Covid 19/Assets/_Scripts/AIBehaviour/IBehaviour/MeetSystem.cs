@@ -63,7 +63,7 @@ namespace Covid19.AIBehaviour.Behaviour
 
         public AgentNPC FindNPCToMeet()
         {
-            foreach (AgentNPC partnerNPC in _ownerNPC.ListAgents)
+            foreach (AgentNPC partnerNPC in NPCManager.Instance.agentNpcs)
             {
                 if (_ownerNPC != partnerNPC &&
                     _ownerNPC.MeetSystem.AcceptsMeeting(partnerNPC) &&

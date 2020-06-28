@@ -1,6 +1,8 @@
 ﻿using System.Linq;
 using System.Reflection;
 using Covid19.AIBehaviour;
+using Covid19.AIBehaviour.Behaviour;
+using TreeEditor;
 using UnityEditor;
 using UnityEngine;
 
@@ -21,11 +23,29 @@ namespace Covid19.Utils
         }
 
         [MenuItem("GameObject/Set Meeting Point", false, priority = -100)]
-        static void Functie()
+        static void SetMeetingPoint()
         {
 
             Debug.Log("entered in functie");
             SetIcon(Selection.activeGameObject, _meetingPoint);
+        }
+        [MenuItem("GameObject/Position Holder", false, priority = -100)]
+        static void SetUpPositionHolder()
+        {
+            var npc = Selection.activeGameObject.GetComponent<AgentNPC>();
+            if (npc)
+            {
+                GameObject posHolder = new GameObject();
+                posHolder.transform.position = npc.transform.position;
+                posHolder.name = "Positions " + npc.name;
+                npc.posHolder = posHolder;
+                for (int i = 1; i <= 3; i++)
+                {
+                    GameObject emptypos = new GameObject();
+                    emptypos.transform.position = npc.transform.position;
+                    emptypos.transform.SetParent(posHolder.transform);
+                }
+            }
         }
         public static void SetIcon(GameObject go, Texture texture)
         {

@@ -67,6 +67,15 @@ namespace Covid19.AIBehaviour.Behaviour
                 _dictionary[_currentBehaviour] = coroutine;
             }
         }
-        
+
+        private void OnDrawGizmos()
+        {
+            int i = 1;
+            foreach (Transform child in posHolder.transform)
+            {
+                child.gameObject.name = $"Pos{i}";
+                i++;
+            }
+        }
     }
 }
