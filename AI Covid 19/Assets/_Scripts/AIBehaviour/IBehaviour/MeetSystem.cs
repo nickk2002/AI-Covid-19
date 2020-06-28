@@ -46,7 +46,8 @@ namespace Covid19.AIBehaviour.Behaviour
             int randomValue = UnityEngine.Random.Range(1, 10);
             if (randomValue <= _ownerNPC.meetConfiguration.sociableLevel)
             {
-                if (AIUtils.CanSeeObject(_transform, agentNPC.transform, agentNPC.meetConfiguration.viewDist, agentNPC.meetConfiguration.viewAngle))
+                if (AIUtils.CanSeeObject(_transform, agentNPC.transform, 
+                    NPCManager.Instance.generalConfiguration.viewDistance, NPCManager.Instance.generalConfiguration.viewAngle))
                 {
                     return true;
                 }
@@ -91,7 +92,7 @@ namespace Covid19.AIBehaviour.Behaviour
             var position = _transform.position;
             Vector3 direction = npc.transform.position - position;
             direction /= 2;
-            Vector3 meetingPosition = position + direction - _ownerNPC.meetConfiguration.offsetMeeting * direction.normalized;
+            Vector3 meetingPosition = position + direction - NPCManager.Instance.generalConfiguration.meetingDistance / 2 * direction.normalized;
             
             return meetingPosition;
         }
