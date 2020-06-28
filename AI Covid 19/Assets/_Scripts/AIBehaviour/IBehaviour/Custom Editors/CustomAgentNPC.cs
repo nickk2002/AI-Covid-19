@@ -22,7 +22,11 @@ public class CustomAgentNPC : Editor
     {
 
         if (_cachedEditor == null)
-            _cachedEditor = Editor.CreateEditor(_agentNPC.meetConfiguration);
+        {
+            if(_agentNPC.meetConfiguration != null)
+                _cachedEditor = Editor.CreateEditor(_agentNPC.meetConfiguration);
+        }
+
         base.OnInspectorGUI();
         
         _cachedEditor.DrawDefaultInspector();

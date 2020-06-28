@@ -12,6 +12,8 @@ namespace Covid19.AIBehaviour.Behaviour.States
         private AgentNPC _npc;
 
         private static readonly int Typing = Animator.StringToHash("typing");
+        private static readonly int Sitting = Animator.StringToHash("sitting");
+        private bool _reached = false;
         
         public void Enable()
         {
@@ -30,14 +32,20 @@ namespace Covid19.AIBehaviour.Behaviour.States
             _npc.Agent.SetDestination(position);
             while (true)
             {
-                if (_npc.Agent.remainingDistance < 1)
+                if (Vector3.Distance(transform.position,chairTarget.transform.position) < 0.15f)
                 {
-                    _npc.Agent.isStopped = true;
-                    _animator.SetBool(Typing, true);
-                    yield return new WaitForSeconds(3f);
-                    _animator.SetBool(Typing, false);
-                    _npc.RemoveBehaviour(this);
-                    _npc.Agent.isStopped = false;
+                    if (_reached == false)
+                    {
+                        _npc.Agent.isStopped = true;
+                        _reached = true;
+                    }
+                }
+
+                if (_reached)
+                {
+                    transform.rotation = Quaternion.identity;
+                    _animator.SetBool(Sitting,true);   
+                    _animator.SetBool(Typing,true);
                 }
                 yield return null;    
             }
