@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Covid19.AIBehaviour.Behaviour.States;
-using Covid19.Utils;
-using UnityEditor;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -10,29 +7,33 @@ namespace Covid19.AIBehaviour.Behaviour
 {
     public class AgentNPC : MonoBehaviour
     {
-        public NavMeshAgent Agent { get; private set; }
-        public List<AgentNPC> ListAgents => listAgents;
-        public MeetSystem MeetSystem => _meetSystem;
-        [SerializeField] private List<AgentNPC> listAgents;
-
-        [Header("Patrol")]
-        public GameObject[] patrolPositions; // array holding patrol positions
-        public GameObject posHolder; // This is used for an easier way to set patrol points
-        
-        public PatrolConfiguration patrolConfiguration;
-        public MeetConfiguration meetConfiguration;
-        
-        private MeetSystem _meetSystem;
-        
         private readonly Stack<IBehaviour> _behaviours = new Stack<IBehaviour>();
         private readonly Dictionary<IBehaviour, Coroutine> _dictionary = new Dictionary<IBehaviour, Coroutine>();
         private IBehaviour _currentBehaviour;
-        
-        void Awake()
+        private InfectionSystem _infectionSystem;
+
+
+        public float growthInterval;
+        public float infectionSpeed = 0.1f;
+        [SerializeField] private List<AgentNPC> listAgents;
+        public MeetConfiguration meetConfiguration;
+
+        public PatrolConfiguration patrolConfiguration;
+
+        [Header("Patrol")] public GameObject[] patrolPositions; // array holding patrol positions
+
+        public GameObject posHolder; // This is used for an easier way to set patrol points
+        public NavMeshAgent Agent { get; private set; }
+        public List<AgentNPC> ListAgents => listAgents;
+        public MeetSystem MeetSystem { get; private set; }
+
+        private void Awake()
         {
             Agent = GetComponent<NavMeshAgent>();
             SetBehaviour(GetComponent<IBehaviour>());
-            _meetSystem = new MeetSystem(this);
+
+            MeetSystem = new MeetSystem(this);
+            _infectionSystem = new InfectionSystem(this);
         }
 
         public void SetBehaviour(IBehaviour behaviour)
@@ -57,7 +58,7 @@ namespace Covid19.AIBehaviour.Behaviour
         {
             StopCoroutine(_dictionary[behaviour]);
             behaviour.Disable();
-            Destroy(behaviour as UnityEngine.Object);
+            Destroy(behaviour as Object);
             _behaviours.Pop();
             if (_behaviours.Count > 0)
             {
@@ -68,9 +69,14 @@ namespace Covid19.AIBehaviour.Behaviour
             }
         }
 
+        public void StartInfection()
+        {
+            _infectionSystem.StartInfection();
+        }
+
         private void OnDrawGizmos()
         {
-            int i = 1;
+            var i = 1;
             foreach (Transform child in posHolder.transform)
             {
                 child.gameObject.name = $"Pos{i}";

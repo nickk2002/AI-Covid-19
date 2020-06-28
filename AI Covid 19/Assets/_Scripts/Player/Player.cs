@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using Covid19.AIBehaviour;
+using Covid19.AIBehaviour.Behaviour;
 using Covid19.GameManagers.UI_Manager;
 using Covid19.Player.Quests;
 using TMPro;
@@ -14,29 +15,28 @@ namespace Covid19.Player
     {
         // Start is called before the first frame update
         public static Player Instance;
-
-        public AudioClip[] coughSoundArray;
-        [Header("Coughing")]
-
-        public float coughInfectDistance = 5f;
-        public float maxNumberCoughs = 3f;
-
-        [HideInInspector] public Camera mainCamera;
-        [HideInInspector] public bool hasObject = false;
-
-        float _currentTimer;
-        AudioClip _coughClip;
-        AudioClip _lastAudioClip;
-        AudioSource _source;
+        private AudioClip _coughClip;
 
         private float _coughCount = 0;
         private Image _coughLoadingBarUI;
         private TextMeshProUGUI _coughTextUI;
-        private List<QuestRequirement> _questRequirementList = new List<QuestRequirement>();
+
+        private float _currentTimer;
         private FirstPersonController _firstPersonController;
+        private AudioClip _lastAudioClip;
+        private readonly List<QuestRequirement> _questRequirementList = new List<QuestRequirement>();
+        private AudioSource _source;
+
+        [Header("Coughing")] public float coughInfectDistance = 5f;
+
+        public AudioClip[] coughSoundArray;
+        [HideInInspector] public bool hasObject = false;
+
+        [HideInInspector] public Camera mainCamera;
+        public float maxNumberCoughs = 3f;
 
 
-        void Awake()
+        private void Awake()
         {
             if (Instance == null)
                 Instance = this;
@@ -44,6 +44,7 @@ namespace Covid19.Player
             _firstPersonController = GetComponent<FirstPersonController>();
             mainCamera = GetComponentInChildren<Camera>();
         }
+
         private void Start()
         {
             _coughLoadingBarUI = UIManager.Instance.coughLoadingBarUI;
@@ -54,6 +55,7 @@ namespace Covid19.Player
         {
             return _questRequirementList.Contains(questRequirement);
         }
+
         public void TakeQuestRequirement(QuestRequirement questRequirement)
         {
             _questRequirementList.Add(questRequirement);
@@ -65,10 +67,11 @@ namespace Covid19.Player
             transform.position = position;
             yield return new WaitForFixedUpdate();
         }
+
         private AudioClip RandomAudio()
         {
             AudioClip clip = coughSoundArray[Random.Range(0, coughSoundArray.Length - 1)];
-            int tries = 0;
+            var tries = 0;
             while (clip == _lastAudioClip && tries <= 3)
             {
                 clip = coughSoundArray[Random.Range(0, coughSoundArray.Length - 1)];
@@ -78,17 +81,18 @@ namespace Covid19.Player
             _lastAudioClip = clip;
             return clip;
         }
-        bool CanInfect(Bot bot)
+
+        private bool CanInfect(Bot bot)
         {
-            float dist = Vector3.Distance(transform.position, bot.transform.position);
+            var dist = Vector3.Distance(transform.position, bot.transform.position);
             if (dist <= coughInfectDistance && bot.cured == false)
                 return true;
             return false;
         }
-        void TryInfectSomeone()
+
+        private void TryInfectSomeone()
         {
             foreach (Bot bot in Bot.ListBots)
-            {
                 /// daca nu este infectat si este in distanta potrivita atunci il infecteaza
                 if (bot.infectionLevel == 0 && CanInfect(bot))
                 {
@@ -96,15 +100,19 @@ namespace Covid19.Player
                     bot.StartInfection();
                     return;
                 }
-            }
+
+            foreach (AgentNPC agentNPC in NPCManager.Instance.agentNpcs)
+                if (Vector3.Distance(transform.position, agentNPC.transform.position) <= coughInfectDistance)
+                    agentNPC.StartInfection();
         }
-        void CoughMecanic()
+
+        private void CoughMecanic()
         {
-            if (Input.GetKeyDown(KeyCode.C) && _coughCount < maxNumberCoughs && (_coughClip == null || _currentTimer > _coughClip.length))
+            if (Input.GetKeyDown(KeyCode.C) && _coughCount < maxNumberCoughs &&
+                (_coughClip == null || _currentTimer > _coughClip.length))
             {
                 _coughCount++;
                 _coughClip = RandomAudio();
-                //Debug.Log("Playing clip : " + coughClip.name);
                 _source.PlayOneShot(_coughClip);
                 TryInfectSomeone();
                 _currentTimer = 0;
@@ -115,9 +123,10 @@ namespace Covid19.Player
                 {
                     if (_coughTextUI != null)
                     {
-                        int value = (int)(_currentTimer / _coughClip.length * 100);
-                        _coughTextUI.text = value.ToString() + "%";
+                        var value = (int) (_currentTimer / _coughClip.length * 100);
+                        _coughTextUI.text = value + "%";
                     }
+
                     if (_coughLoadingBarUI)
                         _coughLoadingBarUI.fillAmount = _currentTimer / _coughClip.length;
                     _currentTimer += Time.deltaTime;
@@ -133,7 +142,7 @@ namespace Covid19.Player
         }
 
         // Update is called once per frame
-        void Update()
+        private void Update()
         {
             CoughMecanic();
         }
