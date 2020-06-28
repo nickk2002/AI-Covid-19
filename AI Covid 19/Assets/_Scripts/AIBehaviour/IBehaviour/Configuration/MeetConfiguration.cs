@@ -9,9 +9,6 @@ namespace Covid19.AIBehaviour.Behaviour.States
     public class MeetConfiguration : ScriptableObject
     {
         [Range(1,10)] public int sociableLevel;
-        [Range(1,5)] public int offsetMeeting;
-        public float viewDist;
-        public float viewAngle;
         public float cooldownMeeting;
     }
 }
