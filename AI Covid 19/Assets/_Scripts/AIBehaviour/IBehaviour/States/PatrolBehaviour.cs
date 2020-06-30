@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
@@ -8,33 +7,17 @@ namespace Covid19.AIBehaviour.Behaviour.States
 {
     public class PatrolBehaviour : MonoBehaviour, IBehaviour
     {
-        private AgentNPC _npc;
         private NavMeshAgent _agent;
-        private int _indexPatrol = 0;
-        private bool _startPatroling = false;
         private Coroutine _coroutine;
-
-        private void SetUpPosHolder()
-        {
-            if (_npc.posHolder != null)
-            {
-                // daca se intampla ca cineva sa puna un obiect aleator ca si PosHolder care nu are copii
-                if (_npc.posHolder.transform.childCount == 0) 
-                    Debug.LogError("Pos holder of bot : " + name + "has no other children");
-                // initializez vectorul de pozitii cu cati copii are posHolder
-                _npc.patrolPositions = new GameObject[_npc.posHolder.transform.childCount];
-                var i = 0;
-                foreach (Transform child in _npc.posHolder.transform)
-                {
-                    _npc.patrolPositions[i] = child.gameObject; 
-                    i++;
-                }
-            }
-        }
+        private Vector3 _currentDestination = Vector3.negativeInfinity;
+        private int _indexPatrol = 0;
+        private AgentNPC _npc;
+        private bool _startPatroling = false;
 
         public void Enable()
         {
             Debug.Log($"Entered patrol {name}");
+
             _npc = GetComponent<AgentNPC>();
             _agent = GetComponent<NavMeshAgent>();
             SetUpPosHolder();
@@ -42,7 +25,6 @@ namespace Covid19.AIBehaviour.Behaviour.States
 
         public void Disable()
         {
-            
         }
 
         public IEnumerator OnUpdate()
@@ -50,31 +32,87 @@ namespace Covid19.AIBehaviour.Behaviour.States
             while (true)
             {
                 Debug.Log($"In patrol {name}");
-                if (_startPatroling == false || _npc.Agent.remainingDistance < _npc.patrolConfiguration.stoppingDistance)
+                if (_startPatroling == false ||
+                    _npc.Agent.remainingDistance < _npc.patrolConfiguration.stoppingDistance)
                 {
+                    if (_startPatroling)
+                        _currentDestination = _npc.patrolPositions[_indexPatrol].transform.position;
                     _startPatroling = true;
                     _npc.Agent.SetDestination(_npc.patrolPositions[_indexPatrol].transform.position);
-                    
+
                     _indexPatrol++;
                     if (_indexPatrol == _npc.patrolPositions.Length)
                         _indexPatrol = 0;
                 }
 
-                yield return null; // VERY IMPORTANT TO PAUSE THE EXECUTION HERE, it will make sure that this coroutine can be stopped
-                
+                yield return
+                    null; // VERY IMPORTANT TO PAUSE THE EXECUTION HERE, it will make sure that this coroutine can be stopped
+
                 AgentNPC partnerNPC = _npc.MeetSystem.FindNPCToMeet();
                 if (partnerNPC)
                 {
-                    _npc.MeetSystem.SetTalkDuration(partnerNPC,UnityEngine.Random.Range(8,10));
+                    _npc.MeetSystem.SetTalkDuration(partnerNPC, Random.Range(8, 10));
 
                     Vector3 meetingPosition = _npc.MeetSystem.GetMeetingPosition(partnerNPC);
-                    MeetBehaviour meetBehaviour = _npc.gameObject.AddComponent<MeetBehaviour>();
+                    var meetBehaviour = _npc.gameObject.AddComponent<MeetBehaviour>();
                     meetBehaviour.MeetPosition = meetingPosition;
                     meetBehaviour.partnerNPC = partnerNPC;
                     _npc.SetBehaviour(meetBehaviour);
                 }
 
                 yield return null;
+            }
+        }
+
+        private void SetUpPosHolder()
+        {
+            if (_npc.posHolder != null)
+            {
+                // daca se intampla ca cineva sa puna un obiect aleator ca si PosHolder care nu are copii
+                if (_npc.posHolder.transform.childCount == 0)
+                    Debug.LogError("Pos holder of bot : " + name + "has no other children");
+                // initializez vectorul de pozitii cu cati copii are posHolder
+                _npc.patrolPositions = new GameObject[_npc.posHolder.transform.childCount];
+                var i = 0;
+                foreach (Transform child in _npc.posHolder.transform)
+                {
+                    _npc.patrolPositions[i] = child.gameObject;
+                    i++;
+                }
+            }
+        }
+
+        private void OnDrawGizmos()
+        {
+            Enable();
+
+            var cnt = 0;
+            var positions = new List<Vector3>();
+            foreach (Transform child in _npc.posHolder.transform)
+            {
+                child.gameObject.name = $"Pos{cnt}";
+                positions.Add(child.position);
+                cnt++;
+            }
+
+            positions.Add(positions[0]);
+            for (var i = 0; i < positions.Count - 1; i++)
+            {
+                if (Application.isPlaying && _currentDestination == positions[i + 1])
+
+                    Gizmos.color = new Color(1f, 0.15f, 0.32f);
+                else
+                    Gizmos.color = new Color(0.44f, 0.68f, 1f);
+                Gizmos.DrawLine(positions[i], positions[i + 1]);
+                Vector3 direction = (positions[i] - positions[i + 1]).normalized;
+                Vector3 pos1 = positions[i + 1] + Quaternion.Euler(0, 45, 0) * direction;
+                Vector3 pos2 = positions[i + 1] + Quaternion.Euler(0, -45, 0) * direction;
+                if (Application.isPlaying && _currentDestination == positions[i + 1])
+                    Gizmos.color = new Color(1f, 0.15f, 0.32f);
+                else
+                    Gizmos.color = Color.white;
+                Gizmos.DrawLine(positions[i + 1], pos1);
+                Gizmos.DrawLine(positions[i + 1], pos2);
             }
         }
     }

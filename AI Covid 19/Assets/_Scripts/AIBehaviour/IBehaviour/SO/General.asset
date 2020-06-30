@@ -12,6 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cc112da9b488a834cac9b9f9d0ac49c7, type: 3}
   m_Name: General
   m_EditorClassIdentifier: 
-  offsetMeeting: 0
-  viewAngle: 0
-  viewDistance: 0
+  growthInterval: 0.1
+  infectionSpeed: 0.1
+  meetingDistance: 5
+  viewAngle: 60
+  viewDistance: 14.8

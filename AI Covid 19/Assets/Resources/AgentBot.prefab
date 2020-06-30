@@ -1257,9 +1257,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 04683cfc4bea39b41a3673abc76d7121, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  listAgents:
-  - {fileID: 4312097011571535175}
-  - {fileID: 0}
+  meetConfiguration: {fileID: 11400000, guid: 85f563ac43bb0044a9ca21f7b2d11328, type: 2}
+  patrolConfiguration: {fileID: 11400000, guid: c355e567fd4b3d543b6d4e0b12603428,
+    type: 2}
   patrolPositions:
   - {fileID: 0}
   - {fileID: 0}
@@ -1268,9 +1268,6 @@ MonoBehaviour:
   - {fileID: 0}
   - {fileID: 0}
   posHolder: {fileID: 0}
-  patrolConfiguration: {fileID: 11400000, guid: c355e567fd4b3d543b6d4e0b12603428,
-    type: 2}
-  meetConfiguration: {fileID: 11400000, guid: 85f563ac43bb0044a9ca21f7b2d11328, type: 2}
 --- !u!114 &4312097011571535172
 MonoBehaviour:
   m_ObjectHideFlags: 0
