@@ -11,20 +11,20 @@ namespace Covid19.AIBehaviour.Behaviour
         private readonly Dictionary<IBehaviour, Coroutine> _dictionary = new Dictionary<IBehaviour, Coroutine>();
         private IBehaviour _currentBehaviour;
         private InfectionSystem _infectionSystem;
+        public int age = 35;
 
 
-        public float growthInterval;
-        public float infectionSpeed = 0.1f;
-        [SerializeField] private List<AgentNPC> listAgents;
         public MeetConfiguration meetConfiguration;
 
+        public string npcName = "Bob";
+        public string occupation = "Bussines Man";
         public PatrolConfiguration patrolConfiguration;
+        [HideInInspector] public GameObject[] patrolPositions; // array holding patrol positions
 
-        [Header("Patrol")] public GameObject[] patrolPositions; // array holding patrol positions
+        public GameObject
+            posHolder; // This is used for an easier way to set patrol points, should be added to a SO in the feature
 
-        public GameObject posHolder; // This is used for an easier way to set patrol points
         public NavMeshAgent Agent { get; private set; }
-        public List<AgentNPC> ListAgents => listAgents;
         public MeetSystem MeetSystem { get; private set; }
 
         private void Awake()
@@ -76,12 +76,6 @@ namespace Covid19.AIBehaviour.Behaviour
 
         private void OnDrawGizmos()
         {
-            var i = 1;
-            foreach (Transform child in posHolder.transform)
-            {
-                child.gameObject.name = $"Pos{i}";
-                i++;
-            }
         }
     }
 }
