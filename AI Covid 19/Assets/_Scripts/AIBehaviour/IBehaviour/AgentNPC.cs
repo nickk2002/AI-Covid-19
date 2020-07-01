@@ -36,6 +36,11 @@ namespace Covid19.AIBehaviour.Behaviour
             _infectionSystem = new InfectionSystem(this);
         }
 
+        public bool IsCurrentBehaviour(IBehaviour behaviour)
+        {
+            return _behaviours.Peek() == behaviour;
+        }
+
         public void SetBehaviour(IBehaviour behaviour)
         {
             if (_currentBehaviour != null)
@@ -72,10 +77,6 @@ namespace Covid19.AIBehaviour.Behaviour
         public void StartInfection()
         {
             _infectionSystem.StartInfection();
-        }
-
-        private void OnDrawGizmos()
-        {
         }
     }
 }
