@@ -12,9 +12,9 @@ namespace Covid19.Utils
     [InitializeOnLoad]
     public class CustomHierarchy : MonoBehaviour
     {
-        private static readonly Texture _botIcon = Resources.Load("Bot_icon") as Texture;
-        private static readonly Texture _botIconSelected = Resources.Load("Bot_icon_selected") as Texture;
-        private static readonly Texture _meetingPoint = Resources.Load("meet") as Texture;
+        private static readonly Texture BotIcon = Resources.Load("Bot_icon") as Texture;
+        private static readonly Texture BotIconSelected = Resources.Load("Bot_icon_selected") as Texture;
+        public static readonly Texture MeetingPointIcon = Resources.Load("meet") as Texture;
         private int _nic;
 
 
@@ -27,7 +27,7 @@ namespace Covid19.Utils
         private static void SetMeetingPoint()
         {
             Debug.Log("entered in functie");
-            SetIcon(Selection.activeGameObject, _meetingPoint);
+            SetIcon(Selection.activeGameObject, MeetingPointIcon);
         }
 
         [MenuItem("GameObject/Position Holder", false, priority = -100)]
@@ -40,12 +40,13 @@ namespace Covid19.Utils
                 Transform npcTransform = npc.transform;
                 posHolder.transform.position = npcTransform.position;
                 posHolder.name = "Positions " + npc.name;
+                posHolder.transform.SetParent(npcTransform.parent);
                 npc.posHolder = posHolder;
+
                 for (var i = 1; i <= 3; i++)
                 {
                     var emptypos = new GameObject();
                     emptypos.transform.position = npc.transform.position;
-                    emptypos.transform.SetParent(npcTransform.parent);
                     emptypos.transform.SetParent(posHolder.transform);
                 }
             }
@@ -69,11 +70,11 @@ namespace Covid19.Utils
             if (obj != null)
                 if (go.GetComponent<Bot>())
                 {
-                    Texture botTexture = _botIcon;
+                    Texture botTexture = BotIcon;
                     var position = new Rect(selectionRect);
                     position.size = new Vector2(17, 17);
                     var backgroundColor = new Color(194, 194, 194);
-                    if (Selection.instanceIDs.Contains(instanceId)) botTexture = _botIconSelected;
+                    if (Selection.instanceIDs.Contains(instanceId)) botTexture = BotIconSelected;
                     EditorGUI.DrawRect(position, backgroundColor);
                     var style = new GUIStyle();
                     GUI.Box(position, botTexture, style);

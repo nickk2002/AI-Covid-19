@@ -76,8 +76,10 @@ namespace Covid19.AIBehaviour.Behaviour.States
                 var i = 0;
                 foreach (Transform child in _npc.posHolder.transform)
                 {
-                    _npc.patrolPositions[i] = child.gameObject;
+                    GameObject childGameObject = child.gameObject;
+                    _npc.patrolPositions[i] = childGameObject;
                     i++;
+                    childGameObject.name = $"Pos{i}";
                 }
             }
         }
@@ -85,34 +87,33 @@ namespace Covid19.AIBehaviour.Behaviour.States
         private void OnDrawGizmos()
         {
             Enable();
+            if (_npc.posHolder == null) return;
 
-            var cnt = 0;
-            var positions = new List<Vector3>();
-            foreach (Transform child in _npc.posHolder.transform)
+            if (Application.isPlaying == false || _npc.IsCurrentBehaviour(this))
             {
-                child.gameObject.name = $"Pos{cnt}";
-                positions.Add(child.position);
-                cnt++;
-            }
+                var positions = new List<Vector3>();
+                foreach (GameObject patrolGameObject in _npc.patrolPositions)
+                    positions.Add(patrolGameObject.transform.position);
 
-            positions.Add(positions[0]);
-            for (var i = 0; i < positions.Count - 1; i++)
-            {
-                if (Application.isPlaying && _currentDestination == positions[i + 1])
+                positions.Add(positions[0]);
+                for (var i = 0; i < positions.Count - 1; i++)
+                {
+                    if (Application.isPlaying && _currentDestination == positions[i + 1])
 
-                    Gizmos.color = new Color(1f, 0.15f, 0.32f);
-                else
-                    Gizmos.color = new Color(0.44f, 0.68f, 1f);
-                Gizmos.DrawLine(positions[i], positions[i + 1]);
-                Vector3 direction = (positions[i] - positions[i + 1]).normalized;
-                Vector3 pos1 = positions[i + 1] + Quaternion.Euler(0, 45, 0) * direction;
-                Vector3 pos2 = positions[i + 1] + Quaternion.Euler(0, -45, 0) * direction;
-                if (Application.isPlaying && _currentDestination == positions[i + 1])
-                    Gizmos.color = new Color(1f, 0.15f, 0.32f);
-                else
-                    Gizmos.color = Color.white;
-                Gizmos.DrawLine(positions[i + 1], pos1);
-                Gizmos.DrawLine(positions[i + 1], pos2);
+                        Gizmos.color = new Color(1f, 0.15f, 0.32f);
+                    else
+                        Gizmos.color = new Color(0.44f, 0.68f, 1f);
+                    Gizmos.DrawLine(positions[i], positions[i + 1]);
+                    Vector3 direction = (positions[i] - positions[i + 1]).normalized;
+                    Vector3 pos1 = positions[i + 1] + Quaternion.Euler(0, 45, 0) * direction;
+                    Vector3 pos2 = positions[i + 1] + Quaternion.Euler(0, -45, 0) * direction;
+                    if (Application.isPlaying && _currentDestination == positions[i + 1])
+                        Gizmos.color = new Color(1f, 0.15f, 0.32f);
+                    else
+                        Gizmos.color = Color.white;
+                    Gizmos.DrawLine(positions[i + 1], pos1);
+                    Gizmos.DrawLine(positions[i + 1], pos2);
+                }
             }
         }
     }
