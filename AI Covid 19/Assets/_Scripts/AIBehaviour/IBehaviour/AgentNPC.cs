@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Covid19.AIBehaviour.Behaviour.Configuration;
 using Covid19.AIBehaviour.Behaviour.States;
 using UnityEngine;
 using UnityEngine.AI;
@@ -7,26 +8,19 @@ namespace Covid19.AIBehaviour.Behaviour
 {
     public class AgentNPC : MonoBehaviour
     {
-        private readonly Stack<IBehaviour> _behaviours = new Stack<IBehaviour>();
-        private readonly Dictionary<IBehaviour, Coroutine> _dictionary = new Dictionary<IBehaviour, Coroutine>();
-        private IBehaviour _currentBehaviour;
-        private InfectionSystem _infectionSystem;
-        public int age = 35;
 
-
-        public MeetConfiguration meetConfiguration;
-
-        public string npcName = "Bob";
-        public string occupation = "Bussines Man";
-        public PatrolConfiguration patrolConfiguration;
+        public AgentConfiguration agentConfiguration;
+        
         [HideInInspector] public GameObject[] patrolPositions; // array holding patrol positions
-
-        public GameObject
-            posHolder; // This is used for an easier way to set patrol points, should be added to a SO in the feature
+        public GameObject posHolder; // This is used for an easier way to set patrol points, should be added to a SO in the feature
 
         public NavMeshAgent Agent { get; private set; }
         public MeetSystem MeetSystem { get; private set; }
 
+        private readonly Stack<IBehaviour> _behaviours = new Stack<IBehaviour>();
+        private readonly Dictionary<IBehaviour, Coroutine> _dictionary = new Dictionary<IBehaviour, Coroutine>();
+        private IBehaviour _currentBehaviour;
+        private InfectionSystem _infectionSystem;
         private void Awake()
         {
             Agent = GetComponent<NavMeshAgent>();

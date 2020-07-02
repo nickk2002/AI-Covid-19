@@ -11,7 +11,8 @@ public class CustomAgentNPC : Editor
 {
     private Editor _cachedEditor;
     private AgentNPC _agentNPC;
-
+    private bool _ok;
+    
     private void OnEnable()
     {
         _cachedEditor = null;
@@ -20,16 +21,16 @@ public class CustomAgentNPC : Editor
 
     public override void OnInspectorGUI()
     {
-
-        if (_cachedEditor == null)
+        if (_cachedEditor == null && _ok)
         {
-            if(_agentNPC.meetConfiguration != null)
-                _cachedEditor = Editor.CreateEditor(_agentNPC.meetConfiguration);
+            if(_agentNPC.agentConfiguration != null)
+                _cachedEditor = Editor.CreateEditor(_agentNPC.agentConfiguration);
         }
 
         base.OnInspectorGUI();
         
-        _cachedEditor.DrawDefaultInspector();
+        if(_cachedEditor)
+            _cachedEditor.DrawDefaultInspector();
     }
 
 
