@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+﻿﻿using UnityEngine;
 
 [CreateAssetMenu(menuName = "AI Behaviour/General")]
 public class GeneralAIConfiguration : ScriptableObject

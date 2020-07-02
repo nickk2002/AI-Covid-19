@@ -33,7 +33,7 @@ namespace Covid19.AIBehaviour.Behaviour.States
             {
                 Debug.Log($"In patrol {name}");
                 if (_startPatroling == false ||
-                    _npc.Agent.remainingDistance < _npc.patrolConfiguration.stoppingDistance)
+                    _npc.Agent.remainingDistance < _npc.agentConfiguration.stoppingDistance)
                 {
                     if (_startPatroling)
                         _currentDestination = _npc.patrolPositions[_indexPatrol].transform.position;
@@ -50,9 +50,9 @@ namespace Covid19.AIBehaviour.Behaviour.States
 
                 AgentNPC partnerNPC = _npc.MeetSystem.FindNPCToMeet();
                 if (partnerNPC)
-                {
+                {    
+                    Debug.Log($"Botul {_npc} si {partnerNPC}");
                     _npc.MeetSystem.SetTalkDuration(partnerNPC, Random.Range(8, 10));
-
                     Vector3 meetingPosition = _npc.MeetSystem.GetMeetingPosition(partnerNPC);
                     var meetBehaviour = _npc.gameObject.AddComponent<MeetBehaviour>();
                     meetBehaviour.MeetPosition = meetingPosition;

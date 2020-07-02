@@ -9,8 +9,14 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 90445e15ef05c6b4f928084a1f8ee34e, type: 3}
-  m_Name: Meet
+  m_Script: {fileID: 11500000, guid: cbc5d10cddfa416288a65ee7ca04a9ae, type: 3}
+  m_Name: Data bot1
   m_EditorClassIdentifier: 
-  sociableLevel: 6
+  npcName: Bob
+  occupation: Bussines Man
+  age: 35
+  sociableLevel: 5
+  cautiousLevel: 3
+  immunityLevel: 2
   cooldownMeeting: 5
+  stoppingDistance: 0.1

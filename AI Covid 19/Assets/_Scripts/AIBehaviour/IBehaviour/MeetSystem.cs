@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Covid19.AIBehaviour.Behaviour.States;
 using Covid19.Utils;
 using UnityEngine;
 using Random = UnityEngine.Random;
@@ -25,8 +26,10 @@ namespace Covid19.AIBehaviour.Behaviour
 
         private bool AcceptsMeeting(AgentNPC agentNPC)
         {
+            if (agentNPC.GetComponent<MeetBehaviour>())
+                return false; // if it is already in meeting then return false
             // check to prevent two agents meeting without having time to turn around and walk away
-            if (LastMeetingTime != 0 && !(Time.time - LastMeetingTime > _ownerNPC.meetConfiguration.cooldownMeeting))
+            if (LastMeetingTime != 0 && !(Time.time - LastMeetingTime > _ownerNPC.agentConfiguration.cooldownMeeting))
                 return false;
 
             var found = _ignoredAgents.Find(tuple => tuple.Item1 == agentNPC);
@@ -46,7 +49,7 @@ namespace Covid19.AIBehaviour.Behaviour
 
             // check if the probabilites and the sociable level are satisfed
             var randomValue = Random.Range(1, 10);
-            if (randomValue <= _ownerNPC.meetConfiguration.sociableLevel)
+            if (randomValue <= _ownerNPC.agentConfiguration.sociableLevel)
             {
                 if (AIUtils.CanSeeObject(_transform, agentNPC.transform,
                     NPCManager.Instance.generalConfiguration.viewDistance,
@@ -57,7 +60,7 @@ namespace Covid19.AIBehaviour.Behaviour
             {
                 // failed due to probability, than we prevent this two agents to try again, in order to mentain math probability
                 Debug.Log(
-                    $"meeting failed due to probability, expected <= {_ownerNPC.meetConfiguration.sociableLevel} but random was {randomValue}");
+                    $"meeting failed due to probability, expected <= {_ownerNPC.agentConfiguration.sociableLevel} but random was {randomValue}");
                 _ignoredAgents.Add(new Tuple<AgentNPC, float>(agentNPC, Time.time));
             }
 
@@ -87,9 +90,8 @@ namespace Covid19.AIBehaviour.Behaviour
             Vector3 position = _transform.position;
             Vector3 direction = npc.transform.position - position;
             direction /= 2;
-            Vector3 meetingPosition = position + direction -
-                                      NPCManager.Instance.generalConfiguration.meetingDistance / 2 *
-                                      direction.normalized;
+            float meetingDistance = NPCManager.Instance.generalConfiguration.meetingDistance / 2;
+            Vector3 meetingPosition = position + direction - meetingDistance * direction.normalized;
 
             return meetingPosition;
         }
