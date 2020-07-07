@@ -32,6 +32,8 @@ namespace Covid19.AIBehaviour.Behaviour
 
         public bool IsCurrentBehaviour(IBehaviour behaviour)
         {
+            if (_behaviours.Count == 0)
+                return false;
             return _behaviours.Peek() == behaviour;
         }
 
@@ -45,9 +47,9 @@ namespace Covid19.AIBehaviour.Behaviour
             }
 
             _currentBehaviour = behaviour; // set the current behaviour
+            _behaviours.Push(_currentBehaviour); // push this behaviour to the stack
             _currentBehaviour.Enable(); // run initialization logic ( get the dependencies)
 
-            _behaviours.Push(_currentBehaviour); // push this behaviour to the stack
             Coroutine coroutine = StartCoroutine(_currentBehaviour.OnUpdate()); // cache the corutine to stop later
             //Debug.Log($"Putting the coroutine {_currentBehaviour} into the dictionary",this);
             _dictionary[_currentBehaviour] = coroutine;

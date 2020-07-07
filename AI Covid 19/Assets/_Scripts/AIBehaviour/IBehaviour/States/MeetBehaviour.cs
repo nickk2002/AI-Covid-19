@@ -78,6 +78,8 @@ namespace Covid19.AIBehaviour.Behaviour.States
 
         private void OnDrawGizmos()
         {
+            if (partnerNPC == null)
+                return;
             if (_npc.IsCurrentBehaviour(this) && _drawGizmos && partnerNPC.GetComponent<MeetBehaviour>()._drawGizmos)
             {
                 _meetGizmos = new GameObject {name = "MeetGizmos"};
