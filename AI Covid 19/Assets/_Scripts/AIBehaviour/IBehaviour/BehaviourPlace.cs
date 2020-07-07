@@ -1,5 +1,4 @@
-﻿using System;
-using Covid19.AIBehaviour.Behaviour;
+﻿using Covid19.AIBehaviour.Behaviour;
 using Covid19.AIBehaviour.Behaviour.States;
 using UnityEngine;
 
@@ -7,20 +6,28 @@ using UnityEngine;
 [RequireComponent(typeof(Collider))]
 public class BehaviourPlace : MonoBehaviour
 {
-    [SerializeField] private GameObject chair;
+    private Collider _collider;
     private bool _occupied = false;
-    
+
+    [SerializeField] private GameObject chair;
+
+    private void Awake()
+    {
+        _collider = GetComponent<Collider>();
+    }
+
     private void OnTriggerEnter(Collider other)
     {
-        AgentNPC npc = other.gameObject.GetComponent<AgentNPC>();
-        
+        var npc = other.gameObject.GetComponent<AgentNPC>();
+
         if (npc != null && _occupied == false)
         {
             _occupied = true;
-            TypingBehaviour typingBehaviour = npc.gameObject.AddComponent<TypingBehaviour>();
+            var typingBehaviour = npc.gameObject.AddComponent<TypingBehaviour>();
             typingBehaviour.chairTarget = chair;
             Debug.Log(typingBehaviour.chairTarget);
             npc.SetBehaviour(typingBehaviour);
+            _collider.enabled = false;
         }
     }
 

@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using Covid19.AIBehaviour.Behaviour.Configuration;
-using Covid19.AIBehaviour.Behaviour.States;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -8,24 +7,34 @@ namespace Covid19.AIBehaviour.Behaviour
 {
     public class AgentNPC : MonoBehaviour
     {
-
-        public AgentConfiguration agentConfiguration;
-        
-        [HideInInspector] public GameObject[] patrolPositions; // array holding patrol positions
-        public GameObject posHolder; // This is used for an easier way to set patrol points, should be added to a SO in the feature
-
-        public NavMeshAgent Agent { get; private set; }
-        public MeetSystem MeetSystem { get; private set; }
-
         private readonly Stack<IBehaviour> _behaviours = new Stack<IBehaviour>();
         private readonly Dictionary<IBehaviour, Coroutine> _dictionary = new Dictionary<IBehaviour, Coroutine>();
+
+        private AgentUI _agentUI;
         private IBehaviour _currentBehaviour;
         private InfectionSystem _infectionSystem;
-        private void Awake()
-        {
-            Agent = GetComponent<NavMeshAgent>();
-            SetBehaviour(GetComponent<IBehaviour>());
 
+        public AgentConfiguration agentConfiguration;
+
+        [HideInInspector] public GameObject[] patrolPositions; // array holding patrol positions
+
+        public GameObject
+            posHolder; // This is used for an easier way to set patrol points, should be added to a SO in the feature
+
+        public NavMeshAgent Agent { get; private set; }
+        public Animator Animator { get; private set; }
+        public MeetSystem MeetSystem { get; private set; }
+
+        private void Start()
+        {
+            AgentManager.Instance.AddAgent(this);
+
+            _agentUI = GetComponentInChildren<AgentUI>();
+
+            Agent = GetComponent<NavMeshAgent>();
+            Animator = GetComponent<Animator>();
+
+            SetBehaviour(GetComponent<IBehaviour>());
             MeetSystem = new MeetSystem(this);
             _infectionSystem = new InfectionSystem(this);
         }
@@ -73,6 +82,11 @@ namespace Covid19.AIBehaviour.Behaviour
         public void StartInfection()
         {
             _infectionSystem.StartInfection();
+        }
+
+        private void OnDrawGizmos()
+        {
+            if (_behaviours.Count > 0 && _agentUI) _agentUI.gizmoActionNameHolder.name = _behaviours.Peek().ToString();
         }
     }
 }

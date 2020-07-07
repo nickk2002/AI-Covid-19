@@ -47,27 +47,34 @@ namespace Covid19.AIBehaviour.Behaviour.States
                     null; // VERY IMPORTANT TO PAUSE THE EXECUTION HERE, it will make sure that this coroutine can be stopped
 
                 AgentNPC partnerNPC = _npc.MeetSystem.FindNPCToMeet();
-                if (partnerNPC)
+                if (partnerNPC != null)
                 {
                     // check if the probabilites and the sociable level are satisfied for both
                     var randomValue = Random.Range(1, 10);
-                    if (randomValue <= _npc.agentConfiguration.sociableLevel 
+                    if (randomValue <= _npc.agentConfiguration.sociableLevel
                         && randomValue <= partnerNPC.agentConfiguration.sociableLevel)
                     {
                         Debug.Log($"Botul {_npc.name} si {partnerNPC.name}"); // then they actually meet.
-                        _npc.MeetSystem.Meet(partnerNPC);
-                        partnerNPC.MeetSystem.Meet(_npc);
+                        var talkDuration = Random.Range(8f, 11f);
+                        _npc.MeetSystem.Meet(partnerNPC, talkDuration);
+                        partnerNPC.MeetSystem.Meet(_npc, talkDuration);
                     }
                     else
                     {
-                        Debug.Log($"<color=red>meeting failed due to probability, expected <= {randomValue} {_npc.name} {partnerNPC.name} </color>");
-                        _npc.MeetSystem.IgnoreAgent(partnerNPC,10); // ignores agent for a number of 10 seconds
-                        partnerNPC.MeetSystem.IgnoreAgent(_npc,10);
+                        Debug.Log(
+                            $"<color=red>meeting failed due to probability, expected <= {randomValue} {_npc.name} {partnerNPC.name} </color>");
+                        _npc.MeetSystem.IgnoreAgent(partnerNPC, 10); // ignores agent for a number of 10 seconds
+                        partnerNPC.MeetSystem.IgnoreAgent(_npc, 10);
                     }
                 }
 
                 yield return null;
             }
+        }
+
+        public override string ToString()
+        {
+            return "Patrol";
         }
 
         private void SetUpPosHolder()

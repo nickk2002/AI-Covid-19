@@ -7,9 +7,9 @@ namespace Covid19.AIBehaviour.Behaviour
     {
         private static readonly int Cough = Animator.StringToHash("cough");
         private readonly Animator _animator;
+        private readonly AgentNPC _npc;
         private bool _infected = false;
         private float _infectionLevel = 0;
-        private readonly AgentNPC _npc;
 
         public InfectionSystem(AgentNPC owner)
         {
@@ -28,7 +28,7 @@ namespace Covid19.AIBehaviour.Behaviour
 
         private void InfectNearbyAgents()
         {
-            foreach (AgentNPC agentNPC in NPCManager.Instance.agentNpcs)
+            foreach (AgentNPC agentNPC in AgentManager.Instance.agentNPCList)
                 if (Vector3.Distance(_npc.transform.position, agentNPC.transform.position) < 10)
                     agentNPC.StartInfection();
         }
@@ -54,8 +54,8 @@ namespace Covid19.AIBehaviour.Behaviour
         {
             while (true)
             {
-                yield return new WaitForSeconds(NPCManager.Instance.generalConfiguration.growthInterval);
-                _infectionLevel += NPCManager.Instance.generalConfiguration.growthInterval;
+                yield return new WaitForSeconds(AgentManager.Instance.generalConfiguration.growthInterval);
+                _infectionLevel += AgentManager.Instance.generalConfiguration.growthInterval;
             }
         }
     }

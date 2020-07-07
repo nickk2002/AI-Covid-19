@@ -1,5 +1,80 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!1 &396436503
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 396436504}
+  m_Layer: 0
+  m_Name: ActionName
+  m_TagString: Untagged
+  m_Icon: {fileID: -1412012063857583412, guid: 0000000000000000d000000000000000, type: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &396436504
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 396436503}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -0.069, y: 1.44, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 1820214631}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1820214630
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1820214631}
+  - component: {fileID: 1820214632}
+  m_Layer: 0
+  m_Name: UIManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1820214631
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1820214630}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children:
+  - {fileID: 396436504}
+  m_Father: {fileID: 976433096572821334}
+  m_RootOrder: 9
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1820214632
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1820214630}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 403889424d114c5c93abfbc7b5d84a82, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  gizmoActionNameHolder: {fileID: 396436503}
 --- !u!1 &103548632050027382
 GameObject:
   m_ObjectHideFlags: 0
@@ -1142,6 +1217,7 @@ Transform:
   - {fileID: 4297969056134119224}
   - {fileID: 6064754080089348926}
   - {fileID: 3393787299401097416}
+  - {fileID: 1820214631}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -1175,7 +1251,7 @@ NavMeshAgent:
   m_AgentTypeID: 0
   m_Radius: 0.26
   m_Speed: 1
-  m_Acceleration: 1
+  m_Acceleration: 10
   avoidancePriority: 55
   m_AngularSpeed: 120
   m_StoppingDistance: 0
@@ -1257,9 +1333,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 04683cfc4bea39b41a3673abc76d7121, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  meetConfiguration: {fileID: 11400000, guid: 85f563ac43bb0044a9ca21f7b2d11328, type: 2}
-  patrolConfiguration: {fileID: 11400000, guid: c355e567fd4b3d543b6d4e0b12603428,
-    type: 2}
+  agentConfiguration: {fileID: 11400000, guid: f274317049369804a9098ff1a02b964d, type: 2}
   patrolPositions:
   - {fileID: 0}
   - {fileID: 0}

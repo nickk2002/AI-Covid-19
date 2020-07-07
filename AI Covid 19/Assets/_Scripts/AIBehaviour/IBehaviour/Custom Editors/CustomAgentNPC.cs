@@ -1,18 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using Covid19.AIBehaviour.Behaviour;
-using Covid19.Utils;
+﻿using Covid19.AIBehaviour.Behaviour;
 using UnityEditor;
-using UnityEngine;
-using Random = UnityEngine.Random;
 
 [CustomEditor(typeof(AgentNPC))]
 public class CustomAgentNPC : Editor
 {
-    private Editor _cachedEditor;
     private AgentNPC _agentNPC;
+    private Editor _cachedEditor;
     private bool _ok;
-    
+
     private void OnEnable()
     {
         _cachedEditor = null;
@@ -22,17 +17,12 @@ public class CustomAgentNPC : Editor
     public override void OnInspectorGUI()
     {
         if (_cachedEditor == null && _ok)
-        {
-            if(_agentNPC.agentConfiguration != null)
-                _cachedEditor = Editor.CreateEditor(_agentNPC.agentConfiguration);
-        }
+            if (_agentNPC.agentConfiguration != null)
+                _cachedEditor = CreateEditor(_agentNPC.agentConfiguration);
 
         base.OnInspectorGUI();
-        
-        if(_cachedEditor)
+
+        if (_cachedEditor)
             _cachedEditor.DrawDefaultInspector();
     }
-
-
-
 }
