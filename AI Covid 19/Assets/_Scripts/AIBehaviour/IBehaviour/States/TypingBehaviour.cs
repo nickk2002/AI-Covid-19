@@ -23,12 +23,11 @@ namespace Covid19.AIBehaviour.Behaviour.States
 
         public void Disable()
         {
+            
         }
-
         public IEnumerator OnUpdate()
         {
             var position = chairTarget.transform.position;
-            Debug.Log($"in On Update {chairTarget} with position {position}", chairTarget);
             _npc.Agent.SetDestination(position);
             while (true)
             {

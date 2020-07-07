@@ -16,8 +16,6 @@ namespace Covid19.AIBehaviour.Behaviour.States
 
         public void Enable()
         {
-            Debug.Log($"Entered patrol {name}");
-
             _npc = GetComponent<AgentNPC>();
             _agent = GetComponent<NavMeshAgent>();
             SetUpPosHolder();
@@ -50,14 +48,22 @@ namespace Covid19.AIBehaviour.Behaviour.States
 
                 AgentNPC partnerNPC = _npc.MeetSystem.FindNPCToMeet();
                 if (partnerNPC)
-                {    
-                    Debug.Log($"Botul {_npc} si {partnerNPC}");
-                    _npc.MeetSystem.SetTalkDuration(partnerNPC, Random.Range(8, 10));
-                    Vector3 meetingPosition = _npc.MeetSystem.GetMeetingPosition(partnerNPC);
-                    var meetBehaviour = _npc.gameObject.AddComponent<MeetBehaviour>();
-                    meetBehaviour.MeetPosition = meetingPosition;
-                    meetBehaviour.partnerNPC = partnerNPC;
-                    _npc.SetBehaviour(meetBehaviour);
+                {
+                    // check if the probabilites and the sociable level are satisfied for both
+                    var randomValue = Random.Range(1, 10);
+                    if (randomValue <= _npc.agentConfiguration.sociableLevel 
+                        && randomValue <= partnerNPC.agentConfiguration.sociableLevel)
+                    {
+                        Debug.Log($"Botul {_npc.name} si {partnerNPC.name}"); // then they actually meet.
+                        _npc.MeetSystem.Meet(partnerNPC);
+                        partnerNPC.MeetSystem.Meet(_npc);
+                    }
+                    else
+                    {
+                        Debug.Log($"<color=red>meeting failed due to probability, expected <= {randomValue} {_npc.name} {partnerNPC.name} </color>");
+                        _npc.MeetSystem.IgnoreAgent(partnerNPC,10); // ignores agent for a number of 10 seconds
+                        partnerNPC.MeetSystem.IgnoreAgent(_npc,10);
+                    }
                 }
 
                 yield return null;
