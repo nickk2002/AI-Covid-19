@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using Covid19.AIBehaviour.Behaviour.States;
 using Covid19.Utils;
 using UnityEngine;
-using Random = UnityEngine.Random;
 
 namespace Covid19.AIBehaviour.Behaviour
 {
@@ -20,20 +19,19 @@ namespace Covid19.AIBehaviour.Behaviour
             _transform = _npc.transform;
         }
 
-        public int TalkAnimationID { get; private set; }
-        public float TalkDuration { get; private set; }
         public float LastMeetingTime { set; private get; }
 
-        public void Meet(AgentNPC partnerNPC)
+        public void Meet(AgentNPC partnerNPC, float talkDuration)
         {
             // set up every thing in order to meet the agent partnerNPC
-            SetTalkDuration(partnerNPC, Random.Range(8, 10));
             Vector3 meetingPosition = GetMeetingPosition(partnerNPC);
             var meetBehaviour = _npc.gameObject.AddComponent<MeetBehaviour>();
             meetBehaviour.MeetPosition = meetingPosition;
             meetBehaviour.partnerNPC = partnerNPC;
+            meetBehaviour.talkDuration = talkDuration;
             _npc.SetBehaviour(meetBehaviour);
         }
+
         private bool AcceptsMeeting(AgentNPC agentNPC)
         {
             if (agentNPC.GetComponent<MeetBehaviour>())
@@ -47,8 +45,8 @@ namespace Covid19.AIBehaviour.Behaviour
             if (found != null)
             {
                 // if the duration has passed seconds had not still passed, then we simply cancel the meeting
-                int ignoreDuration = found.Item2;
-                float initialIgnoreTIme = found.Item3;
+                var ignoreDuration = found.Item2;
+                var initialIgnoreTIme = found.Item3;
                 if (Time.time - initialIgnoreTIme < ignoreDuration)
                 {
                     Debug.Log($"Meeting Failed because {_npc.name} ignored {agentNPC.name}");
@@ -58,24 +56,23 @@ namespace Covid19.AIBehaviour.Behaviour
                 // if the duration in seconds passed(e.g 10 seconds) than remove the bot because is no longer ignored
                 _ignoredAgents.Remove(found);
             }
-            
+
             if (AIUtils.CanSeeObject(_transform, agentNPC.transform,
-                NPCManager.Instance.generalConfiguration.viewDistance,
-                NPCManager.Instance.generalConfiguration.viewAngle))
+                AgentManager.Instance.generalConfiguration.viewDistance,
+                AgentManager.Instance.generalConfiguration.viewAngle))
                 return true;
-            
+
             return false;
         }
 
-        public void IgnoreAgent(AgentNPC agent,int duration)
+        public void IgnoreAgent(AgentNPC agent, int duration)
         {
             _ignoredAgents.Add(new Tuple<AgentNPC, int, float>(agent, duration, Time.time));
         }
-        
 
         public AgentNPC FindNPCToMeet()
         {
-            foreach (AgentNPC partnerNPC in NPCManager.Instance.agentNpcs)
+            foreach (AgentNPC partnerNPC in AgentManager.Instance.agentNPCList)
                 if (_npc != partnerNPC &&
                     _npc.MeetSystem.AcceptsMeeting(partnerNPC) &&
                     partnerNPC.MeetSystem.AcceptsMeeting(_npc))
@@ -83,20 +80,12 @@ namespace Covid19.AIBehaviour.Behaviour
             return null;
         }
 
-        public void SetTalkDuration(AgentNPC partnerNpc, float duration)
-        {
-            TalkAnimationID = Random.Range(0, 3);
-            while (TalkAnimationID == partnerNpc.MeetSystem.TalkAnimationID) TalkAnimationID = Random.Range(0, 3);
-
-            Debug.Log($"Talk Animation ID is {TalkAnimationID}");
-        }
-
-        public Vector3 GetMeetingPosition(AgentNPC npc)
+        private Vector3 GetMeetingPosition(AgentNPC npc)
         {
             Vector3 position = _transform.position;
             Vector3 direction = npc.transform.position - position;
             direction /= 2;
-            float meetingDistance = NPCManager.Instance.generalConfiguration.meetingDistance / 2;
+            var meetingDistance = AgentManager.Instance.generalConfiguration.meetingDistance / 2;
             Vector3 meetingPosition = position + direction - meetingDistance * direction.normalized;
 
             return meetingPosition;

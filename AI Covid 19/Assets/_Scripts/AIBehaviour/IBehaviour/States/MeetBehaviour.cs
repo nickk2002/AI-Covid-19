@@ -10,14 +10,20 @@ namespace Covid19.AIBehaviour.Behaviour.States
         private static readonly int TalkingBool = Animator.StringToHash("talking");
         private static readonly int ListeningBool = Animator.StringToHash("listening");
         private static readonly int TalkID = Animator.StringToHash("talkID");
+
         private Animator _animator;
 
         private bool _drawGizmos = true;
+
+        private float _listeningDuration = 4f;
         private GameObject _meetGizmos;
+
+
         private AgentNPC _npc;
         private bool _reached = false;
         private float _startListeningTime = 0;
         public AgentNPC partnerNPC;
+        public float talkDuration;
         public Vector3 MeetPosition { set; private get; }
 
         public void Enable()
@@ -34,6 +40,8 @@ namespace Covid19.AIBehaviour.Behaviour.States
             _npc.MeetSystem.LastMeetingTime = Time.time;
             _npc.Agent.isStopped = false;
             _animator.SetBool(MeetingBool, false);
+            _animator.SetBool(TalkingBool, false);
+            _animator.SetBool(ListeningBool, false);
             if (_meetGizmos)
                 Destroy(_meetGizmos);
         }
@@ -45,12 +53,15 @@ namespace Covid19.AIBehaviour.Behaviour.States
                 if (_npc.Agent.remainingDistance < 0.1f)
                     if (_reached == false)
                     {
+                        StartCoroutine(WaitUntilMeetingEnds());
                         _reached = true;
                         _npc.Agent.isStopped = true;
                         _animator.SetBool(MeetingBool, true);
-                        if (partnerNPC.gameObject.GetComponent<Animator>().GetBool(TalkingBool) == false)
+                        if (partnerNPC.Animator.GetBool(TalkingBool) == false)
                         {
+                            var randomTalkID = Random.Range(0, 3);
                             _animator.SetBool(TalkingBool, true);
+                            _animator.SetInteger(TalkID, randomTalkID);
                         }
                         else
                         {
@@ -61,19 +72,33 @@ namespace Covid19.AIBehaviour.Behaviour.States
 
                 if (_reached)
                     if (_animator.GetBool(ListeningBool))
-                        if (Time.time - _startListeningTime > 4f)
+                        if (Time.time - _startListeningTime > _listeningDuration)
                         {
                             Debug.Log($"<color=red> Swith conversation {_npc.name} </color>");
+                            var randomTalkID = Random.Range(0, 3);
+                            _animator.SetInteger(TalkID, randomTalkID);
                             _animator.SetBool(TalkingBool, true);
                             _animator.SetBool(ListeningBool, false);
 
-                            partnerNPC.gameObject.GetComponent<Animator>().SetBool(TalkingBool, false);
-                            partnerNPC.gameObject.GetComponent<Animator>().SetBool(ListeningBool, true);
-                            partnerNPC.gameObject.GetComponent<MeetBehaviour>()._startListeningTime = Time.time;
+                            partnerNPC.Animator.SetBool(TalkingBool, false);
+                            partnerNPC.Animator.SetBool(ListeningBool, true);
+                            partnerNPC.GetComponent<MeetBehaviour>()._startListeningTime = Time.time;
+                            partnerNPC.GetComponent<MeetBehaviour>()._listeningDuration = Random.Range(4f, 10f);
                         }
 
                 yield return null;
             }
+        }
+
+        public override string ToString()
+        {
+            return "Meet";
+        }
+
+        private IEnumerator WaitUntilMeetingEnds()
+        {
+            yield return new WaitForSeconds(talkDuration);
+            _npc.RemoveBehaviour(this);
         }
 
         private void OnDrawGizmos()

@@ -15,6 +15,7 @@ namespace Covid19.Player
     {
         // Start is called before the first frame update
         public static Player Instance;
+        private readonly List<QuestRequirement> _questRequirementList = new List<QuestRequirement>();
         private AudioClip _coughClip;
 
         private float _coughCount = 0;
@@ -24,7 +25,6 @@ namespace Covid19.Player
         private float _currentTimer;
         private FirstPersonController _firstPersonController;
         private AudioClip _lastAudioClip;
-        private readonly List<QuestRequirement> _questRequirementList = new List<QuestRequirement>();
         private AudioSource _source;
 
         [Header("Coughing")] public float coughInfectDistance = 5f;
@@ -101,7 +101,7 @@ namespace Covid19.Player
                     return;
                 }
 
-            foreach (AgentNPC agentNPC in NPCManager.Instance.agentNpcs)
+            foreach (AgentNPC agentNPC in AgentManager.Instance.agentNPCList)
                 if (Vector3.Distance(transform.position, agentNPC.transform.position) <= coughInfectDistance)
                     agentNPC.StartInfection();
         }
