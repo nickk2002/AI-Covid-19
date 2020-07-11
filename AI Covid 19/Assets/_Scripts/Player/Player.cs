@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using Covid19.AIBehaviour;
 using Covid19.AIBehaviour.Behaviour;
 using Covid19.GameManagers.UI_Manager;
@@ -13,7 +14,15 @@ namespace Covid19.Player
 {
     public class Player : MonoBehaviour
     {
-        // Start is called before the first frame update
+
+        
+        
+        [Header("Coughing")] public float coughInfectDistance = 5f;
+        public float maxNumberCoughs = 3f;
+        public AudioClip[] coughSoundArray;
+        [HideInInspector] public bool hasObject = false;
+        [HideInInspector] public Camera mainCamera;
+        
         public static Player Instance;
         private readonly List<QuestRequirement> _questRequirementList = new List<QuestRequirement>();
         private AudioClip _coughClip;
@@ -26,15 +35,7 @@ namespace Covid19.Player
         private FirstPersonController _firstPersonController;
         private AudioClip _lastAudioClip;
         private AudioSource _source;
-
-        [Header("Coughing")] public float coughInfectDistance = 5f;
-
-        public AudioClip[] coughSoundArray;
-        [HideInInspector] public bool hasObject = false;
-
-        [HideInInspector] public Camera mainCamera;
-        public float maxNumberCoughs = 3f;
-
+        private LineRenderer _lineRenderer;
 
         private void Awake()
         {
@@ -42,6 +43,7 @@ namespace Covid19.Player
                 Instance = this;
             _source = GetComponent<AudioSource>();
             _firstPersonController = GetComponent<FirstPersonController>();
+            _lineRenderer = gameObject.GetComponent<LineRenderer>();
             mainCamera = GetComponentInChildren<Camera>();
         }
 
@@ -92,18 +94,36 @@ namespace Covid19.Player
 
         private void TryInfectSomeone()
         {
+            
+            
             foreach (Bot bot in Bot.ListBots)
-                /// daca nu este infectat si este in distanta potrivita atunci il infecteaza
                 if (bot.infectionLevel == 0 && CanInfect(bot))
                 {
-                    //Debug.Log("Player has Infected bot : " + bot.name);
                     bot.StartInfection();
-                    return;
+                    break;
                 }
 
             foreach (AgentNPC agentNPC in AgentManager.Instance.agentNPCList)
                 if (Vector3.Distance(transform.position, agentNPC.transform.position) <= coughInfectDistance)
+                {
                     agentNPC.StartInfection();
+                    break;
+                }
+            
+        }
+
+        private void ShowLines()
+        {
+            List<Vector3> positions = new List<Vector3>();
+            foreach (AgentNPC agentNPC in AgentManager.Instance.agentNPCList)
+                if (Vector3.Distance(transform.position, agentNPC.transform.position) <= coughInfectDistance)
+                {
+                    positions.Add(transform.position);
+                    positions.Add(agentNPC.transform.position);
+                }
+
+            _lineRenderer.positionCount = positions.Count;
+            _lineRenderer.SetPositions(positions.ToArray());
         }
 
         private void CoughMecanic()
@@ -145,6 +165,7 @@ namespace Covid19.Player
         private void Update()
         {
             CoughMecanic();
+            ShowLines();
         }
     }
 }

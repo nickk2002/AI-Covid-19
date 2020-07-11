@@ -101,21 +101,20 @@ namespace Covid19.AIBehaviour.Behaviour.States
             _npc.RemoveBehaviour(this);
         }
 
-        private void OnDrawGizmos()
+        private void OnDrawGizmos()    
         {
             if (partnerNPC == null)
                 return;
-            if (_npc.IsCurrentBehaviour(this) && _drawGizmos && partnerNPC.GetComponent<MeetBehaviour>()._drawGizmos)
-            {
-                _meetGizmos = new GameObject {name = "MeetGizmos"};
-                Vector3 otherMeetPosition = partnerNPC.GetComponent<MeetBehaviour>().MeetPosition;
-                Vector3 meetGizmoPosition = MeetPosition + (otherMeetPosition - MeetPosition) / 2;
-                meetGizmoPosition += Vector3.up * 0.5f;
-                _meetGizmos.transform.position = meetGizmoPosition;
-                CustomHierarchy.SetIcon(_meetGizmos, CustomHierarchy.MeetingPointIcon);
-                _drawGizmos = false;
-                partnerNPC.GetComponent<MeetBehaviour>()._drawGizmos = false;
-            }
+            if (!_npc.IsCurrentBehaviour(this) || !_drawGizmos || partnerNPC.GetComponent<MeetBehaviour>()._drawGizmos) 
+                return;
+            _meetGizmos = new GameObject {name = "MeetGizmos"};
+            Vector3 otherMeetPosition = partnerNPC.GetComponent<MeetBehaviour>().MeetPosition;
+            Vector3 meetGizmosPosition = MeetPosition + (otherMeetPosition - MeetPosition) / 2;
+            meetGizmosPosition += Vector3.up * 0.5f;
+            _meetGizmos.transform.position = meetGizmosPosition;
+            CustomHierarchy.SetIcon(_meetGizmos, CustomHierarchy.MeetingPointIcon);
+            _drawGizmos = false;
+            partnerNPC.GetComponent<MeetBehaviour>()._drawGizmos = false;
         }
     }
 }

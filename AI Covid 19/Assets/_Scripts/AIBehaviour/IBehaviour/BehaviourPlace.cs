@@ -1,4 +1,6 @@
-﻿using Covid19.AIBehaviour.Behaviour;
+﻿using System;
+using System.Collections.Generic;
+using Covid19.AIBehaviour.Behaviour;
 using Covid19.AIBehaviour.Behaviour.States;
 using UnityEngine;
 
@@ -10,6 +12,13 @@ public class BehaviourPlace : MonoBehaviour
     private bool _occupied = false;
 
     [SerializeField] private GameObject chair;
+    [SerializeField] private GameObject destination;
+    [SerializeField] private GameObject chairFinalPosition;
+    [SerializeField] private GameObject chairCorrectPosition;
+    [SerializeField] private GameObject mouse;
+
+    private AgentNPC _npc;
+    private Dictionary<AgentNPC, float> _dictionary;
 
     private void Awake()
     {
@@ -18,21 +27,31 @@ public class BehaviourPlace : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        var npc = other.gameObject.GetComponent<AgentNPC>();
+         _npc = other.gameObject.GetComponent<AgentNPC>();
 
-        if (npc != null && _occupied == false)
+        if (_npc != null && _occupied == false && _npc.GetComponent<TypingBehaviour>() == null)
         {
             _occupied = true;
-            var typingBehaviour = npc.gameObject.AddComponent<TypingBehaviour>();
-            typingBehaviour.chairTarget = chair;
-            Debug.Log(typingBehaviour.chairTarget);
-            npc.SetBehaviour(typingBehaviour);
+            var typingBehaviour = _npc.gameObject.AddComponent<TypingBehaviour>();
+            typingBehaviour.targetPosition = destination;
+            typingBehaviour.chairFinalPosition = chairFinalPosition.transform.position;
+            typingBehaviour.chair = chair;
+            typingBehaviour.mouse = mouse;
+            typingBehaviour.correctSittingPosition = chairCorrectPosition.transform.localPosition;
+            Debug.Log(typingBehaviour.targetPosition);
+            _npc.SetBehaviour(typingBehaviour);
             _collider.enabled = false;
         }
     }
 
-    private void OnTriggerExit(Collider other)
+    private void OnCollisionStay(Collision other)
     {
-        _occupied = false;
+        if (_npc.GetComponent<TypingBehaviour>() == null)
+        {
+            _occupied = false;
+            // if(_dictionary.
+            //     )
+            _dictionary.Add(_npc, Time.time);
+        }
     }
 }
