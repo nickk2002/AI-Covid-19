@@ -1,5 +1,7 @@
 ﻿using System.Collections.Generic;
+using System.Text.RegularExpressions;
 using Covid19.AIBehaviour.Behaviour.Configuration;
+using Covid19.AIBehaviour.Behaviour.States;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -7,13 +9,13 @@ namespace Covid19.AIBehaviour.Behaviour
 {
     public class AgentNPC : MonoBehaviour
     {
-        private readonly Stack<IBehaviour> _behaviours = new Stack<IBehaviour>();
-        private readonly Dictionary<IBehaviour, Coroutine> _dictionary = new Dictionary<IBehaviour, Coroutine>();
+        public enum GroupType
+        {
+            Cook,
+            Business,
+        }
 
-        private AgentUI _agentUI;
-        private IBehaviour _currentBehaviour;
-        private InfectionSystem _infectionSystem;
-
+        public GroupType type;
         public AgentConfiguration agentConfiguration;
 
         [HideInInspector] public GameObject[] patrolPositions; // array holding patrol positions
@@ -25,14 +27,31 @@ namespace Covid19.AIBehaviour.Behaviour
         public Animator Animator { get; private set; }
         public MeetSystem MeetSystem { get; private set; }
 
+        public GameObject rightHand;
+        private readonly Stack<IBehaviour> _behaviours = new Stack<IBehaviour>();
+        private readonly Dictionary<IBehaviour, Coroutine> _dictionary = new Dictionary<IBehaviour, Coroutine>();
+        private AgentUI _agentUI;
+        private IBehaviour _currentBehaviour;
+        private InfectionSystem _infectionSystem;
+        private Dictionary<GroupType, List<IBehaviour>> _altceva = new Dictionary<GroupType, List<IBehaviour>>();
+        private List<System.Type> _basicActions = new List<System.Type>
+        {
+            typeof(MeetBehaviour),
+            typeof(EatBeahaviour),
+        };
+
         private void Start()
         {
+            System.Type type = typeof(MeetBehaviour);
+            // altceva.Add(GroupType.Cook, new List<IBehaviour>(TypingBehaviour), typeof(MeetBehaviour)));
+            // altceva.Add(GroupType.Business, new List<IBehaviour>(TypingBehaviour, MeetBehaviour,));
             AgentManager.Instance.AddAgent(this);
 
             _agentUI = GetComponentInChildren<AgentUI>();
 
             Agent = GetComponent<NavMeshAgent>();
             Animator = GetComponent<Animator>();
+            GetComponent<Rigidbody>().useGravity = false;
 
             SetBehaviour(GetComponent<IBehaviour>());
             MeetSystem = new MeetSystem(this);
@@ -45,7 +64,7 @@ namespace Covid19.AIBehaviour.Behaviour
                 return false;
             return _behaviours.Peek() == behaviour;
         }
-
+        
         public void SetBehaviour(IBehaviour behaviour)
         {
             if (_currentBehaviour != null)

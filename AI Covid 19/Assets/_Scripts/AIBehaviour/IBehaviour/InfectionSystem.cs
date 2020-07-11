@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using Covid19.AIBehaviour.Behaviour.States;
 using UnityEngine;
 
 namespace Covid19.AIBehaviour.Behaviour
@@ -10,6 +11,7 @@ namespace Covid19.AIBehaviour.Behaviour
         private readonly AgentNPC _npc;
         private bool _infected = false;
         private float _infectionLevel = 0;
+        private bool _goingToInfirmery = false;
 
         public InfectionSystem(AgentNPC owner)
         {
@@ -56,6 +58,11 @@ namespace Covid19.AIBehaviour.Behaviour
             {
                 yield return new WaitForSeconds(AgentManager.Instance.generalConfiguration.growthInterval);
                 _infectionLevel += AgentManager.Instance.generalConfiguration.growthInterval;
+                if (_infectionLevel > 1 && _goingToInfirmery == false)
+                {
+                    _npc.SetBehaviour(_npc.gameObject.AddComponent<InfirmeryBehaviour>());
+                    _goingToInfirmery = true;
+                }
             }
         }
     }
