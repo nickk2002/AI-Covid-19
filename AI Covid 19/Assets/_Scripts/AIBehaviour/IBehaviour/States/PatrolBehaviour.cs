@@ -29,7 +29,6 @@ namespace Covid19.AIBehaviour.Behaviour.States
         {
             while (true)
             {
-                Debug.Log($"In patrol {name}");
                 if (_startPatroling == false ||
                     _npc.Agent.remainingDistance < _npc.agentConfiguration.stoppingDistance)
                 {

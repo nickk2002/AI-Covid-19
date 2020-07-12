@@ -1,48 +1,55 @@
-﻿using System.Collections.Generic;
-using System.Text.RegularExpressions;
+﻿using System;
+using System.Collections.Generic;
 using Covid19.AIBehaviour.Behaviour.Configuration;
 using Covid19.AIBehaviour.Behaviour.States;
 using UnityEngine;
 using UnityEngine.AI;
+using Object = UnityEngine.Object;
 
 namespace Covid19.AIBehaviour.Behaviour
 {
     public class AgentNPC : MonoBehaviour
     {
-        public enum GroupType
+        public enum AgentType
         {
             Cook,
-            Business,
+            BusinessMan,
+            Doctor
         }
 
-        public GroupType type;
+        private readonly Dictionary<IBehaviour, Coroutine>
+            _behaviourCoroutine = new Dictionary<IBehaviour, Coroutine>();
+
+        private readonly Stack<IBehaviour> _behaviours = new Stack<IBehaviour>();
+
+        private AgentUI _agentUI;
+
+        private Dictionary<AgentType, List<IBehaviour>> _altceva = new Dictionary<AgentType, List<IBehaviour>>();
+
+        private List<Type> _basicActions = new List<Type>
+        {
+            typeof(MeetBehaviour),
+            typeof(EatBeahaviour)
+        };
+
+        private IBehaviour _currentBehaviour;
         public AgentConfiguration agentConfiguration;
+        public AgentType agentType;
 
         [HideInInspector] public GameObject[] patrolPositions; // array holding patrol positions
 
-        public GameObject
-            posHolder; // This is used for an easier way to set patrol points, should be added to a SO in the feature
+        // This is used for an easier way to set patrol points, should be added to a SO in the feature
+        public GameObject posHolder;
+        public GameObject rightHand;
 
         public NavMeshAgent Agent { get; private set; }
         public Animator Animator { get; private set; }
         public MeetSystem MeetSystem { get; private set; }
-
-        public GameObject rightHand;
-        private readonly Stack<IBehaviour> _behaviours = new Stack<IBehaviour>();
-        private readonly Dictionary<IBehaviour, Coroutine> _dictionary = new Dictionary<IBehaviour, Coroutine>();
-        private AgentUI _agentUI;
-        private IBehaviour _currentBehaviour;
-        private InfectionSystem _infectionSystem;
-        private Dictionary<GroupType, List<IBehaviour>> _altceva = new Dictionary<GroupType, List<IBehaviour>>();
-        private List<System.Type> _basicActions = new List<System.Type>
-        {
-            typeof(MeetBehaviour),
-            typeof(EatBeahaviour),
-        };
+        public InfectionSystem InfectionSystem { get; private set; }
 
         private void Start()
         {
-            System.Type type = typeof(MeetBehaviour);
+            Type type = typeof(MeetBehaviour);
             // altceva.Add(GroupType.Cook, new List<IBehaviour>(TypingBehaviour), typeof(MeetBehaviour)));
             // altceva.Add(GroupType.Business, new List<IBehaviour>(TypingBehaviour, MeetBehaviour,));
             AgentManager.Instance.AddAgent(this);
@@ -51,11 +58,16 @@ namespace Covid19.AIBehaviour.Behaviour
 
             Agent = GetComponent<NavMeshAgent>();
             Animator = GetComponent<Animator>();
-            GetComponent<Rigidbody>().useGravity = false;
-
             SetBehaviour(GetComponent<IBehaviour>());
+
             MeetSystem = new MeetSystem(this);
-            _infectionSystem = new InfectionSystem(this);
+            InfectionSystem = new InfectionSystem(this);
+
+            if (agentType == AgentType.Doctor)
+                InfectionSystem.cured = true;
+
+            if (gameObject.name == "bot1")
+                StartInfection();
         }
 
         public bool IsCurrentBehaviour(IBehaviour behaviour)
@@ -64,13 +76,13 @@ namespace Covid19.AIBehaviour.Behaviour
                 return false;
             return _behaviours.Peek() == behaviour;
         }
-        
+
         public void SetBehaviour(IBehaviour behaviour)
         {
             if (_currentBehaviour != null)
             {
                 //Debug.Log($"Ending coroutine {_currentBehaviour} because we are setting up {behaviour} now",this);
-                StopCoroutine(_dictionary[_currentBehaviour]);
+                StopCoroutine(_behaviourCoroutine[_currentBehaviour]);
                 _currentBehaviour.Disable();
             }
 
@@ -80,12 +92,12 @@ namespace Covid19.AIBehaviour.Behaviour
 
             Coroutine coroutine = StartCoroutine(_currentBehaviour.OnUpdate()); // cache the corutine to stop later
             //Debug.Log($"Putting the coroutine {_currentBehaviour} into the dictionary",this);
-            _dictionary[_currentBehaviour] = coroutine;
+            _behaviourCoroutine[_currentBehaviour] = coroutine;
         }
 
         public void RemoveBehaviour(IBehaviour behaviour)
         {
-            StopCoroutine(_dictionary[behaviour]);
+            StopCoroutine(_behaviourCoroutine[behaviour]);
             behaviour.Disable();
             Destroy(behaviour as Object);
             _behaviours.Pop();
@@ -94,13 +106,13 @@ namespace Covid19.AIBehaviour.Behaviour
                 _currentBehaviour = _behaviours.Peek();
                 _currentBehaviour.Enable();
                 Coroutine coroutine = StartCoroutine(_currentBehaviour.OnUpdate());
-                _dictionary[_currentBehaviour] = coroutine;
+                _behaviourCoroutine[_currentBehaviour] = coroutine;
             }
         }
 
         public void StartInfection()
         {
-            _infectionSystem.StartInfection();
+            InfectionSystem.StartInfection();
         }
 
         private void OnDrawGizmos()

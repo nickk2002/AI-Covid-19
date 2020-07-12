@@ -34,7 +34,7 @@ namespace Covid19.AIBehaviour.Behaviour
 
         private bool AcceptsMeeting(AgentNPC agentNPC)
         {
-            if (agentNPC.GetComponent<MeetBehaviour>())
+            if (agentNPC.GetComponent<MeetBehaviour>() || agentNPC.GetComponent<PatrolBehaviour>() == null)
                 return false; // if it is already in meeting then return false
             // check to prevent two agents meeting without having time to turn around and walk away
             if (LastMeetingTime != 0 && !(Time.time - LastMeetingTime > _npc.agentConfiguration.cooldownMeeting))
