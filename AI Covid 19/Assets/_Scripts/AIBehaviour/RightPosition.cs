@@ -1,13 +1,11 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class RightPosition : StateMachineBehaviour
 {
     public bool start = true;
-    
+
     // OnStateEnter is called before OnStateEnter is called on any state inside this state machine
-    override public void OnStateEnter(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
+    public override void OnStateEnter(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
     {
         if (start)
         {
@@ -25,7 +23,7 @@ public class RightPosition : StateMachineBehaviour
     //}
 
     // OnStateExit is called before OnStateExit is called on any state inside this state machine
-    override public void OnStateExit(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
+    public override void OnStateExit(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
     {
         if (!start)
         {
@@ -55,8 +53,7 @@ public class RightPosition : StateMachineBehaviour
     //}
 
     // OnStateMachineExit is called when exiting a state machine via its Exit Node
-    override public void OnStateMachineExit(Animator animator, int stateMachinePathHash)
+    public override void OnStateMachineExit(Animator animator, int stateMachinePathHash)
     {
-
     }
 }

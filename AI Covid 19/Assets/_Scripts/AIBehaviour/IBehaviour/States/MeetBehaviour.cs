@@ -101,12 +101,13 @@ namespace Covid19.AIBehaviour.Behaviour.States
             _npc.RemoveBehaviour(this);
         }
 
-        private void OnDrawGizmos()    
+        private void OnDrawGizmos()
         {
             if (partnerNPC == null)
                 return;
-            if (!_npc.IsCurrentBehaviour(this) || !_drawGizmos || partnerNPC.GetComponent<MeetBehaviour>()._drawGizmos) 
+            if (!_npc.IsCurrentBehaviour(this) || !_drawGizmos || !partnerNPC.GetComponent<MeetBehaviour>()._drawGizmos)
                 return;
+            Debug.Log("Draw a gizmos");
             _meetGizmos = new GameObject {name = "MeetGizmos"};
             Vector3 otherMeetPosition = partnerNPC.GetComponent<MeetBehaviour>().MeetPosition;
             Vector3 meetGizmosPosition = MeetPosition + (otherMeetPosition - MeetPosition) / 2;

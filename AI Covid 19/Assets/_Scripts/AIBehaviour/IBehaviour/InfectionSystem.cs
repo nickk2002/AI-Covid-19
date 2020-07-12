@@ -9,9 +9,11 @@ namespace Covid19.AIBehaviour.Behaviour
         private static readonly int Cough = Animator.StringToHash("cough");
         private readonly Animator _animator;
         private readonly AgentNPC _npc;
+        private bool _goingToInfirmery = false;
         private bool _infected = false;
         private float _infectionLevel = 0;
-        private bool _goingToInfirmery = false;
+
+        public bool cured = false;
 
         public InfectionSystem(AgentNPC owner)
         {
@@ -21,7 +23,7 @@ namespace Covid19.AIBehaviour.Behaviour
 
         public void StartInfection()
         {
-            if (_infected) return;
+            if (_infected || cured) return;
             Debug.Log("Heii I am infected" + _npc.name);
             _infected = true;
             _npc.StartCoroutine(InfectionHandler());
@@ -31,7 +33,8 @@ namespace Covid19.AIBehaviour.Behaviour
         private void InfectNearbyAgents()
         {
             foreach (AgentNPC agentNPC in AgentManager.Instance.agentNPCList)
-                if (Vector3.Distance(_npc.transform.position, agentNPC.transform.position) < 10)
+                if (Vector3.Distance(_npc.transform.position, agentNPC.transform.position) <
+                    AgentManager.Instance.generalConfiguration.infectionDistance)
                     agentNPC.StartInfection();
         }
 
@@ -39,6 +42,8 @@ namespace Covid19.AIBehaviour.Behaviour
         {
             while (true)
             {
+                if (cured)
+                    break;
                 var coughVal =
                     AIManager.Instance.coughCurve
                         .Evaluate(_infectionLevel); // evaluate from gamemanager cough interval over infection function
@@ -58,6 +63,8 @@ namespace Covid19.AIBehaviour.Behaviour
             {
                 yield return new WaitForSeconds(AgentManager.Instance.generalConfiguration.growthInterval);
                 _infectionLevel += AgentManager.Instance.generalConfiguration.growthInterval;
+                if (cured)
+                    break;
                 if (_infectionLevel > 1 && _goingToInfirmery == false)
                 {
                     _npc.SetBehaviour(_npc.gameObject.AddComponent<InfirmeryBehaviour>());
