@@ -15,5 +15,6 @@ namespace Covid19.AIBehaviour.Behaviour.Configuration
         
         public float cooldownMeeting = 5;
         public float stoppingDistance = 0.1f;
+        
     }
 }
