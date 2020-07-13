@@ -1,6 +1,6 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using Covid19.AIBehaviour;
 using Covid19.AIBehaviour.Behaviour;
 using Covid19.GameManagers.UI_Manager;
@@ -9,19 +9,18 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityStandardAssets.Characters.FirstPerson;
+using Random = UnityEngine.Random;
 
 namespace Covid19.Player
 {
     public class Player : MonoBehaviour
     {
-
-        
-        
         [Header("Coughing")] public float coughInfectDistance = 5f;
         public float maxNumberCoughs = 3f;
-        public AudioClip[] coughSoundArray;
+        public CoughConfiguration coughConfiguration;
         [HideInInspector] public bool hasObject = false;
         [HideInInspector] public Camera mainCamera;
+        public event Action OnFirstCough;
         
         public static Player Instance;
         private readonly List<QuestRequirement> _questRequirementList = new List<QuestRequirement>();
@@ -30,12 +29,13 @@ namespace Covid19.Player
         private float _coughCount = 0;
         private Image _coughLoadingBarUI;
         private TextMeshProUGUI _coughTextUI;
-
         private float _currentTimer;
         private FirstPersonController _firstPersonController;
         private AudioClip _lastAudioClip;
         private AudioSource _source;
         private LineRenderer _lineRenderer;
+        
+        
 
         private void Awake()
         {
@@ -72,11 +72,11 @@ namespace Covid19.Player
 
         private AudioClip RandomAudio()
         {
-            AudioClip clip = coughSoundArray[Random.Range(0, coughSoundArray.Length - 1)];
+            AudioClip clip = coughConfiguration.soundArray[Random.Range(0, coughConfiguration.soundArray.Length - 1)];
             var tries = 0;
             while (clip == _lastAudioClip && tries <= 3)
             {
-                clip = coughSoundArray[Random.Range(0, coughSoundArray.Length - 1)];
+                clip = coughConfiguration.soundArray[Random.Range(0, coughConfiguration.soundArray.Length - 1)];
                 tries++;
             }
 
@@ -94,8 +94,6 @@ namespace Covid19.Player
 
         private void TryInfectSomeone()
         {
-            
-            
             foreach (Bot bot in Bot.ListBots)
                 if (bot.infectionLevel == 0 && CanInfect(bot))
                 {
@@ -131,6 +129,8 @@ namespace Covid19.Player
             if (Input.GetKeyDown(KeyCode.C) && _coughCount < maxNumberCoughs &&
                 (_coughClip == null || _currentTimer > _coughClip.length))
             {
+                if (_coughCount == 0)
+                    OnFirstCough.Invoke();
                 _coughCount++;
                 _coughClip = RandomAudio();
                 _source.PlayOneShot(_coughClip);

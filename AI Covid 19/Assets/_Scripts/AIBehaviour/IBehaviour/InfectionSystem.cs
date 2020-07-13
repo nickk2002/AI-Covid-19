@@ -9,27 +9,64 @@ namespace Covid19.AIBehaviour.Behaviour
         private static readonly int Cough = Animator.StringToHash("cough");
         private readonly Animator _animator;
         private readonly AgentNPC _npc;
+
+        private float _infectionLevel = 0;
+        
+        private Coroutine _infectionGrowthCoroutine;
+        private Coroutine _coughCoroutine;
+        
         private bool _goingToInfirmery = false;
         private bool _infected = false;
-        private float _infectionLevel = 0;
+        private bool _cured = false;
 
-        public bool cured = false;
+        private AudioClip _lastAudioClip;
+        private AudioSource _audioSource;
+        
+        
+        public bool Cured    
+        {
+            get => _cured;
+            set
+            {
+                if (_coughCoroutine != null && _infectionGrowthCoroutine != null)
+                {
+                    _npc.StopCoroutine(_coughCoroutine);
+                    _npc.StopCoroutine(_infectionGrowthCoroutine);
+                }
+
+                Debug.Log("Stopped coroutines!");
+                _cured = value;
+            }
+        }  
 
         public InfectionSystem(AgentNPC owner)
         {
             _npc = owner;
             _animator = owner.GetComponent<Animator>();
+            _audioSource = owner.GetComponent<AudioSource>();
         }
 
         public void StartInfection()
         {
-            if (_infected || cured) return;
+            if (_infected || _cured) return;
             Debug.Log("Heii I am infected" + _npc.name);
             _infected = true;
-            _npc.StartCoroutine(InfectionHandler());
-            _npc.StartCoroutine(InfectingOthersHandler());
+            _infectionGrowthCoroutine = _npc.StartCoroutine(InfectionHandler());
+            _coughCoroutine = _npc.StartCoroutine(InfectingOthersHandler());
         }
+        private AudioClip RandomAudio()
+        {
+            AudioClip clip = _npc.coughConfiguration.soundArray[Random.Range(0, _npc.coughConfiguration.soundArray.Length - 1)];
+            var tries = 0;
+            while (clip == _lastAudioClip && tries <= 3)
+            {
+                clip = _npc.coughConfiguration.soundArray[Random.Range(0, _npc.coughConfiguration.soundArray.Length - 1)];
+                tries++;
+            }
 
+            _lastAudioClip = clip;
+            return clip;
+        }
         private void InfectNearbyAgents()
         {
             foreach (AgentNPC agentNPC in AgentManager.Instance.agentNPCList)
@@ -42,16 +79,17 @@ namespace Covid19.AIBehaviour.Behaviour
         {
             while (true)
             {
-                if (cured)
-                    break;
-                var coughVal =
-                    AIManager.Instance.coughCurve
-                        .Evaluate(_infectionLevel); // evaluate from gamemanager cough interval over infection function
+                // evaluate from gamemanager cough interval over infection function
+                var coughVal = AIManager.Instance.coughCurve.Evaluate(_infectionLevel); 
                 var coughInterval = Random.Range(coughVal - 1, coughVal); // add a bit of random 
                 yield return new WaitForSeconds(coughInterval);
                 if (_animator.GetBool(Cough) == false)
                 {
                     _animator.SetTrigger(Cough);
+                    AudioClip clip = RandomAudio();
+                    _audioSource.clip = clip;
+                    _audioSource.Play();
+                    Debug.Log($"{_npc.name} has coughed!");
                     InfectNearbyAgents();
                 }
             }
@@ -63,12 +101,13 @@ namespace Covid19.AIBehaviour.Behaviour
             {
                 yield return new WaitForSeconds(AgentManager.Instance.generalConfiguration.growthInterval);
                 _infectionLevel += AgentManager.Instance.generalConfiguration.growthInterval;
-                if (cured)
-                    break;
-                if (_infectionLevel > 1 && _goingToInfirmery == false)
+                if (_infectionLevel > 1 && _goingToInfirmery == false && Infirmery.Instance.HasAvailableSpace() && _npc.IsCurrentBehaviour(_npc.GetComponent<PatrolBehaviour>()))
                 {
-                    _npc.SetBehaviour(_npc.gameObject.AddComponent<InfirmeryBehaviour>());
+                    GoToInfirmeryBehaviour behaviour = _npc.gameObject.AddComponent<GoToInfirmeryBehaviour>();
+                    behaviour.destination = Infirmery.Instance.GetBedPosition(_npc);
                     _goingToInfirmery = true;
+                    _npc.SetBehaviour(behaviour);
+                    
                 }
             }
         }

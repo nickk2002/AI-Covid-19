@@ -3,17 +3,19 @@ using UnityEngine;
 
 namespace Covid19.AIBehaviour.Behaviour.States
 {
-    public class InfirmeryBehaviour : MonoBehaviour, IBehaviour
+    public class GoToInfirmeryBehaviour : MonoBehaviour, IBehaviour
     {
-        private Vector3 _destination;
+        public Transform destination;
         private AgentNPC _npc;
         private bool _reached = false;
 
+        // this behaviuor is entered only if the Infirmery has available space
         public void Enable()
         {
             _npc = GetComponent<AgentNPC>();
-            _destination = Infirmery.Instance.target.transform.position;
-            _npc.Agent.SetDestination(_destination);
+            
+            Debug.Assert(destination != null,"destination != null");
+            _npc.Agent.SetDestination(destination.position);
         }
 
         public void Disable()
@@ -33,14 +35,17 @@ namespace Covid19.AIBehaviour.Behaviour.States
                         _reached = true;
                     }
 
-                if (_npc.InfectionSystem.cured)
+                if (_npc.InfectionSystem.Cured)
                 {
-                    _npc.RemoveBehaviour(this);
+                    Debug.Log("Now I am healed! The bed is free");
+                    Infirmery.Instance.FreeBed(_npc);
                     _npc.Agent.isStopped = false;
+                    _npc.RemoveBehaviour(this);
+                    
                 }
 
                 yield return null;
-            }
+            }    
         }
 
         public override string ToString()

@@ -1,4 +1,6 @@
 ﻿using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace Covid19.AIBehaviour.Behaviour
@@ -7,56 +9,75 @@ namespace Covid19.AIBehaviour.Behaviour
     {
         private Vector3 _meetingPosition;
         private AgentNPC _npc;
-        private bool _reachedFaceToFace = false;
-        private bool _reachedMeeting = false;
-        public Infirmery infirmery;
-        public AgentNPC pacient;
 
+        public Infirmery infirmery;
+        
+        private readonly Stack<AgentNPC> _pacientsStack = new Stack<AgentNPC>();
+    
         public void Enable()
-        {
+        {    
             _npc = GetComponent<AgentNPC>();
-            Transform pacientTransform = pacient.transform;
-            _meetingPosition = pacientTransform.position + pacientTransform.forward * 2;
+            _npc.Agent.isStopped = false;
             Debug.Log($"enabling heal behaviour at position {_meetingPosition}");
-            var go = new GameObject("Meeting Position For Doctor");
-            go.transform.position = _meetingPosition;
-            _npc.Agent.SetDestination(_meetingPosition);
         }
 
         public void Disable()
         {
         }
 
-        public IEnumerator OnUpdate()
+        public void AddPacient(AgentNPC npc)
         {
+            _pacientsStack.Push(npc);
+        }
+        
+        private void PrepareDestination(AgentNPC pacient)
+        {
+            Transform pacientTransform = pacient.transform;
+            _meetingPosition = pacientTransform.position + pacientTransform.forward * 2;
+            _npc.Agent.SetDestination(_meetingPosition);
+        }
+        private IEnumerator HealPacient(AgentNPC pacient)
+        {
+            PrepareDestination(pacient);
             while (true)
             {
-                if (Vector3.Distance(transform.position, _meetingPosition) < 0.1f)
-                    if (_reachedMeeting == false)
-                    {
-                        Debug.Log("doctor reached");
-                        _npc.Agent.isStopped = true;
-                        _reachedMeeting = true;
-                        StartCoroutine(RotateCoroutine(1f));
-                    }
-
-                if (_reachedFaceToFace)
+                if (_npc.Agent.pathPending)
+                    yield return null;
+                Debug.Log(Vector3.Distance(transform.position, _meetingPosition) + " " + _npc.Agent.remainingDistance);
+                if (_npc.Agent.remainingDistance < 0.5f)
                 {
+                    Debug.Log($"doctor reached at {pacient.name}");
+                    _npc.Agent.isStopped = true;
+                    yield return StartCoroutine(RotateCoroutine(1f, pacient));
+                    
+                    // TODO: add heal animation
                     yield return new WaitForSeconds(2f);
-                    pacient.InfectionSystem.cured = true;
-                    _npc.RemoveBehaviour(this);
+                    
+                    Debug.Log($"{pacient.name} is healed");
+                    pacient.InfectionSystem.Cured = true;
+                    _npc.Agent.isStopped = false;
+                    break;
                 }
-
                 yield return null;
-            }
+            }    
         }
+        public IEnumerator OnUpdate()
+        {
+            while (_pacientsStack.Count > 0)
+            {
+                AgentNPC pacient = _pacientsStack.Peek();
+                _pacientsStack.Pop();
+                yield return StartCoroutine(HealPacient(pacient));
+            }
 
+            _npc.RemoveBehaviour(this);
+        }
         public override string ToString()
         {
             return "Heal";
         }
 
-        private IEnumerator RotateCoroutine(float duration)
+        private IEnumerator RotateCoroutine(float duration,AgentNPC pacient)
         {
             Quaternion initialRotation = transform.rotation;
             Quaternion desiredRotation = pacient.transform.rotation * Quaternion.Euler(0, 180, 0);
@@ -70,7 +91,6 @@ namespace Covid19.AIBehaviour.Behaviour
             }
 
             transform.rotation = desiredRotation;
-            _reachedFaceToFace = true;
         }
     }
 }
