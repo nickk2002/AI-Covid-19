@@ -46,12 +46,7 @@
 #*.PDF   diff=astextplain
 #*.rtf   diff=astextplain
 #*.RTF   diff=astextplain
-*.fbx filter=lfs diff=lfs merge=lfs -text
-*.unity filter=lfs diff=lfs merge=lfs -text
-*.png filter=lfs diff=lfs merge=lfs -text
-*.tga:
- filter=lfs diff=lfs merge=lfs -text
-*.tga filter=lfs diff=lfs merge=lfs -text
+
 _Scripts text !filter !merge !diff
 _Scenes/BasicScene.unity filter=lfs diff=lfs merge=lfs -text
 _Scnes text !filter !merge !diff
