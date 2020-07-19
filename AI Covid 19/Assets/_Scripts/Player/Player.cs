@@ -8,7 +8,6 @@ using Covid19.Player.Quests;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using UnityStandardAssets.Characters.FirstPerson;
 using Random = UnityEngine.Random;
 
 namespace Covid19.Player
@@ -30,7 +29,6 @@ namespace Covid19.Player
         private Image _coughLoadingBarUI;
         private TextMeshProUGUI _coughTextUI;
         private float _currentTimer;
-        private FirstPersonController _firstPersonController;
         private AudioClip _lastAudioClip;
         private AudioSource _source;
         private LineRenderer _lineRenderer;
@@ -42,7 +40,6 @@ namespace Covid19.Player
             if (Instance == null)
                 Instance = this;
             _source = GetComponent<AudioSource>();
-            _firstPersonController = GetComponent<FirstPersonController>();
             _lineRenderer = gameObject.GetComponent<LineRenderer>();
             mainCamera = GetComponentInChildren<Camera>();
         }
@@ -65,7 +62,6 @@ namespace Covid19.Player
 
         public IEnumerator JumpAt(Vector3 position)
         {
-            _firstPersonController.enabled = false;
             transform.position = position;
             yield return new WaitForFixedUpdate();
         }
