@@ -40,7 +40,7 @@ namespace Covid19.AI.Behaviour.States
                     Debug.Log("Now I am healed! The bed is free");
                     Infirmery.Instance.FreeBed(_npc);
                     _npc.Agent.isStopped = false;
-                    _npc.RemoveBehaviour(this);
+                    _npc.BehaviourSystem.RemoveBehaviour(this);
                     
                 }
 

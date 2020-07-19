@@ -11,7 +11,6 @@ namespace Covid19.AI.Behaviour
         private readonly List<AgentNPC> _doctorList = new List<AgentNPC>();
         private readonly List<bool> _ocuppiedBeds = new List<bool>();
         private readonly Dictionary<AgentNPC,int> _npcBedIndex = new Dictionary<AgentNPC,int>();
-        public GameObject target;
 
         private void Awake()
         {
@@ -60,7 +59,7 @@ namespace Covid19.AI.Behaviour
             {
                 var healBehaviour = doctor.gameObject.AddComponent<HealAgentBehaviour>();
                 healBehaviour.AddPacient(pacient);
-                doctor.SetBehaviour(healBehaviour);
+                doctor.BehaviourSystem.SetBehaviour(healBehaviour);
             }
             else
             {

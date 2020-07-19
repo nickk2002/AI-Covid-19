@@ -1,12 +1,9 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using Covid19.GameManagers.UI_Manager;
 using Covid19.UI.Quests;
 using UnityEngine;
 
-namespace Covid19.Player.Quests
+namespace Covid19.Core.Quests
 {
     [RequireComponent(typeof(BoxCollider))]
     public class Room : MonoBehaviour
@@ -25,7 +22,7 @@ namespace Covid19.Player.Quests
         {
             // make sure the trigger is set on
             GetComponent<BoxCollider>().isTrigger = true;
-            _actionManagerUI = UIManager.Instance.actionsManagerUI;
+            //_actionManagerUI = UIManager.Instance.actionsManagerUI;
 
             if (detectFromChildren)
                 playerQuests = GetComponentsInChildren<Quest>().ToList();

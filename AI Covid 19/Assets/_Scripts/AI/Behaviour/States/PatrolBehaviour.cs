@@ -101,30 +101,31 @@ namespace Covid19.AI.Behaviour.States
             Enable();
             if (_npc.posHolder == null) return;
 
-            if (Application.isPlaying == false || _npc.IsCurrentBehaviour(this))
+            if (Application.isPlaying == false || _npc.BehaviourSystem.IsCurrentBehaviour(this))
             {
                 var positions = new List<Vector3>();
                 foreach (GameObject patrolGameObject in _npc.patrolPositions)
                     positions.Add(patrolGameObject.transform.position);
 
                 positions.Add(positions[0]);
+                Color redColor = new Color(1f, 0.15f, 0.32f);
+                Color blueColor = new Color(0.44f, 0.68f, 1f);
                 for (var i = 0; i < positions.Count - 1; i++)
                 {
                     if (Application.isPlaying && _currentDestination == positions[i + 1])
-
-                        Gizmos.color = new Color(1f, 0.15f, 0.32f);
+                        Gizmos.color = redColor;
                     else
-                        Gizmos.color = new Color(0.44f, 0.68f, 1f);
+                        Gizmos.color = blueColor;
                     Gizmos.DrawLine(positions[i], positions[i + 1]);
                     Vector3 direction = (positions[i] - positions[i + 1]).normalized;
                     Vector3 pos1 = positions[i + 1] + Quaternion.Euler(0, 45, 0) * direction;
                     Vector3 pos2 = positions[i + 1] + Quaternion.Euler(0, -45, 0) * direction;
                     if (Application.isPlaying && _currentDestination == positions[i + 1])
-                        Gizmos.color = new Color(1f, 0.15f, 0.32f);
+                        Gizmos.color = redColor;
                     else
                         Gizmos.color = Color.white;
                     Gizmos.DrawLine(positions[i + 1], pos1);
-                    Gizmos.DrawLine(positions[i + 1], pos2);
+                    Gizmos.DrawLine(positions[i + 1], pos2);    
                 }
             }
         }

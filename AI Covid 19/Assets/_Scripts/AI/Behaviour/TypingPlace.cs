@@ -39,7 +39,7 @@ namespace Covid19.AI.Behaviour
                 typingBehaviour.mouse = mouse;
                 typingBehaviour.correctSittingPosition = chairCorrectPosition.transform.localPosition;
                 Debug.Log(typingBehaviour.targetPosition);
-                _npc.SetBehaviour(typingBehaviour);
+                _npc.BehaviourSystem.SetBehaviour(typingBehaviour);
                 _collider.enabled = false;
             }
         }

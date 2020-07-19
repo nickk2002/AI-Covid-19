@@ -102,12 +102,12 @@ namespace Covid19.AI.Behaviour.Systems
             {
                 yield return new WaitForSeconds(_npc.generalConfig.growthInterval);
                 _infectionLevel += _npc.generalConfig.growthInterval;
-                if (_infectionLevel > 1 && _goingToInfirmery == false && Infirmery.Instance.HasAvailableSpace() && _npc.IsCurrentBehaviour(_npc.GetComponent<PatrolBehaviour>()))
+                if (_infectionLevel > 1 && _goingToInfirmery == false && Infirmery.Instance.HasAvailableSpace() && _npc.BehaviourSystem.IsCurrentBehaviour(_npc.GetComponent<PatrolBehaviour>()))
                 {
                     GoToInfirmeryBehaviour behaviour = _npc.gameObject.AddComponent<GoToInfirmeryBehaviour>();
                     behaviour.destination = Infirmery.Instance.GetBedPosition(_npc);
                     _goingToInfirmery = true;
-                    _npc.SetBehaviour(behaviour);
+                    _npc.BehaviourSystem.SetBehaviour(behaviour);
                     
                 }
             }

@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace Covid19.Player.Quests {
+namespace Covid19.Core.Quests {
     public class QuestRequirement : MonoBehaviour
     {
         

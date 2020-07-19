@@ -15,7 +15,7 @@ MonoBehaviour:
   growthInterval: 0.1
   infectionDistance: 5
   infectionSpeed: 0.1
-  meetingDistance: 1
+  meetingDistance: 4
   viewAngle: 60
   viewDistance: 30
   agentList: {fileID: 11400000, guid: bf4a2e6fd82e8854b82e9d0f6c708e4c, type: 2}

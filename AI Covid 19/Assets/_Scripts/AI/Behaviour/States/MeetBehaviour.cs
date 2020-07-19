@@ -6,25 +6,24 @@ namespace Covid19.AI.Behaviour.States
 {
     public class MeetBehaviour : MonoBehaviour, IBehaviour
     {
+
+        public AgentNPC partnerNPC;
+        public float talkDuration;
+        
+        public Vector3 MeetPosition { set; private get; }
+
+        private Animator _animator;
+        
         private static readonly int MeetingBool = Animator.StringToHash("meeting");
         private static readonly int TalkingBool = Animator.StringToHash("talking");
         private static readonly int ListeningBool = Animator.StringToHash("listening");
         private static readonly int TalkID = Animator.StringToHash("talkID");
-
-        private Animator _animator;
-
+        
         private bool _drawGizmos = true;
-
-
         private GameObject _meetGizmos;
-
-
+        
         private AgentNPC _npc;
         private bool _reached = false;
-        public AgentNPC partnerNPC;
-        public float talkDuration;
-        public Vector3 MeetPosition { set; private get; }
-
         public void Enable()
         {
             Debug.Log($"Entered meeting {name}");
@@ -97,14 +96,14 @@ namespace Covid19.AI.Behaviour.States
         private IEnumerator WaitUntilMeetingEnds()
         {
             yield return new WaitForSeconds(talkDuration);
-            _npc.RemoveBehaviour(this);
+            _npc.BehaviourSystem.RemoveBehaviour(this);
         }
 
         private void OnDrawGizmos()
         {
             if (partnerNPC == null)
                 return;
-            if (!_npc.IsCurrentBehaviour(this) || !_drawGizmos || !partnerNPC.GetComponent<MeetBehaviour>()._drawGizmos)
+            if (!_npc.BehaviourSystem.IsCurrentBehaviour(this) || !_drawGizmos || !partnerNPC.GetComponent<MeetBehaviour>()._drawGizmos)
                 return;
             Debug.Log("Draw a gizmos");
             _meetGizmos = new GameObject {name = "MeetGizmos"};

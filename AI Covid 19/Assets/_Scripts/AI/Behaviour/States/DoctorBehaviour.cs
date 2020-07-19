@@ -1,9 +1,10 @@
 ﻿using System.Collections;
 using UnityEngine;
+using Covid19.Core;
 
 namespace Covid19.AI.Behaviour.States
 {
-    public class DoctorBehaviour : MonoBehaviour, States.IBehaviour
+    public class DoctorBehaviour : MonoBehaviour, IBehaviour
     {
         private AgentNPC _npc;
         private AudioSource _audioSource;
@@ -14,7 +15,7 @@ namespace Covid19.AI.Behaviour.States
             _npc.Agent.isStopped = true;
             _audioSource = GetComponent<AudioSource>();
             
-            Player.Player.Instance.OnFirstCough += SayHeyToPlayer;
+            Player.OnFirstCough += SayHeyToPlayer;
             Infirmery.Instance.AddDoctor(_npc);
             
         }

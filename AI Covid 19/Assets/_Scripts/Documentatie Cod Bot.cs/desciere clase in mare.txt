@@ -1,0 +1,26 @@
+Bot.cs
+-> defineste toate tranziile intre stari
+-> defineste clasa de BotAction,clasa pentru a abstractica orice actiune a unui agent
+-> defineste actiunile posibile pentru un bot
+-> comunica cu interfata din editor
+
+BotEditor.cs
+-> responsabil pentru modificare actiunilor in inspector(obiecte de tip BotAction)
+-> are 3 butoane ce permit usurarea muncii unui game designer si a unui programator care testeaza
+-> Odata ce toata actiunile sunt modificate si setate "cum trebuie" se poate apasa butonul
+"Save Preset", care o sa salveaza ca un JSON informatiile legate de actiuni.
+-> Apoi se poate folosi butonul "Update all other", care modifica toate celelalte actiuni de la toti
+botii din scena, asemanator unui sistem de prefab, cu override all
+-> Pentru un singur bot se poate folosi "Revert changes" care updateaza individual actiunile acelui
+bot astfel incat actiunile sa fie la fel ca cele salvate in JSON
+
+clasa BotAction
+-> clasa care abstractizeaza pe cat posibil o actiune oarecare a unui agent din scena
+(ex: mananca, se duce la baie, tasteaza la calculator)
+-> clasa nu are nicio functionalitate in sine, doar expune niste variabile in editor
+care mai apoi sunt folosite in logica FSM din bot.cs
+-> are o probabilitate, un stopDistance, un target de tip Transform, si de asemenea retine si 
+cum trebuie sa stea botul relativ la obiectul target(retin o pozitie si o rotatie)
+ex: in fata oglinzii sta la o distanga de -2 pe X si rotatit astfel incat sa se uite in oglinda
+
+

@@ -1,4 +1,4 @@
-﻿using Covid19.Player.Quests;
+﻿using Covid19.Core.Quests;
 using TMPro;
 using UnityEngine;
 

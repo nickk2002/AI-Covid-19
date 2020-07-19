@@ -2,8 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using Covid19.Player;
-using Covid19.Player.Quests;
+using Covid19.Core.Quests;
 using UnityEditor.PackageManager;
 using UnityEngine;
 using UnityEngine.Events;

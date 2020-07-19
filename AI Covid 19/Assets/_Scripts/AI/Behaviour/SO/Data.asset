@@ -15,9 +15,8 @@ MonoBehaviour:
   npcName: Bob
   occupation: Bussines Man
   age: 35
-  cautiousLevel: 2
-  immunityLevel: 5
-  sociableLevel: 5
+  cautiousLevel: 3
+  immunityLevel: 3
+  sociableLevel: 10
   stoppingDistance: 0.1
   cooldownMeeting: 5
-  agentList: {fileID: 0}

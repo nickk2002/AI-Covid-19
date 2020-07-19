@@ -29,7 +29,7 @@ namespace Covid19.AI.Behaviour.Systems
             meetBehaviour.MeetPosition = meetingPosition;
             meetBehaviour.partnerNPC = partnerNPC;
             meetBehaviour.talkDuration = talkDuration;
-            _npc.SetBehaviour(meetBehaviour);
+            _npc.BehaviourSystem.SetBehaviour(meetBehaviour);
         }
 
         private bool AcceptsMeeting(AgentNPC agentNPC)

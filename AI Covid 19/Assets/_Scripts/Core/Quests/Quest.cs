@@ -1,8 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
-namespace Covid19.Player.Quests
+namespace Covid19.Core.Quests
 {
     [RequireComponent(typeof(BoxCollider))]
     public class Quest : MonoBehaviour

@@ -39,7 +39,7 @@ namespace Covid19.Learn.Custom_Editors.Editor
         [MenuItem("GameObject/Random Instantiate/Cube")]
         static void CubeSpawn()
         {
-            Vector3 randomPos = UnityEngine.Random.insideUnitSphere * 100;
+            Vector3 randomPos = Random.insideUnitSphere * 100;
             GameObject go = GameObject.CreatePrimitive(PrimitiveType.Cube);
             go.transform.position = randomPos;
         }

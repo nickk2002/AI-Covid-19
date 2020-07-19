@@ -94,7 +94,7 @@ namespace Covid19.AI.Behaviour.States
             chair.transform.position = _chairInitialPosition;
             _npc.Agent.isStopped = false;
             transform.parent = null;
-            _npc.RemoveBehaviour(this);
+            _npc.BehaviourSystem.RemoveBehaviour(this);
         }
 
 

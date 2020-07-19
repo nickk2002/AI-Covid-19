@@ -3,11 +3,11 @@ using System.Collections;
 using System.Collections.Generic;
 using Covid19.AI.Behaviour;
 using Covid19.AI.Behaviour.Configuration;
-using Covid19.Player.Quests;
+using Covid19.Core.Quests;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
-namespace Covid19.Player
+namespace Covid19.Core
 {
     public class Player : MonoBehaviour
     {
@@ -16,9 +16,8 @@ namespace Covid19.Player
         [HideInInspector] public bool hasObject = false;
         [HideInInspector] public Camera mainCamera;
         
-        public event Action OnFirstCough;
+        public static event Action OnFirstCough;
         
-        public static Player Instance;
         private readonly List<QuestRequirement> _questRequirementList = new List<QuestRequirement>();
         
         private float _coughCount = 0;
@@ -28,8 +27,6 @@ namespace Covid19.Player
         private LineRenderer _lineRenderer;
         private void Awake()
         {
-            if (Instance == null)
-                Instance = this;
             _source = GetComponent<AudioSource>();
             _lineRenderer = gameObject.GetComponent<LineRenderer>();
             mainCamera = GetComponentInChildren<Camera>();

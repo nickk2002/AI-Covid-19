@@ -1,5 +1,4 @@
-﻿using Covid19.GameManagers.UI_Manager;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace Covid19.AI.UI
 {
@@ -8,16 +7,16 @@ namespace Covid19.AI.UI
         public GameObject botPanel;
         public GameObject circleImagePrefab;
 
-        [HideInInspector] public GameObject imageDisplay;
-
-        [HideInInspector] public GameObject panel;
+        public GameObject imageDisplay;
+        public GameObject panel;
 
         private void Start()
         {
             if (circleImagePrefab != null)
-            {
-                imageDisplay = Instantiate(circleImagePrefab, UIManager.Instance.canvas.transform, true);
-                panel = Instantiate(botPanel, UIManager.Instance.canvas.transform, true);
+            { 
+                Canvas canvas = FindObjectOfType<Canvas>();
+                imageDisplay = Instantiate(circleImagePrefab, canvas.transform , true);
+                panel = Instantiate(botPanel, canvas.transform, true);
                 panel.SetActive(false);
             }
         }

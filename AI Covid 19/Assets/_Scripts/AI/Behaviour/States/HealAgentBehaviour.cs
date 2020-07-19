@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Covid19.AI.Behaviour.States
 {
-    public class HealAgentBehaviour : MonoBehaviour, States.IBehaviour
+    public class HealAgentBehaviour : MonoBehaviour, IBehaviour
     {
         private Vector3 _meetingPosition;
         private AgentNPC _npc;
@@ -69,7 +69,7 @@ namespace Covid19.AI.Behaviour.States
                 yield return StartCoroutine(HealPacient(pacient));
             }
 
-            _npc.RemoveBehaviour(this);
+            _npc.BehaviourSystem.RemoveBehaviour(this);
         }
         public override string ToString()
         {
