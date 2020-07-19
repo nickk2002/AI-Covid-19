@@ -15,13 +15,12 @@ namespace Covid19.AI.Behaviour.States
 
         private bool _drawGizmos = true;
 
-        private float _listeningDuration = 4f;
+
         private GameObject _meetGizmos;
 
 
         private AgentNPC _npc;
         private bool _reached = false;
-        private float _startListeningTime = 0;
         public AgentNPC partnerNPC;
         public float talkDuration;
         public Vector3 MeetPosition { set; private get; }
@@ -29,6 +28,7 @@ namespace Covid19.AI.Behaviour.States
         public void Enable()
         {
             Debug.Log($"Entered meeting {name}");
+            talkDuration = 150f;
             _npc = GetComponent<AgentNPC>();
             _npc.Agent.SetDestination(MeetPosition);
             _animator = GetComponent<Animator>();
@@ -46,46 +46,45 @@ namespace Covid19.AI.Behaviour.States
                 Destroy(_meetGizmos);
         }
 
+        private void SwitchConversation()
+        {
+            Debug.Log($"<color=red> Swith conversation {_npc.name} </color>");
+            var randomTalkID = Random.Range(0, 3);
+            _animator.SetInteger(TalkID, randomTalkID);
+            _animator.SetBool(TalkingBool, true);
+            _animator.SetBool(ListeningBool, false);
+
+            partnerNPC.Animator.SetBool(TalkingBool, false);
+            partnerNPC.Animator.SetBool(ListeningBool, true);
+        }
+
         public IEnumerator OnUpdate()
         {
             while (true)
             {
-                if (_npc.Agent.remainingDistance < 0.1f)
-                    if (_reached == false)
+                if (_npc.Agent.remainingDistance < 0.1f && _reached == false){ 
+                    StartCoroutine(WaitUntilMeetingEnds());
+                    _reached = true;
+                    _npc.Agent.isStopped = true;
+                    _animator.SetBool(MeetingBool, true);
+                    if (partnerNPC.Animator.GetBool(TalkingBool) == false)
                     {
-                        StartCoroutine(WaitUntilMeetingEnds());
-                        _reached = true;
-                        _npc.Agent.isStopped = true;
-                        _animator.SetBool(MeetingBool, true);
-                        if (partnerNPC.Animator.GetBool(TalkingBool) == false)
-                        {
-                            var randomTalkID = Random.Range(0, 3);
-                            _animator.SetBool(TalkingBool, true);
-                            _animator.SetInteger(TalkID, randomTalkID);
-                        }
-                        else
-                        {
-                            _animator.SetBool(ListeningBool, true);
-                            _startListeningTime = Time.time;
-                        }
+                        var randomTalkID = Random.Range(0, 3);
+                        _animator.SetBool(TalkingBool, true);
+                        _animator.SetInteger(TalkID, randomTalkID);
                     }
+                    else
+                    {
+                        _animator.SetBool(ListeningBool, true);
+                    }
+                }
 
-                if (_reached)
-                    if (_animator.GetBool(ListeningBool))
-                        if (Time.time - _startListeningTime > _listeningDuration)
-                        {
-                            Debug.Log($"<color=red> Swith conversation {_npc.name} </color>");
-                            var randomTalkID = Random.Range(0, 3);
-                            _animator.SetInteger(TalkID, randomTalkID);
-                            _animator.SetBool(TalkingBool, true);
-                            _animator.SetBool(ListeningBool, false);
-
-                            partnerNPC.Animator.SetBool(TalkingBool, false);
-                            partnerNPC.Animator.SetBool(ListeningBool, true);
-                            partnerNPC.GetComponent<MeetBehaviour>()._startListeningTime = Time.time;
-                            partnerNPC.GetComponent<MeetBehaviour>()._listeningDuration = Random.Range(4f, 10f);
-                        }
-
+                if (_animator.GetBool(ListeningBool))
+                {
+                    float listeningDuration = Random.Range(4f, 10f); // random listening duration time;
+                    yield return new WaitForSeconds(listeningDuration);
+                    SwitchConversation();
+                }
                 yield return null;
             }
         }
