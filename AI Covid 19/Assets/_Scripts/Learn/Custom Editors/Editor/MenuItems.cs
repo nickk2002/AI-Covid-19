@@ -1,4 +1,4 @@
-﻿using Covid19.AIBehaviour;
+﻿using Covid19.AI;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -47,11 +47,6 @@ namespace Covid19.Learn.Custom_Editors.Editor
         static void ScriptInspection()
         {
 
-        }
-        [MenuItem("Assets/Inspect Script", true)]
-        static bool Validate()
-        {
-            return Selection.activeObject.GetType() == typeof(Scene);
         }
         [MenuItem("CONTEXT/Bot/Randomise Probabilites")]
         static void RandomiseStuff(MenuCommand menuCommand)
