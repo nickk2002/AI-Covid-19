@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using Covid19.AIBehaviour.Behaviour.Configuration;
 using Covid19.AIBehaviour.Behaviour.States;
+using Covid19.AIBehaviour.IBehaviour.Configuration;
 using Covid19.Player;
 using UnityEngine;
 using UnityEngine.AI;
@@ -17,24 +17,11 @@ namespace Covid19.AIBehaviour.Behaviour
             BusinessMan,
             Doctor
         }
-        
-        public AgentType agentType;
-        public AgentConfiguration agentConfiguration;
-        public CoughConfiguration coughConfiguration;
-        
-        [HideInInspector] public GameObject[] patrolPositions; // array holding patrol positions
-        // This is used for an easier way to set patrol points, should be added to a SO in the feature
-        public GameObject posHolder;
-        public GameObject rightHand;
 
-        public NavMeshAgent Agent { get; private set; }
-        public Animator Animator { get; private set; }
-        public MeetSystem MeetSystem { get; private set; }
-        public InfectionSystem InfectionSystem { get; private set; }
-        
-        
+
         private readonly Dictionary<IBehaviour, Coroutine>
             _behaviourCoroutine = new Dictionary<IBehaviour, Coroutine>();
+
         private readonly Stack<IBehaviour> _behaviours = new Stack<IBehaviour>();
         private AgentUI _agentUI;
         private Dictionary<AgentType, List<IBehaviour>> _altceva = new Dictionary<AgentType, List<IBehaviour>>();
@@ -46,7 +33,22 @@ namespace Covid19.AIBehaviour.Behaviour
         };
 
         private IBehaviour _currentBehaviour;
-        
+        public AgentConfiguration agentConfiguration;
+
+        public AgentType agentType;
+        public CoughConfiguration coughConfiguration;
+
+        [HideInInspector] public GameObject[] patrolPositions; // array holding patrol positions
+
+        // This is used for an easier way to set patrol points, should be added to a SO in the feature
+        public GameObject posHolder;
+        public GameObject rightHand;
+
+        public NavMeshAgent Agent { get; private set; }
+        public Animator Animator { get; private set; }
+        public MeetSystem MeetSystem { get; private set; }
+        public InfectionSystem InfectionSystem { get; private set; }
+
         private void Start()
         {
             Type type = typeof(MeetBehaviour);
@@ -61,9 +63,9 @@ namespace Covid19.AIBehaviour.Behaviour
             SetBehaviour(GetComponent<IBehaviour>());
 
             MeetSystem = new MeetSystem(this);
-            if(agentType != AgentType.Doctor)
+            if (agentType != AgentType.Doctor)
                 InfectionSystem = new InfectionSystem(this);
-            
+
             StartInfection();
         }
 

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Covid19.AIBehaviour.IBehaviour.Configuration;
 using UnityEngine;
 
 namespace Covid19.AIBehaviour.Behaviour

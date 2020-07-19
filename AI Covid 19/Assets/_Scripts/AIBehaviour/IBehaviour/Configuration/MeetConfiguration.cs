@@ -1,17 +1,14 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
-namespace Covid19.AIBehaviour.Behaviour.States
+namespace Covid19.AIBehaviour.IBehaviour.Configuration
 {
-    [CreateAssetMenu(menuName = "AI Behaviour/Meet")]
+    [CreateAssetMenu(menuName = "Covid19/AI/Meet")]
     public class MeetConfiguration : ScriptableObject
     {
-        [Range(1,10)] public int sociableLevel;
-        [Range(1,5)] public int offsetMeeting;
-        public float viewDist;
-        public float viewAngle;
         public float cooldownMeeting;
+        [Range(1, 5)] public int offsetMeeting;
+        [Range(1, 10)] public int sociableLevel;
+        public float viewAngle;
+        public float viewDist;
     }
 }
