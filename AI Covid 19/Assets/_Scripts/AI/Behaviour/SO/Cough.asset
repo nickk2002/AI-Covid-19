@@ -1,0 +1,21 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 10c2f69508824969b1b5d7f997da1d85, type: 3}
+  m_Name: Cough
+  m_EditorClassIdentifier: 
+  infectDistance: 5
+  maxNumberCoughs: 100
+  soundArray:
+  - {fileID: 8300000, guid: 23ebe9f41f3486644861be6f0f443796, type: 3}
+  - {fileID: 8300000, guid: 863b95c24ea34e848b9cc627b9a08a96, type: 3}
+  - {fileID: 8300000, guid: 3fc4cee372593bb4495b33b80d075e38, type: 3}
+  - {fileID: 8300000, guid: 31d60a90a99227a4ea5a79481e1cfccb, type: 3}
