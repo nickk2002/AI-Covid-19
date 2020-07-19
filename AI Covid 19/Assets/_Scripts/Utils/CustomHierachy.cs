@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Linq;
 using System.Reflection;
-using Covid19.AIBehaviour;
-using Covid19.AIBehaviour.Behaviour;
+using Covid19.AI;
+using Covid19.AI.Behaviour;
 using UnityEditor;
 using UnityEngine;
 using Object = UnityEngine.Object;

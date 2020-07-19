@@ -1,13 +1,10 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using Covid19.AIBehaviour;
-using Covid19.AIBehaviour.Behaviour;
-using Covid19.GameManagers.UI_Manager;
+using Covid19.AI.Behaviour;
+using Covid19.AI.Behaviour.Configuration;
 using Covid19.Player.Quests;
-using TMPro;
 using UnityEngine;
-using UnityEngine.UI;
 using Random = UnityEngine.Random;
 
 namespace Covid19.Player
@@ -15,6 +12,7 @@ namespace Covid19.Player
     public class Player : MonoBehaviour
     {
         public CoughConfiguration coughConfiguration;
+        public AgentNPCList agentNPCList;
         [HideInInspector] public bool hasObject = false;
         [HideInInspector] public Camera mainCamera;
         
@@ -66,7 +64,7 @@ namespace Covid19.Player
         
         private void TryInfectSomeone()
         {
-            foreach (AgentNPC agentNPC in AgentManager.Instance.agentNPCList)
+            foreach (AgentNPC agentNPC in agentNPCList.items)
                 if (Vector3.Distance(transform.position, agentNPC.transform.position) <= coughConfiguration.infectDistance)
                 {
                     agentNPC.StartInfection();
@@ -77,7 +75,7 @@ namespace Covid19.Player
         private void ShowLines()
         {
             List<Vector3> positions = new List<Vector3>();
-            foreach (AgentNPC agentNPC in AgentManager.Instance.agentNPCList)
+            foreach (AgentNPC agentNPC in agentNPCList.items)
                 if (Vector3.Distance(transform.position, agentNPC.transform.position) <= coughConfiguration.infectDistance)
                 {
                     positions.Add(transform.position);
@@ -105,10 +103,6 @@ namespace Covid19.Player
                 yield return null;
             }
         }
-        // Update is called once per frame
-        private void Update()
-        {
-            //ShowLines();
-        }
+
     }
 }

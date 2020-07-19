@@ -1,5 +1,5 @@
-﻿using UnityEngine;
-using Covid19.AIBehaviour.Behaviour;
+﻿using Covid19.AI.Behaviour;
+using UnityEngine;
 
 namespace Covid19.Utils
 {

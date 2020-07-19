@@ -1,4 +1,4 @@
-﻿using Covid19.AIBehaviour;
+﻿using Covid19.AI;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.SceneManagement;

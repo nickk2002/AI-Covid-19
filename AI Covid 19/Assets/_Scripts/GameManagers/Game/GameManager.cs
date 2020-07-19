@@ -1,5 +1,5 @@
-﻿using Covid19.AIBehaviour;
-using Covid19.AIBehaviour.Actions;
+﻿using Covid19.AI;
+using Covid19.AI.Actions;
 using Covid19.GameManagers.UI_Manager;
 using Covid19.Utils;
 using UnityEngine;
