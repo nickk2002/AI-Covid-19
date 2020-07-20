@@ -16,8 +16,7 @@ namespace Covid19.AI.Behaviour.States
             _audioSource = GetComponent<AudioSource>();
             
             Player.OnFirstCough += SayHeyToPlayer;
-            Infirmery.Instance.AddDoctor(_npc);
-            
+            FindObjectOfType<Infirmery>().AddDoctor(_npc);
         }
 
         public void SayHeyToPlayer()

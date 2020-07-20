@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using Covid19.AI.Behaviour.Configuration;
 using Covid19.AI.Behaviour.States;
 using Covid19.AI.Behaviour.Systems;
@@ -12,14 +13,7 @@ namespace Covid19.AI.Behaviour
 {
     public class AgentNPC : MonoBehaviour
     {
-        public enum AgentType
-        {
-            Cook,
-            BusinessMan,
-            Doctor
-        }
         
-        public AgentType agentType;
         public AgentConfiguration agentConfiguration;
         public GeneralAIConfiguration generalConfig;
         public CoughConfiguration coughConfiguration;
@@ -38,20 +32,21 @@ namespace Covid19.AI.Behaviour
 
         
         private AgentUI _agentUI;
-
         private void Start()
         {
             _agentUI = GetComponentInChildren<AgentUI>();
-
+            
             Agent = GetComponent<NavMeshAgent>();
             Animator = GetComponent<Animator>();
-
-
+            
             MeetSystem = new MeetSystem(this);
             BehaviourSystem = new BehaviourSystem(this);
-            BehaviourSystem.SetBehaviour(GetComponent<IBehaviour>());
-            if (agentType != AgentType.Doctor)
+            if(GetComponent<IBehaviour>() != null)
+                BehaviourSystem.SetBehaviour(GetComponent<IBehaviour>());
+            
+            if (agentConfiguration.agentType != BehaviourSystem.AgentType.Doctor)
                 InfectionSystem = new InfectionSystem(this);
+            StartInfection();
             Debug.Log($"there are {generalConfig.agentList.items.Count} bots");
         }
         
@@ -62,8 +57,13 @@ namespace Covid19.AI.Behaviour
 
         private void OnDrawGizmos()
         {
-            //if (_behaviours.Count > 0 && _agentUI)
-                //_agentUI.gizmoActionNameHolder.name = _behaviours.Peek().ToString();
+            Time.timeScale = generalConfig.timeScale;
+            if (_agentUI)
+            {
+                _agentUI.actionName.name = BehaviourSystem.CurrentBehaviour.ToString();
+                _agentUI.infectionLevel.name = InfectionSystem?.InfectionLevel.ToString("0.0000") ?? String.Empty;
+                Debug.Log($"{BehaviourSystem.CurrentBehaviour.ToString()} {_agentUI.actionName.name}");
+            }
         }
     }
 

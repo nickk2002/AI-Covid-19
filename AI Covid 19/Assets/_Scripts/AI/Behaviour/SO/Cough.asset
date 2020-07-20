@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 10c2f69508824969b1b5d7f997da1d85, type: 3}
   m_Name: Cough
   m_EditorClassIdentifier: 
-  infectDistance: 5
+  infectDistance: 100
   maxNumberCoughs: 100
   soundArray:
   - {fileID: 8300000, guid: 23ebe9f41f3486644861be6f0f443796, type: 3}

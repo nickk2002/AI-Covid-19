@@ -27,7 +27,6 @@ namespace Covid19.AI.Behaviour.States
         public void Enable()
         {
             Debug.Log($"Entered meeting {name}");
-            talkDuration = 150f;
             _npc = GetComponent<AgentNPC>();
             _npc.Agent.SetDestination(MeetPosition);
             _animator = GetComponent<Animator>();

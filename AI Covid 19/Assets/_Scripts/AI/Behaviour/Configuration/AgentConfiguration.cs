@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using Covid19.AI.Behaviour.Systems;
+using UnityEngine;
 
 namespace Covid19.AI.Behaviour.Configuration
 {
@@ -8,6 +9,7 @@ namespace Covid19.AI.Behaviour.Configuration
         public string npcName = "Bob";
         public string occupation = "Bussines Man";
         public int age = 35;
+        public BehaviourSystem.AgentType agentType;
         [Range(1, 10)] public int cautiousLevel = 5;
         [Range(1, 10)] public int immunityLevel = 5;
         [Range(1, 10)] public int sociableLevel = 5;

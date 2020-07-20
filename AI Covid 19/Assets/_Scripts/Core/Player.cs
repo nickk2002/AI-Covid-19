@@ -95,6 +95,7 @@ namespace Covid19.Core
                     AudioClip coughClip = RandomAudio();
                     _source.clip = coughClip;
                     _source.Play();
+                    TryInfectSomeone();
                     yield return new WaitForSeconds(coughClip.length);
                 }
                 yield return null;

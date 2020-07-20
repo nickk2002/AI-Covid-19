@@ -23,6 +23,33 @@ namespace Covid19.Utils
             EditorApplication.hierarchyWindowItemOnGUI += HandleHierarchyWindowItemOnGUI;
         }
 
+
+        [MenuItem("GameObject/Duplicate %d", false, priority = -100)]
+        private static void DuplicateGameObject()
+        {
+            Debug.Log("heii I am called");
+            foreach (GameObject gameObject in Selection.gameObjects)
+            {
+                string name = gameObject.name;
+                int number = 0,i = name.Length - 1;
+                // "Hospital"
+                while (i >= 0)
+                {
+                    bool isNumeric = int.TryParse(name.Substring(i), out var numberTest);
+                    Debug.Log(name.Substring(i) + " " + isNumeric);
+                    if (!isNumeric)
+                        break;
+                    number = numberTest;
+                    i--;
+                }
+                Debug.Log(number);
+                number++;
+                string duplicatedName = name.Substring(0,i + 1) + number;
+                Transform parent = gameObject.transform.parent;
+                GameObject duplicatedGameObject = Instantiate(gameObject, parent, true);
+                duplicatedGameObject.name = duplicatedName;
+            }
+        }
         [MenuItem("GameObject/Set Meeting Point", false, priority = -100)]
         private static void SetMeetingPoint()
         {

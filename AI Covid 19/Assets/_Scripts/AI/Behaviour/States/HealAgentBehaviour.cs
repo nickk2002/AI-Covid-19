@@ -42,7 +42,6 @@ namespace Covid19.AI.Behaviour.States
             {
                 if (_npc.Agent.pathPending)
                     yield return null;
-                Debug.Log(Vector3.Distance(transform.position, _meetingPosition) + " " + _npc.Agent.remainingDistance);
                 if (_npc.Agent.remainingDistance < 0.5f)
                 {
                     Debug.Log($"doctor reached at {pacient.name}");

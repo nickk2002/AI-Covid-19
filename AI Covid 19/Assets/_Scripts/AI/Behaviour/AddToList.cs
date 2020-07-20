@@ -5,22 +5,22 @@ namespace Covid19.AI.Behaviour
 {
     public class AddToList : MonoBehaviour
     {
-        [SerializeField] private AgentNPCList gameObjectList;
-        private AgentNPC _npc;
+        [SerializeField] private MonoBehaviourList gameObjectList;
+        [SerializeField] public MonoBehaviour componentToAdd;
 
         private void OnEnable()
         {
-            _npc = GetComponent<AgentNPC>();
-            gameObjectList.Add(_npc);
+            //_npc = GetComponent<AgentNPC>();
+            gameObjectList.Add(componentToAdd);
         }
         private void OnDisable()
         {
-            gameObjectList.Remove(_npc);
+            gameObjectList.Remove(componentToAdd);
         }
 
         private void OnDestroy()
         {
-            gameObjectList.Remove(_npc);
+            gameObjectList.Remove(componentToAdd);
         }
         
     }

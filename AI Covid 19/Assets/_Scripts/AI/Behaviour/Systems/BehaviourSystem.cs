@@ -7,12 +7,18 @@ using Object = UnityEngine.Object;
 namespace Covid19.AI.Behaviour.Systems
 {
     public class BehaviourSystem
-    {
-        private AgentNPC _npc;
+    {    
+        public enum AgentType
+        {
+            Cook,
+            BusinessMan,
+            Doctor
+        }
         
+        private readonly AgentNPC _npc;
         private readonly Dictionary<IBehaviour, Coroutine> _behaviourCoroutine = new Dictionary<IBehaviour, Coroutine>();
         private readonly Stack<IBehaviour> _behaviours = new Stack<IBehaviour>();
-        private Dictionary<AgentNPC.AgentType, List<IBehaviour>> _altceva = new Dictionary<AgentNPC.AgentType, List<IBehaviour>>();
+        private Dictionary<AgentType, List<IBehaviour>> _altceva = new Dictionary<AgentType, List<IBehaviour>>();
 
         private List<Type> _basicActions = new List<Type>
         {
@@ -20,7 +26,8 @@ namespace Covid19.AI.Behaviour.Systems
             typeof(EatBeahaviour)
         };
         
-        private IBehaviour _currentBehaviour;
+        public IBehaviour CurrentBehaviour { get; private set; }
+        
         public BehaviourSystem(AgentNPC owner)
         {
             _npc = owner;
@@ -34,18 +41,18 @@ namespace Covid19.AI.Behaviour.Systems
         }
         public void SetBehaviour(IBehaviour behaviour)
         {
-            if (_currentBehaviour != null)
+            if (CurrentBehaviour != null)
             {
-                _npc.StopCoroutine(_behaviourCoroutine[_currentBehaviour]);
-                _currentBehaviour.Disable();
+                _npc.StopCoroutine(_behaviourCoroutine[CurrentBehaviour]);
+                CurrentBehaviour.Disable();
             }
 
-            _currentBehaviour = behaviour; // set the current behaviour
-            _behaviours.Push(_currentBehaviour); // push this behaviour to the stack
-            _currentBehaviour.Enable(); // run initialization logic ( get the dependencies)
+            CurrentBehaviour = behaviour; // set the current behaviour
+            _behaviours.Push(CurrentBehaviour); // push this behaviour to the stack
+            CurrentBehaviour.Enable(); // run initialization logic ( get the dependencies)
             
-            Coroutine coroutine = _npc.StartCoroutine(_currentBehaviour.OnUpdate()); // cache the corutine to stop later
-            _behaviourCoroutine[_currentBehaviour] = coroutine;
+            Coroutine coroutine = _npc.StartCoroutine(CurrentBehaviour.OnUpdate()); // cache the corutine to stop later
+            _behaviourCoroutine[CurrentBehaviour] = coroutine;
         }
 
         public void RemoveBehaviour(IBehaviour behaviour)
@@ -56,12 +63,11 @@ namespace Covid19.AI.Behaviour.Systems
             _behaviours.Pop();
             if (_behaviours.Count > 0)
             {
-                _currentBehaviour = _behaviours.Peek();
-                _currentBehaviour.Enable();
-                Coroutine coroutine = _npc.StartCoroutine(_currentBehaviour.OnUpdate());
-                _behaviourCoroutine[_currentBehaviour] = coroutine;
+                CurrentBehaviour = _behaviours.Peek();
+                CurrentBehaviour.Enable();
+                Coroutine coroutine = _npc.StartCoroutine(CurrentBehaviour.OnUpdate());
+                _behaviourCoroutine[CurrentBehaviour] = coroutine;
             }
         }
-
     }
 }

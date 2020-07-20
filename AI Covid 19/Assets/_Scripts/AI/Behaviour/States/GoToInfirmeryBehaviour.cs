@@ -31,19 +31,17 @@ namespace Covid19.AI.Behaviour.States
                     {
                         Debug.Log("Heii am ajuns la destinatie gata, oprirea!!!");
                         _npc.Agent.isStopped = true;
-                        Infirmery.Instance.CallDoctor(_npc);
+                        _npc.InfectionSystem.CallDoctor();
                         _reached = true;
                     }
 
                 if (_npc.InfectionSystem.Cured)
                 {
                     Debug.Log("Now I am healed! The bed is free");
-                    Infirmery.Instance.FreeBed(_npc);
+                    _npc.InfectionSystem.FreeBed();
                     _npc.Agent.isStopped = false;
                     _npc.BehaviourSystem.RemoveBehaviour(this);
-                    
                 }
-
                 yield return null;
             }    
         }

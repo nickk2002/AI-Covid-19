@@ -7,14 +7,12 @@ namespace Covid19.AI.Behaviour
     public class Infirmery : MonoBehaviour
     {
         public List<Transform> beds;
-        public static Infirmery Instance;
         private readonly List<AgentNPC> _doctorList = new List<AgentNPC>();
         private readonly List<bool> _ocuppiedBeds = new List<bool>();
         private readonly Dictionary<AgentNPC,int> _npcBedIndex = new Dictionary<AgentNPC,int>();
 
         private void Awake()
         {
-            Instance = this;
             for (int i = 0; i < beds.Count; i++)
                 _ocuppiedBeds.Add(false);
         }
@@ -54,6 +52,12 @@ namespace Covid19.AI.Behaviour
 
         public void CallDoctor(AgentNPC pacient)
         {
+            if (_doctorList.Count == 0)
+            {
+                Debug.LogError("There is no doctor in the scene!");
+                return;
+            }
+
             AgentNPC doctor = _doctorList[0];
             if (doctor.GetComponent<HealAgentBehaviour>() == null)
             {
