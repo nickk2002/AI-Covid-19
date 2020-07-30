@@ -21,23 +21,48 @@ namespace Covid19.AI.Behaviour.Systems
 
         public float LastMeetingTime { set; private get; }
 
+        public AgentNPC FindNPCToMeet(Type behaviour)
+        {
+            foreach (AgentNPC partnerNPC in _npc.generalConfig.agentList.items)
+            {
+                IBehaviour currentBehaviour = partnerNPC.BehaviourSystem.CurrentBehaviour;
+                if (_npc != partnerNPC && currentBehaviour.GetType() == behaviour &&
+                    _npc.MeetSystem.AcceptsMeeting(partnerNPC) && partnerNPC.MeetSystem.AcceptsMeeting(_npc))
+                    return partnerNPC;
+            }
+
+            return null;
+        }
+
         public void Meet(AgentNPC partnerNPC, float talkDuration)
         {
             // set up every thing in order to meet the agent partnerNPC
             Vector3 meetingPosition = GetMeetingPosition(partnerNPC);
-            var meetBehaviour = _npc.gameObject.AddComponent<MeetBehaviour>();
-            meetBehaviour.MeetPosition = meetingPosition;
-            meetBehaviour.partnerNPC = partnerNPC;
-            meetBehaviour.talkDuration = talkDuration;
-            _npc.BehaviourSystem.SetBehaviour(meetBehaviour);
+            if (_npc.agentConfig.agentType == AgentType.Doctor || partnerNPC.agentConfig.agentType == AgentType.Doctor)
+            {
+                Debug.Log($"infection check behaviour for {_npc.name}");
+                var infectionCheckBehaviour = _npc.gameObject.AddComponent<InfectionCheckBehaviour>();
+                infectionCheckBehaviour.meetingPosition = meetingPosition;
+                infectionCheckBehaviour.partnerNPC = partnerNPC;
+                infectionCheckBehaviour.investigationDuration = 3f;
+                _npc.BehaviourSystem.SetBehaviour(infectionCheckBehaviour);
+            }
+            else
+            {
+                var meetBehaviour = _npc.gameObject.AddComponent<MeetBehaviour>();
+                meetBehaviour.meetPosition = meetingPosition;
+                meetBehaviour.partnerNPC = partnerNPC;
+                meetBehaviour.talkDuration = talkDuration;
+                _npc.BehaviourSystem.SetBehaviour(meetBehaviour);
+            }
         }
 
         private bool AcceptsMeeting(AgentNPC agentNPC)
         {
-            if (agentNPC.GetComponent<MeetBehaviour>() || agentNPC.GetComponent<PatrolBehaviour>() == null)
-                return false; // if it is already in meeting then return false
+            //if (agentNPC.GetComponent<MeetBehaviour>() || (agentNPC.GetComponent<PatrolBehaviour>() == null && agentNPC.GetComponent<DoctorInvestigate>() == null))
+            //  return false; // if it is already in meeting then return false
             // check to prevent two agents meeting without having time to turn around and walk away
-            if (LastMeetingTime != 0 && !(Time.time - LastMeetingTime > _npc.agentConfiguration.cooldownMeeting))
+            if (LastMeetingTime != 0 && !(Time.time - LastMeetingTime > _npc.agentConfig.cooldownMeeting))
                 return false;
 
             var found = _ignoredAgents.Find(tuple => tuple.Item1 == agentNPC);
@@ -61,23 +86,13 @@ namespace Covid19.AI.Behaviour.Systems
                 _npc.generalConfig.viewDistance,
                 _npc.generalConfig.viewAngle))
                 return true;
-
+            Debug.Log($"Domnul {_npc.name} este de acord cu {agentNPC.name}");
             return false;
         }
 
         public void IgnoreAgent(AgentNPC agent, int duration)
         {
             _ignoredAgents.Add(new Tuple<AgentNPC, int, float>(agent, duration, Time.time));
-        }
-
-        public AgentNPC FindNPCToMeet()
-        {
-            foreach (AgentNPC partnerNPC in _npc.generalConfig.agentList.items)
-                if (_npc != partnerNPC &&
-                    _npc.MeetSystem.AcceptsMeeting(partnerNPC) &&
-                    partnerNPC.MeetSystem.AcceptsMeeting(_npc))
-                    return partnerNPC;
-            return null;
         }
 
         private Vector3 GetMeetingPosition(AgentNPC npc)

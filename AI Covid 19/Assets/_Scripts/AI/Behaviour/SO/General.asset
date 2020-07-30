@@ -10,15 +10,16 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f5ed6c44290e3b14bb42b924604a39fc, type: 3}
-  m_Name: AI Configuration
+  m_Name: General
   m_EditorClassIdentifier: 
   growthInterval: 5
   infectionDistance: 5
-  infectionSpeed: 0.1
+  infectionSpeed: 1
   maxInfectionValue: 10
-  meetingDistance: 4
+  timeScale: 1
+  meetingDistance: 5
   viewAngle: 60
-  viewDistance: 30
+  viewDistance: 10
   agentList: {fileID: 11400000, guid: 26e5132b1fce2dd4287223373126813a, type: 2}
   infirmeryList: {fileID: 11400000, guid: aa08c5dfb2fd71b498227536c0e66e3e, type: 2}
   coughCurve:

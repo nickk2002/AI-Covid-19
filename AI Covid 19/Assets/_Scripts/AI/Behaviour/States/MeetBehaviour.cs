@@ -6,29 +6,29 @@ namespace Covid19.AI.Behaviour.States
 {
     public class MeetBehaviour : MonoBehaviour, IBehaviour
     {
-
-        public AgentNPC partnerNPC;
-        public float talkDuration;
-        
-        public Vector3 MeetPosition { set; private get; }
-
-        private Animator _animator;
-        
         private static readonly int MeetingBool = Animator.StringToHash("meeting");
         private static readonly int TalkingBool = Animator.StringToHash("talking");
         private static readonly int ListeningBool = Animator.StringToHash("listening");
         private static readonly int TalkID = Animator.StringToHash("talkID");
-        
+
+        private Animator _animator;
+
         private bool _drawGizmos = true;
         private GameObject _meetGizmos;
-        
+
         private AgentNPC _npc;
         private bool _reached = false;
+
+        public Vector3 meetPosition;
+
+        public AgentNPC partnerNPC;
+        public float talkDuration;
+
         public void Enable()
         {
             Debug.Log($"Entered meeting {name}");
             _npc = GetComponent<AgentNPC>();
-            _npc.Agent.SetDestination(MeetPosition);
+            _npc.Agent.SetDestination(meetPosition);
             _animator = GetComponent<Animator>();
         }
 
@@ -44,23 +44,14 @@ namespace Covid19.AI.Behaviour.States
                 Destroy(_meetGizmos);
         }
 
-        private void SwitchConversation()
-        {
-            Debug.Log($"<color=red> Swith conversation {_npc.name} </color>");
-            var randomTalkID = Random.Range(0, 3);
-            _animator.SetInteger(TalkID, randomTalkID);
-            _animator.SetBool(TalkingBool, true);
-            _animator.SetBool(ListeningBool, false);
-
-            partnerNPC.Animator.SetBool(TalkingBool, false);
-            partnerNPC.Animator.SetBool(ListeningBool, true);
-        }
-
         public IEnumerator OnUpdate()
         {
             while (true)
             {
-                if (_npc.Agent.remainingDistance < 0.1f && _reached == false){ 
+                if (_npc.Agent.pathPending)
+                    yield return null;
+                if (_npc.Agent.remainingDistance < 0.1f && _reached == false)
+                {
                     StartCoroutine(WaitUntilMeetingEnds());
                     _reached = true;
                     _npc.Agent.isStopped = true;
@@ -83,8 +74,21 @@ namespace Covid19.AI.Behaviour.States
                     yield return new WaitForSeconds(listeningDuration);
                     SwitchConversation();
                 }
+
                 yield return null;
             }
+        }
+
+        private void SwitchConversation()
+        {
+            Debug.Log($"<color=red> Swith conversation {_npc.name} </color>");
+            var randomTalkID = Random.Range(0, 3);
+            _animator.SetInteger(TalkID, randomTalkID);
+            _animator.SetBool(TalkingBool, true);
+            _animator.SetBool(ListeningBool, false);
+
+            partnerNPC.Animator.SetBool(TalkingBool, false);
+            partnerNPC.Animator.SetBool(ListeningBool, true);
         }
 
         public override string ToString()
@@ -102,12 +106,12 @@ namespace Covid19.AI.Behaviour.States
         {
             if (partnerNPC == null)
                 return;
-            if (!_npc.BehaviourSystem.IsCurrentBehaviour(this) || !_drawGizmos || !partnerNPC.GetComponent<MeetBehaviour>()._drawGizmos)
+            if (!_npc.BehaviourSystem.IsCurrentBehaviour(this) || !_drawGizmos ||
+                !partnerNPC.GetComponent<MeetBehaviour>()._drawGizmos)
                 return;
-            Debug.Log("Draw a gizmos");
             _meetGizmos = new GameObject {name = "MeetGizmos"};
-            Vector3 otherMeetPosition = partnerNPC.GetComponent<MeetBehaviour>().MeetPosition;
-            Vector3 meetGizmosPosition = MeetPosition + (otherMeetPosition - MeetPosition) / 2;
+            Vector3 otherMeetPosition = partnerNPC.GetComponent<MeetBehaviour>().meetPosition;
+            Vector3 meetGizmosPosition = meetPosition + (otherMeetPosition - meetPosition) / 2;
             meetGizmosPosition += Vector3.up * 0.5f;
             _meetGizmos.transform.position = meetGizmosPosition;
             CustomHierarchy.SetIcon(_meetGizmos, CustomHierarchy.MeetingPointIcon);

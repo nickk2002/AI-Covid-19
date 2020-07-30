@@ -1,23 +1,21 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
 using Covid19.AI.Behaviour.Configuration;
 using Covid19.AI.Behaviour.States;
 using Covid19.AI.Behaviour.Systems;
 using Covid19.Core;
 using UnityEngine;
 using UnityEngine.AI;
-using Object = UnityEngine.Object;
 
 namespace Covid19.AI.Behaviour
 {
     public class AgentNPC : MonoBehaviour
     {
-        
-        public AgentConfiguration agentConfiguration;
-        public GeneralAIConfiguration generalConfig;
+        private AgentUI _agentUI;
+
+        public AgentConfiguration agentConfig;
         public CoughConfiguration coughConfiguration;
-        
+        public GeneralAIConfiguration generalConfig;
+
         [HideInInspector] public GameObject[] patrolPositions; // array holding patrol positions
 
         // This is used for an easier way to set patrol points, should be added to a SO in the feature
@@ -30,41 +28,74 @@ namespace Covid19.AI.Behaviour
         public InfectionSystem InfectionSystem { get; private set; }
         public BehaviourSystem BehaviourSystem { get; private set; }
 
-        
-        private AgentUI _agentUI;
         private void Start()
         {
             _agentUI = GetComponentInChildren<AgentUI>();
-            
+
             Agent = GetComponent<NavMeshAgent>();
             Animator = GetComponent<Animator>();
-            
+
             MeetSystem = new MeetSystem(this);
             BehaviourSystem = new BehaviourSystem(this);
-            if(GetComponent<IBehaviour>() != null)
+            if (GetComponent<IBehaviour>() != null)
                 BehaviourSystem.SetBehaviour(GetComponent<IBehaviour>());
-            
-            if (agentConfiguration.agentType != BehaviourSystem.AgentType.Doctor)
+            if (agentConfig == null)
+            {
+                Debug.LogError($"Agent Configuration SO not set in inspector {name}", this);
+                return;
+            }
+
+            if (agentConfig.agentType != AgentType.Doctor)
                 InfectionSystem = new InfectionSystem(this);
             StartInfection();
-            Debug.Log($"there are {generalConfig.agentList.items.Count} bots");
         }
-        
+
         public void StartInfection()
         {
             InfectionSystem?.StartInfection();
         }
 
+        private void DrawLineOfSight()
+        {
+            if (generalConfig == null || agentConfig == null)
+                return;
+            Gizmos.color = Color.green;
+            var circle = new Vector3[generalConfig.viewAngle + 4];
+            var index = 0;
+            var position = transform.position;
+            for (var angle = -generalConfig.viewAngle / 2; angle <= generalConfig.viewAngle / 2; angle++)
+            {
+                var direction = Quaternion.Euler(0, angle, 0) * transform.forward;
+                if (agentConfig.drawRealSight)
+                {
+                    if (Physics.Raycast(position, direction, out RaycastHit hit, generalConfig.viewDistance))
+                        circle[++index] = hit.point;
+                    else
+                        circle[++index] = position + direction.normalized * generalConfig.viewDistance;
+                }
+                else
+                {
+                    circle[++index] = position + direction.normalized * generalConfig.viewDistance;
+                }
+            }
+
+            Gizmos.DrawLine(position, circle[1]);
+            Gizmos.DrawLine(position, circle[index]);
+            for (var i = 1; i <= index - 1; i++)
+                Gizmos.DrawLine(circle[i], circle[i + 1]);
+        }
+
         private void OnDrawGizmos()
         {
-            Time.timeScale = generalConfig.timeScale;
+            DrawLineOfSight();
+            if (Application.isPlaying)
+                Time.timeScale = generalConfig.timeScale;
             if (_agentUI)
             {
                 _agentUI.actionName.name = BehaviourSystem.CurrentBehaviour.ToString();
+                Debug.Log("INfection : " + InfectionSystem?.InfectionLevel);
                 _agentUI.infectionLevel.name = InfectionSystem?.InfectionLevel.ToString("0.0000") ?? String.Empty;
-                Debug.Log($"{BehaviourSystem.CurrentBehaviour.ToString()} {_agentUI.actionName.name}");
             }
         }
     }
-
 }

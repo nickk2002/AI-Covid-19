@@ -2,6 +2,7 @@
 
 namespace Covid19.AI.Behaviour.Custom_Editors
 {
+    [CanEditMultipleObjects]
     [CustomEditor(typeof(AgentNPC))]
     public class CustomAgentNPC : Editor
     {
@@ -18,8 +19,8 @@ namespace Covid19.AI.Behaviour.Custom_Editors
         public override void OnInspectorGUI()
         {
             if (_cachedEditor == null && _ok)
-                if (_agentNPC.agentConfiguration != null)
-                    _cachedEditor = CreateEditor(_agentNPC.agentConfiguration);
+                if (_agentNPC.agentConfig != null)
+                    _cachedEditor = CreateEditor(_agentNPC.agentConfig);
 
             base.OnInspectorGUI();
 

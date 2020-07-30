@@ -18,6 +18,7 @@ MonoBehaviour:
   agentType: 2
   cautiousLevel: 5
   immunityLevel: 5
-  sociableLevel: 5
+  sociableLevel: 10
   stoppingDistance: 0.1
   cooldownMeeting: 5
+  drawRealSight: 0

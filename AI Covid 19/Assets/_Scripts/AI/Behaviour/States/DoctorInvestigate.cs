@@ -4,12 +4,12 @@ using UnityEngine;
 
 namespace Covid19.AI.Behaviour.States
 {
-    public class PatrolBehaviour : MonoBehaviour, IBehaviour
+    public class DoctorInvestigate : MonoBehaviour, IBehaviour
     {
         private Vector3 _currentDestination = Vector3.negativeInfinity;
         private int _indexPatrol = 0;
         private AgentNPC _npc;
-        private bool _startPatroling = false;
+        private bool _startInvestigation = false;
 
         public void Enable()
         {
@@ -27,14 +27,13 @@ namespace Covid19.AI.Behaviour.States
             {
                 if (_npc.Agent.pathPending)
                     yield return null;
-                if (_startPatroling == false ||
+                if (_startInvestigation == false ||
                     _npc.Agent.remainingDistance < _npc.agentConfig.stoppingDistance)
                 {
-                    if (_startPatroling)
+                    if (_startInvestigation)
                         _currentDestination = _npc.patrolPositions[_indexPatrol].transform.position;
-                    _startPatroling = true;
+                    _startInvestigation = true;
                     _npc.Agent.SetDestination(_npc.patrolPositions[_indexPatrol].transform.position);
-
                     _indexPatrol++;
                     if (_indexPatrol == _npc.patrolPositions.Length)
                         _indexPatrol = 0;
@@ -42,6 +41,7 @@ namespace Covid19.AI.Behaviour.States
 
                 // VERY IMPORTANT TO PAUSE THE EXECUTION HERE, it will make sure that this coroutine can be stopped
                 yield return null;
+
                 TransitionToMeeting();
                 yield return null;
             }
@@ -49,7 +49,7 @@ namespace Covid19.AI.Behaviour.States
 
         public override string ToString()
         {
-            return "Patrol";
+            return "Doctor Investigate";
         }
 
         private void TransitionToMeeting()
@@ -57,23 +57,10 @@ namespace Covid19.AI.Behaviour.States
             AgentNPC partnerNPC = _npc.MeetSystem.FindNPCToMeet(typeof(PatrolBehaviour));
             if (partnerNPC != null)
             {
-                // check if the probabilites and the sociable level are satisfied for both
-                var randomValue = Random.Range(1, 10);
-                if (randomValue <= _npc.agentConfig.sociableLevel
-                    && randomValue <= partnerNPC.agentConfig.sociableLevel)
-                {
-                    Debug.Log($"Botul {_npc.name} si {partnerNPC.name} se intalnesc"); // then they actually meet.
-                    var talkDuration = Random.Range(8f, 11f);
-                    _npc.MeetSystem.Meet(partnerNPC, talkDuration);
-                    partnerNPC.MeetSystem.Meet(_npc, talkDuration);
-                }
-                else
-                {
-                    Debug.Log(
-                        $"<color=red>meeting failed due to probability, expected <= {randomValue} {_npc.name} {partnerNPC.name} </color>");
-                    _npc.MeetSystem.IgnoreAgent(partnerNPC, 10); // ignores agent for a number of 10 seconds
-                    partnerNPC.MeetSystem.IgnoreAgent(_npc, 10);
-                }
+                Debug.Log($"Botul {_npc.name} si {partnerNPC.name} se intalnesc pt investigare");
+                var talkDuration = Random.Range(8f, 11f);
+                _npc.MeetSystem.Meet(partnerNPC, talkDuration);
+                partnerNPC.MeetSystem.Meet(_npc, talkDuration);
             }
         }
 
