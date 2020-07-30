@@ -15,7 +15,6 @@ namespace Covid19.AI.Behaviour.Systems
         private Coroutine _coughCoroutine;
         private bool _cured = false;
 
-        private bool _goingToInfirmery = false;
         private bool _infected = false;
 
         private Coroutine _infectionGrowthCoroutine;
@@ -127,14 +126,16 @@ namespace Covid19.AI.Behaviour.Systems
             while (true)
             {
                 yield return new WaitForSeconds(_npc.generalConfig.growthInterval);
-                InfectionLevel += _npc.generalConfig.infectionSpeed / _npc.agentConfig.immunityLevel;
-                if (InfectionLevel > _npc.generalConfig.maxInfectionValue)
-                    break;
-                if (InfectionLevel > 1 && _goingToInfirmery == false &&
-                    _npc.BehaviourSystem.IsCurrentBehaviour(_npc.GetComponent<PatrolBehaviour>()) &&
+                // add to the agent infection using the immunity
+                InfectionLevel += Mathf.Max(_npc.generalConfig.maxInfectionValue,
+                    _npc.generalConfig.infectionSpeed / _npc.agentConfig.immunityLevel);
+                if (InfectionLevel == _npc.generalConfig.maxInfectionValue)
+                    break; // if it reached the maximum level then we can stop the coroutine
+
+                // if the agent is infected and had not already goen to the infirmery, and the infirmery has available space,then go to infirmery
+                if (InfectionLevel > 10 && _npc.BehaviourSystem.IsCurrentBehaviour(typeof(PatrolBehaviour)) &&
                     _infirmery.HasAvailableSpace())
                 {
-                    _goingToInfirmery = true;
                     GoToInfirmeryBehaviour behaviour = _npc.gameObject.AddComponent<GoToInfirmeryBehaviour>();
                     behaviour.destination = _infirmery.GetBedPosition(_npc);
                     _npc.BehaviourSystem.SetBehaviour(behaviour);

@@ -10,6 +10,7 @@ namespace Covid19.AI.Behaviour.Configuration
 
         public AnimationCurve coughCurve = new AnimationCurve();
 
+
         [Header("Infection")] [Range(0.1f, 5f)] [Tooltip("The time that passes between to 'growths' of infection")]
         public float growthInterval = 2f;
 

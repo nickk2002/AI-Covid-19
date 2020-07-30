@@ -27,7 +27,8 @@ namespace Covid19.AI.Behaviour.States
         {
             while (true)
             {
-                if (Vector3.Distance(transform.position, destination.position) < 0.3f)
+                Debug.Log(Vector3.Distance(transform.position, destination.position));
+                if (Vector3.Distance(transform.position, destination.position) < 2f)
                     if (_reached == false)
                     {
                         Debug.Log("Heii am ajuns la destinatie gata, oprirea!!!");

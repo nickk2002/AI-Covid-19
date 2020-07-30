@@ -85,17 +85,17 @@ namespace Covid19.AI.Behaviour
                 Gizmos.DrawLine(circle[i], circle[i + 1]);
         }
 
+        private void Update()
+        {
+            Time.timeScale = generalConfig.timeScale;
+
+            _agentUI.actionName.name = BehaviourSystem.CurrentBehaviour.ToString();
+            _agentUI.infectionLevel.name = InfectionSystem?.InfectionLevel.ToString("0.0000") ?? String.Empty;
+        }
+
         private void OnDrawGizmos()
         {
             DrawLineOfSight();
-            if (Application.isPlaying)
-                Time.timeScale = generalConfig.timeScale;
-            if (_agentUI)
-            {
-                _agentUI.actionName.name = BehaviourSystem.CurrentBehaviour.ToString();
-                Debug.Log("INfection : " + InfectionSystem?.InfectionLevel);
-                _agentUI.infectionLevel.name = InfectionSystem?.InfectionLevel.ToString("0.0000") ?? String.Empty;
-            }
         }
     }
 }

@@ -106,7 +106,7 @@ namespace Covid19.AI.Behaviour.States
         {
             if (partnerNPC == null)
                 return;
-            if (!_npc.BehaviourSystem.IsCurrentBehaviour(this) || !_drawGizmos ||
+            if (!_npc.BehaviourSystem.IsCurrentBehaviour(typeof(MeetBehaviour)) || !_drawGizmos ||
                 !partnerNPC.GetComponent<MeetBehaviour>()._drawGizmos)
                 return;
             _meetGizmos = new GameObject {name = "MeetGizmos"};

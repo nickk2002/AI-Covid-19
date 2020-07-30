@@ -102,7 +102,7 @@ namespace Covid19.AI.Behaviour.States
             Enable();
             if (_npc.posHolder == null) return;
 
-            if (Application.isPlaying == false || _npc.BehaviourSystem.IsCurrentBehaviour(this))
+            if (Application.isPlaying == false || _npc.BehaviourSystem.IsCurrentBehaviour(typeof(PatrolBehaviour)))
             {
                 var positions = new List<Vector3>();
                 foreach (GameObject patrolGameObject in _npc.patrolPositions)

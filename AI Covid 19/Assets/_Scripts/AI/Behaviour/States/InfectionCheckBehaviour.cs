@@ -40,14 +40,14 @@ namespace Covid19.AI.Behaviour.States
                     _reached = true;
                     _npc.Agent.isStopped = true;
                     yield return new WaitForSeconds(investigationDuration);
+
+                    _npc.BehaviourSystem.RemoveBehaviour(this);
                     if (_npc.agentConfig.agentType != AgentType.Doctor && _npc.InfectionSystem.InfectionLevel > 0)
                     {
                         GoToInfirmeryBehaviour behaviour = _npc.gameObject.AddComponent<GoToInfirmeryBehaviour>();
                         behaviour.destination = FindObjectOfType<Infirmery>().GetBedPosition(_npc);
                         _npc.BehaviourSystem.SetBehaviour(behaviour);
                     }
-
-                    _npc.BehaviourSystem.RemoveBehaviour(this);
                 }
 
                 yield return null;

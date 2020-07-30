@@ -59,8 +59,9 @@ namespace Covid19.AI.Behaviour.Systems
 
         private bool AcceptsMeeting(AgentNPC agentNPC)
         {
-            //if (agentNPC.GetComponent<MeetBehaviour>() || (agentNPC.GetComponent<PatrolBehaviour>() == null && agentNPC.GetComponent<DoctorInvestigate>() == null))
-            //  return false; // if it is already in meeting then return false
+            if (agentNPC.agentConfig.agentType == AgentType.Doctor &&
+                agentNPC.BehaviourSystem.IsCurrentBehaviour(typeof(DoctorInvestigate)) == false)
+                return false; // check if he wants to meet with a doctor, then the doctor should be investigating
             // check to prevent two agents meeting without having time to turn around and walk away
             if (LastMeetingTime != 0 && !(Time.time - LastMeetingTime > _npc.agentConfig.cooldownMeeting))
                 return false;
