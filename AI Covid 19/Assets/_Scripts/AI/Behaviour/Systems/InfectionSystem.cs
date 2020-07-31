@@ -57,7 +57,6 @@ namespace Covid19.AI.Behaviour.Systems
         public void StartInfection()
         {
             if (_infected || _cured || _infirmery == null) return;
-            Debug.Log("Heii I am infected" + _npc.name);
 
             _infected = true;
             _infectionGrowthCoroutine = _npc.StartCoroutine(InfectionHandler());
@@ -138,7 +137,7 @@ namespace Covid19.AI.Behaviour.Systems
                 {
                     GoToInfirmeryBehaviour behaviour = _npc.gameObject.AddComponent<GoToInfirmeryBehaviour>();
                     behaviour.destination = _infirmery.GetBedPosition(_npc);
-                    _npc.BehaviourSystem.SetBehaviour(behaviour);
+                    _npc.BehaviourSystem.SetBehaviour(behaviour,TransitionType.StackTransition);
                 }
             }
         }

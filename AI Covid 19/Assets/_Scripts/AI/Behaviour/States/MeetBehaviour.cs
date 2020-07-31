@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using Covid19.Utils;
+using Covid19.AI.Behaviour.Systems;
 using UnityEngine;
 
 namespace Covid19.AI.Behaviour.States
@@ -17,7 +18,6 @@ namespace Covid19.AI.Behaviour.States
         private GameObject _meetGizmos;
 
         private AgentNPC _npc;
-        private bool _reached = false;
 
         public Vector3 meetPosition;
 
@@ -26,10 +26,10 @@ namespace Covid19.AI.Behaviour.States
 
         public void Enable()
         {
-            Debug.Log($"Entered meeting {name}");
             _npc = GetComponent<AgentNPC>();
-            _npc.Agent.SetDestination(meetPosition);
             _animator = GetComponent<Animator>();
+            
+
         }
 
 
@@ -46,35 +46,33 @@ namespace Covid19.AI.Behaviour.States
 
         public IEnumerator OnUpdate()
         {
+            var goToLocation = gameObject.AddComponent<GoToLocationBehaviour>();
+            goToLocation.destination = meetPosition;
+
+            _npc.BehaviourSystem.SetBehaviour(goToLocation,TransitionType.StackTransition);
+            yield return null;
+            
+            StartCoroutine(WaitUntilMeetingEnds());
+            _npc.Agent.isStopped = true;
+            _animator.SetBool(MeetingBool, true);
+            if (partnerNPC.Animator.GetBool(TalkingBool) == false)
+            {
+                var randomTalkID = Random.Range(0, 3);
+                _animator.SetBool(TalkingBool, true);
+                _animator.SetInteger(TalkID, randomTalkID);
+            }
+            else
+            {
+                _animator.SetBool(ListeningBool, true);
+            }
             while (true)
             {
-                if (_npc.Agent.pathPending)
-                    yield return null;
-                if (_npc.Agent.remainingDistance < 0.1f && _reached == false)
-                {
-                    StartCoroutine(WaitUntilMeetingEnds());
-                    _reached = true;
-                    _npc.Agent.isStopped = true;
-                    _animator.SetBool(MeetingBool, true);
-                    if (partnerNPC.Animator.GetBool(TalkingBool) == false)
-                    {
-                        var randomTalkID = Random.Range(0, 3);
-                        _animator.SetBool(TalkingBool, true);
-                        _animator.SetInteger(TalkID, randomTalkID);
-                    }
-                    else
-                    {
-                        _animator.SetBool(ListeningBool, true);
-                    }
-                }
-
                 if (_animator.GetBool(ListeningBool))
                 {
                     float listeningDuration = Random.Range(4f, 10f); // random listening duration time;
                     yield return new WaitForSeconds(listeningDuration);
                     SwitchConversation();
                 }
-
                 yield return null;
             }
         }

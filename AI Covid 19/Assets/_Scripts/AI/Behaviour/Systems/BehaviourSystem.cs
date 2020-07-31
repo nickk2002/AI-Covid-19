@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using Covid19.AI.Behaviour.States;
 using UnityEngine;
+using static UnityEngine.Object;
 using Object = UnityEngine.Object;
 
 namespace Covid19.AI.Behaviour.Systems
@@ -33,11 +34,12 @@ namespace Covid19.AI.Behaviour.Systems
             if (_behaviours.Count == 0)
                 return false;
             return _behaviours.Peek().GetType() == behaviour;
+            ;
         }
 
-        public void SetBehaviour(IBehaviour behaviour)
+        public void SetBehaviour(IBehaviour behaviour,TransitionType type)
         {
-            if (CurrentBehaviour != null)
+            if (CurrentBehaviour != null)    
             {
                 if (_behaviourCoroutine.ContainsKey(CurrentBehaviour))
                 {
@@ -52,7 +54,15 @@ namespace Covid19.AI.Behaviour.Systems
                         _npc);
                 }
 
-                CurrentBehaviour.Disable();
+                if (type == TransitionType.OverrideTransition)
+                {
+                    CurrentBehaviour.Disable();
+                    Destroy(CurrentBehaviour as Object);
+                }
+                else if(type == TransitionType.StackTransition)
+                {
+                    CurrentBehaviour.Disable();
+                }
             }
 
             CurrentBehaviour = behaviour; // set the current behaviour
@@ -66,10 +76,20 @@ namespace Covid19.AI.Behaviour.Systems
 
         public void RemoveBehaviour(IBehaviour behaviour)
         {
-            _npc.StopCoroutine(_behaviourCoroutine[behaviour]);
             Debug.Log($"<color=red> {_npc.name} exited  {CurrentBehaviour} </color>", _npc);
+            if (_behaviourCoroutine.ContainsKey(CurrentBehaviour))
+            {
+                _npc.StopCoroutine(_behaviourCoroutine[CurrentBehaviour]);
+                Debug.Log($"<color=red> {_npc.name} exited {CurrentBehaviour} </color>", _npc);
+            }
+            else
+            {
+                Debug.Log(
+                    $"<color=red> exited  {_npc.name} {CurrentBehaviour}  but the coroutine was not in dict </color>",
+                    _npc);
+            }
             behaviour.Disable();
-            Object.Destroy(behaviour as Object);
+            Destroy(behaviour as Object);
             _behaviours.Pop();
             if (_behaviours.Count > 0)
             {

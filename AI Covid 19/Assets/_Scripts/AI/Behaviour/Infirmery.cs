@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using Covid19.AI.Behaviour.States;
+using Covid19.AI.Behaviour.Systems;
 using UnityEngine;
 
 namespace Covid19.AI.Behaviour
@@ -63,7 +64,7 @@ namespace Covid19.AI.Behaviour
             {
                 var healBehaviour = doctor.gameObject.AddComponent<HealAgentBehaviour>();
                 healBehaviour.AddPacient(pacient);
-                doctor.BehaviourSystem.SetBehaviour(healBehaviour);
+                doctor.BehaviourSystem.SetBehaviour(healBehaviour,TransitionType.StackTransition);
             }
             else
             {

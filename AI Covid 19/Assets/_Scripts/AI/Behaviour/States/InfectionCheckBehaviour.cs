@@ -41,15 +41,17 @@ namespace Covid19.AI.Behaviour.States
                     _npc.Agent.isStopped = true;
                     yield return new WaitForSeconds(investigationDuration);
 
-                    _npc.BehaviourSystem.RemoveBehaviour(this);
                     if (_npc.agentConfig.agentType != AgentType.Doctor && _npc.InfectionSystem.InfectionLevel > 0)
                     {
                         GoToInfirmeryBehaviour behaviour = _npc.gameObject.AddComponent<GoToInfirmeryBehaviour>();
                         behaviour.destination = FindObjectOfType<Infirmery>().GetBedPosition(_npc);
-                        _npc.BehaviourSystem.SetBehaviour(behaviour);
+                        _npc.BehaviourSystem.SetBehaviour(behaviour,TransitionType.OverrideTransition);
+                    }
+                    else
+                    {
+                        _npc.BehaviourSystem.RemoveBehaviour(this);// daca este doctor atunci opresc direct si gata
                     }
                 }
-
                 yield return null;
             }
         }

@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using Covid19.AI.Behaviour.States;
+using Covid19.AI.Behaviour.Systems;
 using UnityEngine;
 
 namespace Covid19.AI.Behaviour
@@ -39,7 +40,7 @@ namespace Covid19.AI.Behaviour
                 typingBehaviour.mouse = mouse;
                 typingBehaviour.correctSittingPosition = chairCorrectPosition.transform.localPosition;
                 Debug.Log(typingBehaviour.targetPosition);
-                _npc.BehaviourSystem.SetBehaviour(typingBehaviour);
+                _npc.BehaviourSystem.SetBehaviour(typingBehaviour,TransitionType.StackTransition);
                 _collider.enabled = false;
             }
         }

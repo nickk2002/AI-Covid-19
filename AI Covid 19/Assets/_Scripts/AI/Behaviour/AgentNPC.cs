@@ -2,6 +2,7 @@
 using Covid19.AI.Behaviour.Configuration;
 using Covid19.AI.Behaviour.States;
 using Covid19.AI.Behaviour.Systems;
+using Covid19.AI.Behaviour.UI;
 using Covid19.Core;
 using UnityEngine;
 using UnityEngine.AI;
@@ -38,7 +39,7 @@ namespace Covid19.AI.Behaviour
             MeetSystem = new MeetSystem(this);
             BehaviourSystem = new BehaviourSystem(this);
             if (GetComponent<IBehaviour>() != null)
-                BehaviourSystem.SetBehaviour(GetComponent<IBehaviour>());
+                BehaviourSystem.SetBehaviour(GetComponent<IBehaviour>(),TransitionType.StackTransition);
             if (agentConfig == null)
             {
                 Debug.LogError($"Agent Configuration SO not set in inspector {name}", this);

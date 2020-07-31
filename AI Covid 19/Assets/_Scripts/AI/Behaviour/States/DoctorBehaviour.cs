@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using Covid19.AI.Behaviour.Systems;
 using Covid19.Core;
 using UnityEngine;
 
@@ -19,7 +20,7 @@ namespace Covid19.AI.Behaviour.States
             FindObjectOfType<Infirmery>().AddDoctor(_npc);
 
             var doctorInvestigate = _npc.gameObject.AddComponent<DoctorInvestigate>();
-            _npc.BehaviourSystem.SetBehaviour(doctorInvestigate);
+            _npc.BehaviourSystem.SetBehaviour(doctorInvestigate,TransitionType.StackTransition);
         }
 
         public void Disable()

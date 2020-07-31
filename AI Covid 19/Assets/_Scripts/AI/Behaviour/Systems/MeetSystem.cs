@@ -45,7 +45,7 @@ namespace Covid19.AI.Behaviour.Systems
                 infectionCheckBehaviour.meetingPosition = meetingPosition;
                 infectionCheckBehaviour.partnerNPC = partnerNPC;
                 infectionCheckBehaviour.investigationDuration = 3f;
-                _npc.BehaviourSystem.SetBehaviour(infectionCheckBehaviour);
+                _npc.BehaviourSystem.SetBehaviour(infectionCheckBehaviour,TransitionType.StackTransition);
             }
             else
             {
@@ -53,7 +53,7 @@ namespace Covid19.AI.Behaviour.Systems
                 meetBehaviour.meetPosition = meetingPosition;
                 meetBehaviour.partnerNPC = partnerNPC;
                 meetBehaviour.talkDuration = talkDuration;
-                _npc.BehaviourSystem.SetBehaviour(meetBehaviour);
+                _npc.BehaviourSystem.SetBehaviour(meetBehaviour,TransitionType.StackTransition);
             }
         }
 
@@ -86,8 +86,11 @@ namespace Covid19.AI.Behaviour.Systems
             if (AIUtils.CanSeeObject(_transform, agentNPC.transform,
                 _npc.generalConfig.viewDistance,
                 _npc.generalConfig.viewAngle))
+            {
+                Debug.Log($"Domnul {_npc.name} este de acord cu {agentNPC.name}");
                 return true;
-            Debug.Log($"Domnul {_npc.name} este de acord cu {agentNPC.name}");
+            }
+
             return false;
         }
 
