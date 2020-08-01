@@ -5,7 +5,7 @@ namespace Covid19.AI.Behaviour.States
 {
     public class EatBeahaviour : MonoBehaviour,IBehaviour
     {
-        public void Enable()
+        public void WakeUp()
         {
             Debug.Log("Acum mananci");
         }

@@ -5,7 +5,8 @@ namespace Covid19.AI.Behaviour.Configuration
 {
     [CreateAssetMenu(menuName = "Covid19/AI/Data for Agent")]
     public class AgentConfiguration : ScriptableObject
-    {       
+    {
+        public bool debug;
         public AgentType agentType;
         public string npcName = "Bob";
         public string occupation = "Bussines Man";

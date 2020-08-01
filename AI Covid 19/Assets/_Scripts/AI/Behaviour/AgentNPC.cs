@@ -28,6 +28,7 @@ namespace Covid19.AI.Behaviour
         public MeetSystem MeetSystem { get; private set; }
         public InfectionSystem InfectionSystem { get; private set; }
         public BehaviourSystem BehaviourSystem { get; private set; }
+        public DebuggerSystem DebuggerSystem { get; private set; }
 
         private void Start()
         {
@@ -36,6 +37,7 @@ namespace Covid19.AI.Behaviour
             Agent = GetComponent<NavMeshAgent>();
             Animator = GetComponent<Animator>();
 
+            DebuggerSystem = new DebuggerSystem(this);
             MeetSystem = new MeetSystem(this);
             BehaviourSystem = new BehaviourSystem(this);
             if (GetComponent<IBehaviour>() != null)
@@ -61,7 +63,7 @@ namespace Covid19.AI.Behaviour
             if (generalConfig == null || agentConfig == null)
                 return;
             Gizmos.color = Color.green;
-            var circle = new Vector3[generalConfig.viewAngle + 4];
+            var circle = new Vector3[generalConfig.viewAngle + 2];
             var index = 0;
             var position = transform.position;
             for (var angle = -generalConfig.viewAngle / 2; angle <= generalConfig.viewAngle / 2; angle++)
@@ -79,7 +81,6 @@ namespace Covid19.AI.Behaviour
                     circle[++index] = position + direction.normalized * generalConfig.viewDistance;
                 }
             }
-
             Gizmos.DrawLine(position, circle[1]);
             Gizmos.DrawLine(position, circle[index]);
             for (var i = 1; i <= index - 1; i++)

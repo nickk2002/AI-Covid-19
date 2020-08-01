@@ -9,7 +9,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 0}
-  m_Name: InfirmeryList
-  m_EditorClassIdentifier: Scripts:Covid19.AI.Behaviour.Configuration:MonoBehaviourList
+  m_Script: {fileID: 11500000, guid: e1a5e4ba70f8a8f44aed62feb9460c5c, type: 3}
+  m_Name: Infirmery List
+  m_EditorClassIdentifier: 
   items: []

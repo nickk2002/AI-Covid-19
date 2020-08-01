@@ -7,6 +7,10 @@ namespace Covid19.AI.Behaviour.States
 {
     public class MeetBehaviour : MonoBehaviour, IBehaviour
     {
+        public Vector3 meetPosition;
+        public AgentNPC partnerNPC;
+        public float talkDuration;
+        
         private static readonly int MeetingBool = Animator.StringToHash("meeting");
         private static readonly int TalkingBool = Animator.StringToHash("talking");
         private static readonly int ListeningBool = Animator.StringToHash("listening");
@@ -16,24 +20,27 @@ namespace Covid19.AI.Behaviour.States
 
         private bool _drawGizmos = true;
         private GameObject _meetGizmos;
-
         private AgentNPC _npc;
-
-        public Vector3 meetPosition;
-
-        public AgentNPC partnerNPC;
-        public float talkDuration;
-
-        public void Enable()
+        
+        public void WakeUp()
         {
             _npc = GetComponent<AgentNPC>();
             _animator = GetComponent<Animator>();
+            Debug.Log($"Started meeting from Start {_npc.name}");
             
+            var goToLocation = gameObject.AddComponent<GoToLocationBehaviour>();
+            goToLocation.destination = meetPosition;
 
+            _npc.BehaviourSystem.SetBehaviour(goToLocation,TransitionType.StackTransition);
         }
 
 
         public void Disable()
+        {
+            
+        }
+
+        private void EndMeeting()
         {
             _npc.MeetSystem.LastMeetingTime = Time.time;
             _npc.Agent.isStopped = false;
@@ -43,13 +50,9 @@ namespace Covid19.AI.Behaviour.States
             if (_meetGizmos)
                 Destroy(_meetGizmos);
         }
-
         public IEnumerator OnUpdate()
         {
-            var goToLocation = gameObject.AddComponent<GoToLocationBehaviour>();
-            goToLocation.destination = meetPosition;
-
-            _npc.BehaviourSystem.SetBehaviour(goToLocation,TransitionType.StackTransition);
+           
             yield return null;
             
             StartCoroutine(WaitUntilMeetingEnds());

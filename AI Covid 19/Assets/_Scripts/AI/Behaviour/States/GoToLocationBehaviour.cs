@@ -8,7 +8,7 @@ namespace Covid19.AI.Behaviour.States
         public float stopDistance;
         public Vector3 destination;
         private AgentNPC _npc;
-        public void Enable()
+        public void WakeUp()
         {
             _npc = GetComponent<AgentNPC>();
             _npc.Agent.isStopped = false;

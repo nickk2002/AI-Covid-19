@@ -6,30 +6,23 @@ namespace Covid19.AI.Behaviour.Configuration
     [CreateAssetMenu(menuName = "Covid19/AI/General")]
     public class GeneralAIConfiguration : ScriptableObject
     {
-        [Tooltip("List of agents")] public MonoBehaviourList agentList;
+        [Range(1f, 10f)] public float timeScale = 1;
 
-        public AnimationCurve coughCurve = new AnimationCurve();
-
-
-        [Header("Infection")] [Range(0.1f, 5f)] [Tooltip("The time that passes between to 'growths' of infection")]
+        [Header("Infection")] 
+        [Range(0.1f, 5f)] [Tooltip("The time that passes between to 'growths' of infection")]
         public float growthInterval = 2f;
-
         [Range(5, 10)] public float infectionDistance = 5;
-
         [Tooltip("The amound of infection added after each growth interval")] [Range(0.1f, 1)]
         public float infectionSpeed = 0.1f;
-
-        [Tooltip("List of infirmerys")] public MonoBehaviourList infirmeryList;
-
         [Range(1, 10f)] public float maxInfectionValue = 10;
 
         [Header("Meeting")] [Range(1, 5)] public float meetingDistance = 1;
-
-        [Range(1f, 10f)] public float timeScale = 1;
-
         [Range(60f, 90f)] public int viewAngle = 60;
-
         [Range(10, 30)] public float viewDistance = 30;
+        
+        [Tooltip("List of agents")] public MonoBehaviourList agentList;
+        [Tooltip("List of infirmerys")] public MonoBehaviourList infirmeryList;
+        public AnimationCurve coughCurve = new AnimationCurve();
 
         private void OnEnable()
         {

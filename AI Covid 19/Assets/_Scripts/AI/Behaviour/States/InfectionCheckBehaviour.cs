@@ -12,9 +12,9 @@ namespace Covid19.AI.Behaviour.States
         private bool _reached = false;
         public float investigationDuration;
         public Vector3 meetingPosition;
-        public AgentNPC partnerNPC;
+        public AgentNPC partnerNPC;    
 
-        public void Enable()
+        public void WakeUp()
         {
             if (gameObject.GetComponents<InfectionCheckBehaviour>().Length > 1)
                 Debug.LogError("There are more than one InfectionCheckBehaviours");

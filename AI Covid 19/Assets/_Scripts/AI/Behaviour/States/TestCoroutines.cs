@@ -22,8 +22,6 @@ namespace Covid19.AI.Behaviour.States
 
         void Start()
         {
-            Debug.Log("Called Start ");
-            //StartCoroutine(MyCoroutine());
         }
         
         

@@ -31,7 +31,7 @@ namespace Covid19.AI.Behaviour.States
         {
             return "Typing";
         }
-        public void Enable()
+        public void WakeUp()
         {
             _animator = GetComponent<Animator>();
             _npc = GetComponent<AgentNPC>();

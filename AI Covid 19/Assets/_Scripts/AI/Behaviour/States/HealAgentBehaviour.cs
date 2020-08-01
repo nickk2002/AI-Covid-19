@@ -13,7 +13,7 @@ namespace Covid19.AI.Behaviour.States
         
         private readonly Stack<AgentNPC> _pacientsStack = new Stack<AgentNPC>();
     
-        public void Enable()
+        public void WakeUp()
         {    
             _npc = GetComponent<AgentNPC>();
             _npc.Agent.isStopped = false;

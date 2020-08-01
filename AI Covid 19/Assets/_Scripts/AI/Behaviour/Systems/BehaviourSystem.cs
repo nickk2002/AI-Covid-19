@@ -9,11 +9,16 @@ namespace Covid19.AI.Behaviour.Systems
 {
     public class BehaviourSystem
     {
-        private readonly Dictionary<IBehaviour, Coroutine>
-            _behaviourCoroutine = new Dictionary<IBehaviour, Coroutine>();
+        // keep the Behaviour -> Coroutine map
+        private readonly Dictionary<IBehaviour, Coroutine> _behaviourCoroutine = new Dictionary<IBehaviour, Coroutine>();
 
-        private readonly Stack<IBehaviour> _behaviours = new Stack<IBehaviour>();
+        private readonly Stack<IBehaviour> _behaviourStack = new Stack<IBehaviour>();
+        private readonly HashSet<IBehaviour> _wakedUpBehaviours = new HashSet<IBehaviour>();
         private readonly AgentNPC _npc;
+
+        private int _numberOfTransitions = 0;
+
+        // TODO : Add a group of actions based on the agentType
         private Dictionary<AgentType, List<IBehaviour>> _altceva = new Dictionary<AgentType, List<IBehaviour>>();
 
         private List<Type> _basicActions = new List<Type>
@@ -31,74 +36,82 @@ namespace Covid19.AI.Behaviour.Systems
 
         public bool IsCurrentBehaviour(Type behaviour)
         {
-            if (_behaviours.Count == 0)
+            if (_behaviourStack.Count == 0)
                 return false;
-            return _behaviours.Peek().GetType() == behaviour;
-            ;
+            return _behaviourStack.Peek().GetType() == behaviour;
         }
 
-        public void SetBehaviour(IBehaviour behaviour,TransitionType type)
+        public void SetBehaviour(IBehaviour behaviour, TransitionType type)
         {
-            if (CurrentBehaviour != null)    
+            _numberOfTransitions++;
+            if (CurrentBehaviour != null)
             {
-                if (_behaviourCoroutine.ContainsKey(CurrentBehaviour))
-                {
-                    //_npc.StopAllCoroutines();
-                    _npc.StopCoroutine(_behaviourCoroutine[CurrentBehaviour]);
-                    Debug.Log($"<color=red> {_npc.name} exited {CurrentBehaviour} </color>", _npc);
-                }
-                else
-                {
-                    Debug.Log(
-                        $"<color=red> exited  {_npc.name} {CurrentBehaviour}  but the coroutine was not in dict </color>",
-                        _npc);
-                }
-
+                StopCoroutineOnBehavaviour(CurrentBehaviour);
+                
                 if (type == TransitionType.OverrideTransition)
                 {
-                    CurrentBehaviour.Disable();
                     Destroy(CurrentBehaviour as Object);
-                }
-                else if(type == TransitionType.StackTransition)
-                {
-                    CurrentBehaviour.Disable();
                 }
             }
 
             CurrentBehaviour = behaviour; // set the current behaviour
-            _behaviours.Push(CurrentBehaviour); // push this behaviour to the stack
-            CurrentBehaviour.Enable(); // run initialization logic ( get the dependencies)
-            Debug.Log($"<color=green> {_npc.name} started  {CurrentBehaviour} </color>", _npc);
+            _behaviourStack.Push(CurrentBehaviour); // push this behaviour to the stack
 
-            Coroutine coroutine = _npc.StartCoroutine(CurrentBehaviour.OnUpdate()); // cache the corutine to stop later
-            _behaviourCoroutine[CurrentBehaviour] = coroutine;
+            int lastNumberOfTransitions = _numberOfTransitions;
+            if (!_wakedUpBehaviours.Contains(CurrentBehaviour))
+            {
+                _npc.DebuggerSystem.AddDebugLog($"<color=green> {_npc.name} wake up  {CurrentBehaviour} </color>", _npc);
+                CurrentBehaviour.WakeUp(); // call wake up only when adding a new behaviour, not when resuming.
+                _wakedUpBehaviours.Add(CurrentBehaviour);
+            }
+
+            // in CurrentBehaviour.WakeUp() the CurrentBehaviour can change by calling SetBehaviour() or RemoveBehaviour() and we must be aware of that!
+            if (lastNumberOfTransitions == _numberOfTransitions)// if the number of Transitions changed in WakeUp()
+            {
+                StartCoroutineOnBehaviour(CurrentBehaviour);
+            }
         }
 
         public void RemoveBehaviour(IBehaviour behaviour)
         {
-            Debug.Log($"<color=red> {_npc.name} exited  {CurrentBehaviour} </color>", _npc);
-            if (_behaviourCoroutine.ContainsKey(CurrentBehaviour))
+            _numberOfTransitions++;
+            StopCoroutineOnBehavaviour(behaviour);
+
+            _wakedUpBehaviours.Remove(behaviour); // remove the behaviour => the next time is added the enable is called.
+            Destroy(behaviour as Object);
+            _npc.DebuggerSystem.AddDebugLog($"{_npc.name} <color=red> Destroyed {behaviour} </color>");
+            
+            if (_behaviourStack.Count > 1)
             {
-                _npc.StopCoroutine(_behaviourCoroutine[CurrentBehaviour]);
-                Debug.Log($"<color=red> {_npc.name} exited {CurrentBehaviour} </color>", _npc);
+                _behaviourStack.Pop();
+                CurrentBehaviour = _behaviourStack.Peek();
+                StartCoroutineOnBehaviour(CurrentBehaviour);
+            }
+        }
+
+        private void StartCoroutineOnBehaviour(IBehaviour behaviour)
+        {
+            _npc.DebuggerSystem.AddDebugLog($"<color=green> {_npc.name} started coroutine  {behaviour.OnUpdate()} </color>", _npc);
+            Coroutine coroutine = _npc.StartCoroutine(behaviour.OnUpdate());
+            
+            // the dictionary must not contain that key.
+            Debug.Assert(_behaviourCoroutine.ContainsKey(CurrentBehaviour) == false, $"{_npc.name} There are two coroutines running at the same time {CurrentBehaviour}");
+            _behaviourCoroutine[behaviour] = coroutine;
+        }
+
+        private void StopCoroutineOnBehavaviour(IBehaviour behaviour)
+        {
+            if (_behaviourCoroutine.ContainsKey(behaviour))
+            {
+                _npc.StopCoroutine(_behaviourCoroutine[behaviour]);
+                _npc.DebuggerSystem.AddDebugLog($"<color=red> {_npc.name} exited {CurrentBehaviour}</color>", _npc);
+                _behaviourCoroutine.Remove(behaviour);
             }
             else
             {
-                Debug.Log(
-                    $"<color=red> exited  {_npc.name} {CurrentBehaviour}  but the coroutine was not in dict </color>",
-                    _npc);
+                _npc.DebuggerSystem.AddDebugLog($"<color=red> exited  {_npc.name} {behaviour}  but the coroutine was not in dict </color>", _npc);
             }
             behaviour.Disable();
-            Destroy(behaviour as Object);
-            _behaviours.Pop();
-            if (_behaviours.Count > 0)
-            {
-                CurrentBehaviour = _behaviours.Peek();
-                CurrentBehaviour.Enable();
-                Debug.Log($"<color=green> {_npc.name} started {CurrentBehaviour} </color>", _npc);
-                Coroutine coroutine = _npc.StartCoroutine(CurrentBehaviour.OnUpdate());
-                _behaviourCoroutine[CurrentBehaviour] = coroutine;
-            }
-        }
+        }       
     }
 }

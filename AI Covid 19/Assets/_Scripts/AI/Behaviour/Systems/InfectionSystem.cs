@@ -1,6 +1,10 @@
-﻿using System.Collections;
+﻿#region
+
+using System.Collections;
 using Covid19.AI.Behaviour.States;
 using UnityEngine;
+
+#endregion
 
 namespace Covid19.AI.Behaviour.Systems
 {
@@ -19,26 +23,7 @@ namespace Covid19.AI.Behaviour.Systems
 
         private Coroutine _infectionGrowthCoroutine;
         private AudioClip _lastAudioClip;
-
-        public InfectionSystem(AgentNPC owner)
-        {
-            _npc = owner;
-            _animator = owner.GetComponent<Animator>();
-            _audioSource = owner.GetComponent<AudioSource>();
-            if (owner.generalConfig.infirmeryList.items.Count > 0)
-                _infirmery = (Infirmery) owner.generalConfig.infirmeryList.items[0];
-            if (_infirmery == null)
-            {
-                Debug.LogError(
-                    "Infirmery not set in the General AI SO. And no Add To List Component was added to infirmery gameobject. Trying to find in scene");
-                _infirmery = Object.FindObjectOfType<Infirmery>();
-                Debug.Log($"<color=green>Infirmery was actually found!</color>");
-            }
-        }
-
         public float InfectionLevel { get; private set; }
-
-
         public bool Cured
         {
             get => _cured;
@@ -53,6 +38,23 @@ namespace Covid19.AI.Behaviour.Systems
                 _cured = value;
             }
         }
+
+        public InfectionSystem(AgentNPC owner)
+        {
+            _npc = owner;
+            _animator = owner.GetComponent<Animator>();
+            _audioSource = owner.GetComponent<AudioSource>();
+            if (owner.generalConfig.infirmeryList.items.Count > 0)
+                _infirmery = (Infirmery) owner.generalConfig.infirmeryList.items[0];
+            if (_infirmery == null)
+            {
+                Debug.LogError(
+                    "Infirmery not set in the General AI SO. And no Add To List Component was added to infirmery gameobject. Trying to find in scene");
+                _infirmery = Object.FindObjectOfType<Infirmery>();
+                Debug.Log("<color=green>Infirmery was actually found!</color>");
+            }
+        }
+
 
         public void StartInfection()
         {
@@ -92,11 +94,9 @@ namespace Covid19.AI.Behaviour.Systems
         private void InfectNearbyAgents()
         {
             foreach (AgentNPC otherNPC in _npc.generalConfig.agentList.items)
-            {
                 if (Vector3.Distance(_npc.transform.position, otherNPC.transform.position) <
                     _npc.generalConfig.infectionDistance)
                     otherNPC.StartInfection();
-            }
         }
 
         private IEnumerator CoughHandler()
@@ -104,8 +104,8 @@ namespace Covid19.AI.Behaviour.Systems
             while (true)
             {
                 // evaluate from the cough curve (on OX-> infection level, OY = cough Interval)
-                float coughVal = _npc.generalConfig.coughCurve.Evaluate(InfectionLevel);
-                float coughInterval = Random.Range(coughVal - 1, coughVal); // add a bit of random 
+                var coughVal = _npc.generalConfig.coughCurve.Evaluate(InfectionLevel);
+                var coughInterval = Random.Range(coughVal - 1, coughVal); // add a bit of random 
                 yield return new WaitForSeconds(coughInterval);
                 if (_animator.GetBool(Cough) == false)
                 {
@@ -113,7 +113,7 @@ namespace Covid19.AI.Behaviour.Systems
                     AudioClip clip = RandomAudio();
                     _audioSource.clip = clip;
                     _audioSource.Play();
-                    Debug.Log($"{_npc.name} has coughed!");
+                    //Debug.Log($"{_npc.name} has coughed!");
                     InfectNearbyAgents();
                     yield return new WaitForSeconds(clip.length);
                 }
@@ -135,9 +135,9 @@ namespace Covid19.AI.Behaviour.Systems
                 if (InfectionLevel > 10 && _npc.BehaviourSystem.IsCurrentBehaviour(typeof(PatrolBehaviour)) &&
                     _infirmery.HasAvailableSpace())
                 {
-                    GoToInfirmeryBehaviour behaviour = _npc.gameObject.AddComponent<GoToInfirmeryBehaviour>();
+                    var behaviour = _npc.gameObject.AddComponent<GoToInfirmeryBehaviour>();
                     behaviour.destination = _infirmery.GetBedPosition(_npc);
-                    _npc.BehaviourSystem.SetBehaviour(behaviour,TransitionType.StackTransition);
+                    _npc.BehaviourSystem.SetBehaviour(behaviour, TransitionType.StackTransition);
                 }
             }
         }

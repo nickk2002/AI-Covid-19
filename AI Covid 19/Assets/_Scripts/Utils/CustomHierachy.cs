@@ -82,10 +82,10 @@ namespace Covid19.Utils
 
         public static void SetIcon(GameObject go, Texture texture)
         {
+            
             Type editorGUIUtilityType = typeof(EditorGUIUtility);
             BindingFlags bindingFlags = BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Public |
                                         BindingFlags.InvokeMethod;
-            //texture.;
             var args = new object[] {go, texture};
             editorGUIUtilityType.InvokeMember("SetIconForObject", bindingFlags, null, null, args);
         }
