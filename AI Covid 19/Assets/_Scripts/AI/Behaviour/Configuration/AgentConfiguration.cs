@@ -11,7 +11,6 @@ namespace Covid19.AI.Behaviour.Configuration
         public AgentType agentType;
 
         [Range(1, 10)] public int cautiousLevel = 5;
-
         [Header("Debug")] public bool consoleDebug;
 
         public float cooldownMeeting = 5;
@@ -21,7 +20,6 @@ namespace Covid19.AI.Behaviour.Configuration
         public string occupation = "Bussines Man";
         public bool sightDebug;
         [Range(1, 10)] public int sociableLevel = 5;
-
         [Range(0.1f, 4f)] public float stoppingDistance = 0.1f;
     }
 }
