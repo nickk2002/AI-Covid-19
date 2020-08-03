@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using UnityEngine;
+using UnityEngine.Assertions;
 
 namespace Covid19.AI.Behaviour.States
 {
@@ -27,12 +28,14 @@ namespace Covid19.AI.Behaviour.States
             
         }
 
-        public IEnumerator OnUpdate()
-        {
+        public IEnumerator OnUpdate(){
+            
+            
             while (true)
             {
                 if (Vector3.SqrMagnitude(destination - transform.position) < stopDistance * stopDistance)
                 {
+                    yield return null;
                     _npc.BehaviourSystem.RemoveBehaviour(this);
                 }
                 yield return null;

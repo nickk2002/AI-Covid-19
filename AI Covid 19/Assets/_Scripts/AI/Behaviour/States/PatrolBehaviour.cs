@@ -44,7 +44,7 @@ namespace Covid19.AI.Behaviour.States
                 // VERY IMPORTANT TO PAUSE THE EXECUTION HERE, it will make sure that this coroutine can be stopped
                 yield return null;
                 TransitionToMeeting();
-                yield return null;
+                yield return new WaitForSeconds(2f);
             }
         }
 

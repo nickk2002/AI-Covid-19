@@ -58,6 +58,7 @@ namespace Covid19.AI.Behaviour
             InfectionSystem?.StartInfection();
         }
 
+        // TODO : move this function somewhere else
         private void DrawLineOfSight()
         {
             if (generalConfig == null || agentConfig == null)
@@ -87,12 +88,18 @@ namespace Covid19.AI.Behaviour
                 Gizmos.DrawLine(circle[i], circle[i + 1]);
         }
 
+        //TODO : have a proper UI Handler
         private void Update()
         {
             Time.timeScale = generalConfig.timeScale;
 
             _agentUI.actionName.name = BehaviourSystem.CurrentBehaviour.ToString();
             _agentUI.infectionLevel.name = InfectionSystem?.InfectionLevel.ToString("0.0000") ?? String.Empty;
+        }
+
+        override public string ToString()
+        {
+            return gameObject.name;
         }
 
         private void OnDrawGizmos()

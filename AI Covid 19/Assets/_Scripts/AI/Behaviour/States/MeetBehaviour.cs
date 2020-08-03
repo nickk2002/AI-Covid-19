@@ -42,7 +42,7 @@ namespace Covid19.AI.Behaviour.States
 
         private void EndMeeting()
         {
-            _npc.MeetSystem.LastMeetingTime = Time.time;
+            //_npc.MeetSystem.LastMeetingTime = Time.time;
             _npc.Agent.isStopped = false;
             _animator.SetBool(MeetingBool, false);
             _animator.SetBool(TalkingBool, false);
@@ -100,6 +100,9 @@ namespace Covid19.AI.Behaviour.States
         private IEnumerator WaitUntilMeetingEnds()
         {
             yield return new WaitForSeconds(talkDuration);
+            Debug.ClearDeveloperConsole();
+            //TODO : add this line when everything works ! and for testinng disable it
+            EndMeeting();
             _npc.BehaviourSystem.RemoveBehaviour(this);
         }
 

@@ -124,7 +124,6 @@ namespace Covid19.AI.Depreceated
             cooldownMeeting =
                 60; // after this bot has left the meeting he has a cooldown untill he finds another meeting
 
-        // TODO : make cooldownMeeting be determined by sociableLevel ( rezolvat in Start)
         // is set by the AIManger initially, can be modified in inspector
         [FormerlySerializedAs("_inMeeting")] [ShowOnly] [SerializeField]
         private bool inMeeting = false; // if this bot is currently on the way to meet another bot
@@ -155,7 +154,7 @@ namespace Covid19.AI.Depreceated
         /// the angle a bot can see
         [FormerlySerializedAs("_viewDistance")] [ShowOnly] [SerializeField]
         private float
-            viewDistance = 30; // the distance(TODO : sociabalLevel should influence viewDistance) (rezolvat in Start())
+            viewDistance = 30; // the distance
 
         [FormerlySerializedAs("_drawLines")] [SerializeField]
         private bool drawLines = false; // if you want to draw in the scene the line of sight for each bot
