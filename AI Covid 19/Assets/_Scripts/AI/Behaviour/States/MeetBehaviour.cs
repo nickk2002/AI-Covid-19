@@ -1,16 +1,12 @@
 ﻿using System.Collections;
-using Covid19.Utils;
 using Covid19.AI.Behaviour.Systems;
+using Covid19.Utils;
 using UnityEngine;
 
 namespace Covid19.AI.Behaviour.States
 {
     public class MeetBehaviour : MonoBehaviour, IBehaviour
     {
-        public Vector3 meetPosition;
-        public AgentNPC partnerNPC;
-        public float talkDuration;
-        
         private static readonly int MeetingBool = Animator.StringToHash("meeting");
         private static readonly int TalkingBool = Animator.StringToHash("talking");
         private static readonly int ListeningBool = Animator.StringToHash("listening");
@@ -21,40 +17,30 @@ namespace Covid19.AI.Behaviour.States
         private bool _drawGizmos = true;
         private GameObject _meetGizmos;
         private AgentNPC _npc;
-        
+        public Vector3 meetPosition;
+        public AgentNPC partnerNPC;
+        public float talkDuration;
+
         public void WakeUp()
         {
             _npc = GetComponent<AgentNPC>();
             _animator = GetComponent<Animator>();
-            Debug.Log($"Started meeting from Start {_npc.name}");
-            
+
             var goToLocation = gameObject.AddComponent<GoToLocationBehaviour>();
             goToLocation.destination = meetPosition;
 
-            _npc.BehaviourSystem.SetBehaviour(goToLocation,TransitionType.StackTransition);
+            _npc.BehaviourSystem.SetBehaviour(goToLocation, TransitionType.EntryTransition);
         }
 
 
         public void Disable()
         {
-            
         }
 
-        private void EndMeeting()
-        {
-            //_npc.MeetSystem.LastMeetingTime = Time.time;
-            _npc.Agent.isStopped = false;
-            _animator.SetBool(MeetingBool, false);
-            _animator.SetBool(TalkingBool, false);
-            _animator.SetBool(ListeningBool, false);
-            if (_meetGizmos)
-                Destroy(_meetGizmos);
-        }
         public IEnumerator OnUpdate()
         {
-           
             yield return null;
-            
+
             StartCoroutine(WaitUntilMeetingEnds());
             _npc.Agent.isStopped = true;
             _animator.SetBool(MeetingBool, true);
@@ -68,6 +54,7 @@ namespace Covid19.AI.Behaviour.States
             {
                 _animator.SetBool(ListeningBool, true);
             }
+
             while (true)
             {
                 if (_animator.GetBool(ListeningBool))
@@ -76,8 +63,20 @@ namespace Covid19.AI.Behaviour.States
                     yield return new WaitForSeconds(listeningDuration);
                     SwitchConversation();
                 }
+
                 yield return null;
             }
+        }
+
+        private void EndMeeting()
+        {
+            //_npc.MeetSystem.LastMeetingTime = Time.time;
+            _npc.Agent.isStopped = false;
+            _animator.SetBool(MeetingBool, false);
+            _animator.SetBool(TalkingBool, false);
+            _animator.SetBool(ListeningBool, false);
+            if (_meetGizmos)
+                Destroy(_meetGizmos);
         }
 
         private void SwitchConversation()
