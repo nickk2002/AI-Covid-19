@@ -4,8 +4,8 @@ namespace Covid19.AI.Behaviour.States
 {
     public interface IBehaviour
     {
-        void WakeUp();
-        void Disable();
+        void Entry();
+        void Exit();
         IEnumerator OnUpdate();
     }
 }

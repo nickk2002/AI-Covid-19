@@ -13,18 +13,22 @@ namespace Covid19.AI.Behaviour.States
         private static readonly int TalkID = Animator.StringToHash("talkID");
 
         private Animator _animator;
-
         private bool _drawGizmos = true;
         private GameObject _meetGizmos;
         private AgentNPC _npc;
+
+        private MeetBehaviour _partnerBehaviour;
+
         public Vector3 meetPosition;
         public AgentNPC partnerNPC;
         public float talkDuration;
 
-        public void WakeUp()
+        public void Entry()
         {
             _npc = GetComponent<AgentNPC>();
             _animator = GetComponent<Animator>();
+
+            partnerNPC.GetComponent<MeetBehaviour>();
 
             var goToLocation = gameObject.AddComponent<GoToLocationBehaviour>();
             goToLocation.destination = meetPosition;
@@ -33,7 +37,7 @@ namespace Covid19.AI.Behaviour.States
         }
 
 
-        public void Disable()
+        public void Exit()
         {
         }
 
@@ -70,7 +74,7 @@ namespace Covid19.AI.Behaviour.States
 
         private void EndMeeting()
         {
-            //_npc.MeetSystem.LastMeetingTime = Time.time;
+            _npc.MeetSystem.LastMeetingTime = Time.time;
             _npc.Agent.isStopped = false;
             _animator.SetBool(MeetingBool, false);
             _animator.SetBool(TalkingBool, false);
@@ -99,8 +103,6 @@ namespace Covid19.AI.Behaviour.States
         private IEnumerator WaitUntilMeetingEnds()
         {
             yield return new WaitForSeconds(talkDuration);
-            Debug.ClearDeveloperConsole();
-            //TODO : add this line when everything works ! and for testinng disable it
             EndMeeting();
             _npc.BehaviourSystem.RemoveBehaviour(this);
         }
@@ -109,17 +111,18 @@ namespace Covid19.AI.Behaviour.States
         {
             if (partnerNPC == null)
                 return;
-            if (!_npc.BehaviourSystem.IsCurrentBehaviour(typeof(MeetBehaviour)) || !_drawGizmos ||
-                !partnerNPC.GetComponent<MeetBehaviour>()._drawGizmos)
+
+            if (_partnerBehaviour == null || !_npc.BehaviourSystem.IsCurrentBehaviour(typeof(MeetBehaviour)) || !_drawGizmos ||
+                !_partnerBehaviour._drawGizmos)
                 return;
             _meetGizmos = new GameObject {name = "MeetGizmos"};
-            Vector3 otherMeetPosition = partnerNPC.GetComponent<MeetBehaviour>().meetPosition;
+            Vector3 otherMeetPosition = _partnerBehaviour.meetPosition;
             Vector3 meetGizmosPosition = meetPosition + (otherMeetPosition - meetPosition) / 2;
             meetGizmosPosition += Vector3.up * 0.5f;
             _meetGizmos.transform.position = meetGizmosPosition;
             CustomHierarchy.SetIcon(_meetGizmos, CustomHierarchy.MeetingPointIcon);
             _drawGizmos = false;
-            partnerNPC.GetComponent<MeetBehaviour>()._drawGizmos = false;
+            _partnerBehaviour._drawGizmos = false;
         }
     }
 }

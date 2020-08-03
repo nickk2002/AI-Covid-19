@@ -3,16 +3,15 @@ using UnityEngine;
 
 namespace Covid19.AI.Behaviour.States
 {
-    
     public class GoToInfirmeryBehaviour : MonoBehaviour, IBehaviour
     {
         private AgentNPC _npc;
         private bool _reached = false;
         public Transform destination;
-        
+
         // this behaviuor is entered only if the Infirmery has available space
         // TODO : Make a good safety check on this
-        public void WakeUp()
+        public void Entry()
         {
             _npc = GetComponent<AgentNPC>();
             _npc.Agent.isStopped = false;
@@ -21,7 +20,7 @@ namespace Covid19.AI.Behaviour.States
             _npc.Agent.SetDestination(destination.position);
         }
 
-        public void Disable()
+        public void Exit()
         {
         }
 

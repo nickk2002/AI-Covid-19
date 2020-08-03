@@ -37,11 +37,13 @@ namespace Covid19.AI.Behaviour
             Agent = GetComponent<NavMeshAgent>();
             Animator = GetComponent<Animator>();
 
-            DebuggerSystem = new DebuggerSystem(this);
             MeetSystem = new MeetSystem(this);
             BehaviourSystem = new BehaviourSystem(this);
+
+            DebuggerSystem = new DebuggerSystem(this); // depends on other behaviours
+
             if (GetComponent<IBehaviour>() != null)
-                BehaviourSystem.SetBehaviour(GetComponent<IBehaviour>(),TransitionType.StackTransition);
+                BehaviourSystem.SetBehaviour(GetComponent<IBehaviour>(), TransitionType.StackTransition);
             if (agentConfig == null)
             {
                 Debug.LogError($"Agent Configuration SO not set in inspector {name}", this);
@@ -58,36 +60,6 @@ namespace Covid19.AI.Behaviour
             InfectionSystem?.StartInfection();
         }
 
-        // TODO : move this function somewhere else
-        private void DrawLineOfSight()
-        {
-            if (generalConfig == null || agentConfig == null)
-                return;
-            Gizmos.color = Color.green;
-            var circle = new Vector3[generalConfig.viewAngle + 2];
-            var index = 0;
-            var position = transform.position;
-            for (var angle = -generalConfig.viewAngle / 2; angle <= generalConfig.viewAngle / 2; angle++)
-            {
-                var direction = Quaternion.Euler(0, angle, 0) * transform.forward;
-                if (agentConfig.drawRealSight)
-                {
-                    if (Physics.Raycast(position, direction, out RaycastHit hit, generalConfig.viewDistance))
-                        circle[++index] = hit.point;
-                    else
-                        circle[++index] = position + direction.normalized * generalConfig.viewDistance;
-                }
-                else
-                {
-                    circle[++index] = position + direction.normalized * generalConfig.viewDistance;
-                }
-            }
-            Gizmos.DrawLine(position, circle[1]);
-            Gizmos.DrawLine(position, circle[index]);
-            for (var i = 1; i <= index - 1; i++)
-                Gizmos.DrawLine(circle[i], circle[i + 1]);
-        }
-
         //TODO : have a proper UI Handler
         private void Update()
         {
@@ -102,9 +74,11 @@ namespace Covid19.AI.Behaviour
             return gameObject.name;
         }
 
-        private void OnDrawGizmos()
+        private void OnValidate()
         {
-            DrawLineOfSight();
+            Debug.Assert(generalConfig != null, $"{this} the generalConfig is not set in the inspector");
+            Debug.Assert(agentConfig != null, $"{this} the agentConfig is not set in the inspector");
+            Debug.Assert(coughConfiguration != null, $"{this} the coughConfiguration is not set in the inspector");
         }
     }
 }

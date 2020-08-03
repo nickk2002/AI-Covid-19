@@ -12,7 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2d2d476ec06e2f64f9890fa67d9b4aaa, type: 3}
   m_Name: Data
   m_EditorClassIdentifier: 
-  debug: 1
+  consoleDebug: 0
+  sightDebug: 0
   agentType: 0
   npcName: Bob
   occupation: Bussines Man

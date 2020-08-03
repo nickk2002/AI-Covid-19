@@ -11,13 +11,13 @@ namespace Covid19.AI.Behaviour.States
         private AgentNPC _npc;
         private bool _startInvestigation = false;
 
-        public void WakeUp()
+        public void Entry()
         {
             _npc = GetComponent<AgentNPC>();
             SetUpPosHolder();
         }
 
-        public void Disable()
+        public void Exit()
         {
         }
 
@@ -86,7 +86,7 @@ namespace Covid19.AI.Behaviour.States
 
         private void OnDrawGizmos()
         {
-            WakeUp();
+            Entry();
             if (_npc.posHolder == null) return;
 
             if (Application.isPlaying == false || _npc.BehaviourSystem.IsCurrentBehaviour(typeof(DoctorInvestigate)))

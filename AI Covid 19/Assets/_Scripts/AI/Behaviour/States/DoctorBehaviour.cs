@@ -10,7 +10,7 @@ namespace Covid19.AI.Behaviour.States
         private AudioSource _audioSource;
         private AgentNPC _npc;
 
-        public void WakeUp()
+        public void Entry()
         {
             _npc = GetComponent<AgentNPC>();
             _npc.Agent.isStopped = true;
@@ -20,10 +20,10 @@ namespace Covid19.AI.Behaviour.States
             FindObjectOfType<Infirmery>().AddDoctor(_npc);
 
             var doctorInvestigate = _npc.gameObject.AddComponent<DoctorInvestigate>();
-            _npc.BehaviourSystem.SetBehaviour(doctorInvestigate,TransitionType.StackTransition);
+            _npc.BehaviourSystem.SetBehaviour(doctorInvestigate, TransitionType.EntryTransition);
         }
 
-        public void Disable()
+        public void Exit()
         {
             _npc.Agent.isStopped = false;
         }

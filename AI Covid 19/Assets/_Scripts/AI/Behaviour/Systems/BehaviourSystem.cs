@@ -14,8 +14,8 @@ namespace Covid19.AI.Behaviour.Systems
 
         // keep the Behaviour -> Coroutine map
         private readonly Dictionary<IBehaviour, Coroutine> _dictionary = new Dictionary<IBehaviour, Coroutine>();
+        private readonly HashSet<IBehaviour> _entryBehaviours = new HashSet<IBehaviour>();
         private readonly AgentNPC _npc;
-        private readonly HashSet<IBehaviour> _wakedUpBehaviours = new HashSet<IBehaviour>();
 
         // TODO : Add a group of actions based on the agentType
         private Dictionary<AgentType, List<IBehaviour>> _altceva = new Dictionary<AgentType, List<IBehaviour>>();
@@ -32,7 +32,7 @@ namespace Covid19.AI.Behaviour.Systems
         }
 
         public Dictionary<IBehaviour, Coroutine> Dictionary => _dictionary;
-        public HashSet<IBehaviour> wakedUpBehaviours => _wakedUpBehaviours;
+        public HashSet<IBehaviour> EntryBehaviours => _entryBehaviours;
 
         public IBehaviour CurrentBehaviour { get; private set; }
 
@@ -48,7 +48,6 @@ namespace Covid19.AI.Behaviour.Systems
             if (CurrentBehaviour != null)
             {
                 StopRoutine(CurrentBehaviour);
-
                 if (type == TransitionType.OverrideTransition)
                 {
                     Destroy(CurrentBehaviour as Object);
@@ -58,11 +57,11 @@ namespace Covid19.AI.Behaviour.Systems
             CurrentBehaviour = behaviour; // set the current behaviour
             _behaviourStack.Push(CurrentBehaviour); // push this behaviour to the stack
 
-            if (!_wakedUpBehaviours.Contains(CurrentBehaviour))
+            if (!_entryBehaviours.Contains(CurrentBehaviour))
             {
                 _npc.DebuggerSystem.Log($"<color=green> {_npc} wake up  {CurrentBehaviour} </color>", _npc);
-                CurrentBehaviour.WakeUp(); // call wake up only when adding a new behaviour, not when resuming.
-                _wakedUpBehaviours.Add(CurrentBehaviour);
+                CurrentBehaviour.Entry(); // call wake up only when adding a new behaviour, not when resuming.
+                _entryBehaviours.Add(CurrentBehaviour);
             }
 
             if (type != TransitionType.EntryTransition)
@@ -74,8 +73,7 @@ namespace Covid19.AI.Behaviour.Systems
         public void RemoveBehaviour(IBehaviour behaviour)
         {
             StopRoutine(behaviour);
-            _wakedUpBehaviours
-                .Remove(behaviour); // remove the behaviour => the next time is added the enable is called.
+            _entryBehaviours.Remove(behaviour); // remove the behaviour => the next time is added the enable is called.
             Destroy(behaviour as Object);
             _npc.DebuggerSystem.Log($"{_npc} <color=red> Destroyed {behaviour} </color>");
 
@@ -105,7 +103,7 @@ namespace Covid19.AI.Behaviour.Systems
             }
 
             _npc.DebuggerSystem.PrintDictionary();
-            behaviour.Disable();
+            behaviour.Exit();
         }
     }
 }

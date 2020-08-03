@@ -1,37 +1,30 @@
 ﻿using System.Collections;
 using UnityEngine;
-using Random = UnityEngine.Random;
 
 namespace Covid19.AI.Behaviour.States
 {
     public class TypingBehaviour : MonoBehaviour, IBehaviour
     {
+        private static readonly int Typing = Animator.StringToHash("typing");
+        private static readonly int Sitting = Animator.StringToHash("sitting");
+        private Animator _animator;
+
+        private Vector3 _chairInitialPosition;
+        private Vector3 _initialPos;
+        private Transform _initialTransformParent;
+        private AgentNPC _npc;
+        private bool _reachedChair = false;
+
+        private bool _reachedDesk = false;
+        private bool _startMoveChair = false;
+        private float _typingDuration;
         public GameObject chair;
-        public GameObject targetPosition;
         public Vector3 chairFinalPosition;
         public Vector3 correctSittingPosition;
         public GameObject mouse;
+        public GameObject targetPosition;
 
-        private Vector3 _chairInitialPosition;
-        private Animator _animator;
-        private AgentNPC _npc;
-        private float _typingDuration;
-
-        private static readonly int Typing = Animator.StringToHash("typing");
-        private static readonly int Sitting = Animator.StringToHash("sitting");
-
-        private bool _reachedDesk = false;
-        private bool _reachedChair = false;
-        private bool _startMoveChair = false;
-        private Transform _initialTransformParent;
-        private Vector3 _initialPos;
-        
-        
-        public override string ToString()
-        {
-            return "Typing";
-        }
-        public void WakeUp()
+        public void Entry()
         {
             _animator = GetComponent<Animator>();
             _npc = GetComponent<AgentNPC>();
@@ -40,20 +33,64 @@ namespace Covid19.AI.Behaviour.States
             _chairInitialPosition = chair.transform.position;
         }
 
-        public void Disable()
+        public void Exit()
         {
         }
-        
+
+
+        public IEnumerator OnUpdate()
+        {
+            var position = targetPosition.transform.position;
+            _npc.Agent.SetDestination(position);
+            while (true)
+            {
+                if (Vector3.Distance(transform.position, targetPosition.transform.position) < 0.15f)
+                {
+                    if (_reachedChair == false)
+                    {
+                        _npc.Agent.isStopped = true;
+                        _reachedChair = true;
+                        transform.rotation = Quaternion.identity;
+                        transform.position = targetPosition.transform.position;
+                        transform.position = new Vector3(transform.position.x, 0.5223575f, transform.position.z);
+                        _animator.Update(0);
+                        _animator.SetBool(Sitting, true);
+                    }
+                }
+
+                if (_reachedChair && _startMoveChair)
+                {
+                    chair.transform.position =
+                        Vector3.MoveTowards(chair.transform.position, chairFinalPosition, Time.deltaTime);
+                }
+
+                if (Vector3.Distance(chair.transform.position, chairFinalPosition) < 0.1 && !_reachedDesk)
+                {
+                    _animator.SetBool(Typing, true);
+                    _reachedDesk = true;
+                }
+
+                yield return null;
+            }
+        }
+
+
+        public override string ToString()
+        {
+            return "Typing";
+        }
+
         public void MoveChair()
         {
             Debug.Log("Move chair");
             _startMoveChair = true;
             transform.SetParent(chair.transform);
         }
+
         public void ParentMouse()
         {
-            mouse.transform.SetParent(_npc.rightHand.transform,true);
-        }    
+            mouse.transform.SetParent(_npc.rightHand.transform, true);
+        }
 
         public void UnParentMouse()
         {
@@ -91,46 +128,11 @@ namespace Covid19.AI.Behaviour.States
                     Vector3.MoveTowards(chair.transform.position, _chairInitialPosition, Time.deltaTime);
                 yield return null;
             }
+
             chair.transform.position = _chairInitialPosition;
             _npc.Agent.isStopped = false;
             transform.parent = null;
             _npc.BehaviourSystem.RemoveBehaviour(this);
-        }
-
-
-        public IEnumerator OnUpdate()
-        {
-            var position = targetPosition.transform.position;
-            _npc.Agent.SetDestination(position);
-            while (true)
-            {
-                if (Vector3.Distance(transform.position,targetPosition.transform.position) < 0.15f)
-                {
-                    if (_reachedChair == false)
-                    {
-                        _npc.Agent.isStopped = true;
-                        _reachedChair = true;
-                        transform.rotation = Quaternion.identity;
-                        transform.position = targetPosition.transform.position;
-                        transform.position = new Vector3(transform.position.x,0.5223575f,transform.position.z);
-                        _animator.Update(0);
-                        _animator.SetBool(Sitting,true);
-
-                    }
-                }
-                if (_reachedChair && _startMoveChair)
-                {
-                    chair.transform.position =
-                        Vector3.MoveTowards(chair.transform.position, chairFinalPosition, Time.deltaTime);
-                }
-
-                if (Vector3.Distance(chair.transform.position, chairFinalPosition) < 0.1 && !_reachedDesk)
-                {
-                    _animator.SetBool(Typing,true);
-                    _reachedDesk = true;
-                }
-                yield return null;    
-            }
         }
     }
 }

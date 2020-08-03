@@ -12,9 +12,9 @@ namespace Covid19.AI.Behaviour.States
         private bool _reached = false;
         public float investigationDuration;
         public Vector3 meetingPosition;
-        public AgentNPC partnerNPC;    
+        public AgentNPC partnerNPC;
 
-        public void WakeUp()
+        public void Entry()
         {
             if (gameObject.GetComponents<InfectionCheckBehaviour>().Length > 1)
                 Debug.LogError("There are more than one InfectionCheckBehaviours");
@@ -23,7 +23,7 @@ namespace Covid19.AI.Behaviour.States
             _npc.Agent.SetDestination(meetingPosition);
         }
 
-        public void Disable()
+        public void Exit()
         {
             Debug.Log("agent is ok");
             _npc.Agent.isStopped = false;
@@ -45,13 +45,14 @@ namespace Covid19.AI.Behaviour.States
                     {
                         GoToInfirmeryBehaviour behaviour = _npc.gameObject.AddComponent<GoToInfirmeryBehaviour>();
                         behaviour.destination = FindObjectOfType<Infirmery>().GetBedPosition(_npc);
-                        _npc.BehaviourSystem.SetBehaviour(behaviour,TransitionType.OverrideTransition);
+                        _npc.BehaviourSystem.SetBehaviour(behaviour, TransitionType.OverrideTransition);
                     }
                     else
                     {
-                        _npc.BehaviourSystem.RemoveBehaviour(this);// daca este doctor atunci opresc direct si gata
+                        _npc.BehaviourSystem.RemoveBehaviour(this); // daca este doctor atunci opresc direct si gata
                     }
                 }
+
                 yield return null;
             }
         }
