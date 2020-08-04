@@ -1,12 +1,12 @@
 ﻿using System.Collections;
+using Covid19.AI.Behaviour.Systems;
 using UnityEngine;
 
 namespace Covid19.AI.Behaviour.States
 {
-    public class GoToInfirmeryBehaviour : MonoBehaviour, IBehaviour
+    public class PacientAtInfirmeryBehaviour : MonoBehaviour, IBehaviour
     {
         private AgentNPC _npc;
-        private bool _reached = false;
         public Transform destination;
 
         // this behaviuor is entered only if the Infirmery has available space
@@ -15,44 +15,40 @@ namespace Covid19.AI.Behaviour.States
         {
             _npc = GetComponent<AgentNPC>();
             _npc.Agent.isStopped = false;
-            Debug.Log("going to infirmery");
             Debug.Assert(destination != null, "destination != null");
-            _npc.Agent.SetDestination(destination.position);
+            
+            var goToLocation = gameObject.AddComponent<GoToLocationBehaviour>();
+            goToLocation.destination = destination.position;
+            goToLocation.stopDistance = 2f;
+            _npc.BehaviourSystem.SetBehaviour(goToLocation,TransitionType.EntryTransition);
         }
 
         public void Exit()
         {
+            _npc.Agent.isStopped = false;
         }
 
         public IEnumerator OnUpdate()
         {
+            yield return null;
+            _npc.Agent.isStopped = true;
+            _npc.InfectionSystem.CallDoctor();
+
             while (true)
             {
-                Debug.Log(Vector3.Distance(transform.position, destination.position));
-                if (Vector3.Distance(transform.position, destination.position) < 2f)
-                    if (_reached == false)
-                    {
-                        Debug.Log("Heii am ajuns la destinatie gata, oprirea!!!");
-                        _npc.Agent.isStopped = true;
-                        _npc.InfectionSystem.CallDoctor();
-                        _reached = true;
-                    }
-
                 if (_npc.InfectionSystem.Cured)
                 {
-                    Debug.Log("Now I am healed! The bed is free");
+                    Debug.Log($"{_npc} Now I am healed! The bed is free");
                     _npc.InfectionSystem.FreeBed();
-                    _npc.Agent.isStopped = false;
                     _npc.BehaviourSystem.RemoveBehaviour(this);
                 }
-
                 yield return null;
             }
         }
 
         public override string ToString()
         {
-            return "Going To Infirmery";
+            return "Being Healed behaviour";
         }
     }
 }

@@ -13,7 +13,8 @@ MonoBehaviour:
   m_Name: Data
   m_EditorClassIdentifier: 
   consoleDebug: 0
-  sightDebug: 0
+  sightDebug: 1
+  drawRealSight: 1
   agentType: 0
   npcName: Bob
   occupation: Bussines Man
@@ -22,5 +23,4 @@ MonoBehaviour:
   immunityLevel: 1
   sociableLevel: 10
   cooldownMeeting: 5
-  drawRealSight: 1
   stoppingDistance: 0.1

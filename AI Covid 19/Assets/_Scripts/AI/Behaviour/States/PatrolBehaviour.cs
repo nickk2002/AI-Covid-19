@@ -42,6 +42,12 @@ namespace Covid19.AI.Behaviour.States
                 }
 
                 TransitionToMeeting();
+                while (true)
+                {
+                    if (_npc.BehaviourSystem.CurrentBehaviour == this)
+                        break;
+                    yield return null;
+                }
                 yield return null;
             }
         }

@@ -18,6 +18,7 @@ namespace Covid19.AI.Behaviour.Systems
         private readonly AgentNPC _npc;
 
         // TODO : Add a group of actions based on the agentType
+        // TODO : Pause and Resume the courotines
         private Dictionary<AgentType, List<IBehaviour>> _altceva = new Dictionary<AgentType, List<IBehaviour>>();
 
         private List<Type> _basicActions = new List<Type>

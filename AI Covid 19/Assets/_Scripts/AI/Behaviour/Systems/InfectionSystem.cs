@@ -135,7 +135,7 @@ namespace Covid19.AI.Behaviour.Systems
                 if (InfectionLevel > 10 && _npc.BehaviourSystem.IsCurrentBehaviour(typeof(PatrolBehaviour)) &&
                     _infirmery.HasAvailableSpace())
                 {
-                    var behaviour = _npc.gameObject.AddComponent<GoToInfirmeryBehaviour>();
+                    var behaviour = _npc.gameObject.AddComponent<PacientAtInfirmeryBehaviour>();
                     behaviour.destination = _infirmery.GetBedPosition(_npc);
                     _npc.BehaviourSystem.SetBehaviour(behaviour, TransitionType.StackTransition);
                 }

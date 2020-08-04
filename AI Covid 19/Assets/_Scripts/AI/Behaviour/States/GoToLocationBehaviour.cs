@@ -8,6 +8,7 @@ namespace Covid19.AI.Behaviour.States
         private AgentNPC _npc;
         public Vector3 destination;
         public float stopDistance;
+        public float remainingDistance;
 
         public void Entry()
         {
@@ -27,6 +28,7 @@ namespace Covid19.AI.Behaviour.States
             while (true)
             {
                 // TODO Check if the position is reachable
+                remainingDistance = Vector3.Distance(destination, transform.position);
                 if (Vector3.SqrMagnitude(destination - transform.position) < stopDistance * stopDistance)
                 {
                     yield return null;

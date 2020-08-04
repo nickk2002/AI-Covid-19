@@ -58,6 +58,8 @@ namespace Covid19.AI.Behaviour.Systems
         {
             if (_agentConfig == null || _generalConfig == null)
                 return;
+            if (!_agentConfig.sightDebug)
+                return;
 
             Gizmos.color = Color.green;
             var circle = new Vector3[_generalConfig.viewAngle + 2];
@@ -84,11 +86,6 @@ namespace Covid19.AI.Behaviour.Systems
             for (var i = 1; i <= index - 1; i++)
                 Gizmos.DrawLine(circle[i], circle[i + 1]);
         }
-
-        private void OnDrawGizmos()
-        {
-            if (_agentConfig.sightDebug)
-                DrawLineOfSight();
-        }
+        
     }
 }

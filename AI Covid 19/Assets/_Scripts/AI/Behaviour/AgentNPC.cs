@@ -64,7 +64,6 @@ namespace Covid19.AI.Behaviour
         private void Update()
         {
             Time.timeScale = generalConfig.timeScale;
-
             _agentUI.actionName.name = BehaviourSystem.CurrentBehaviour.ToString();
             _agentUI.infectionLevel.name = InfectionSystem?.InfectionLevel.ToString("0.0000") ?? String.Empty;
         }
@@ -74,11 +73,15 @@ namespace Covid19.AI.Behaviour
             return gameObject.name;
         }
 
-        private void OnValidate()
+        private void OnDrawGizmos()
         {
             Debug.Assert(generalConfig != null, $"{this} the generalConfig is not set in the inspector");
             Debug.Assert(agentConfig != null, $"{this} the agentConfig is not set in the inspector");
             Debug.Assert(coughConfiguration != null, $"{this} the coughConfiguration is not set in the inspector");
+            if (Application.isPlaying)
+            {
+                DebuggerSystem.DrawLineOfSight();;
+            }
         }
     }
 }
