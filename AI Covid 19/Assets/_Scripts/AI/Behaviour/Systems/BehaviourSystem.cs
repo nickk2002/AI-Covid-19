@@ -20,6 +20,7 @@ namespace Covid19.AI.Behaviour.Systems
         // TODO : Add a group of actions based on the agentType
         // TODO : Pause and Resume the courotines
         private Dictionary<AgentType, List<IBehaviour>> _altceva = new Dictionary<AgentType, List<IBehaviour>>();
+        private float _numberTransitions = 0;
 
         private List<Type> _basicActions = new List<Type>
         {
@@ -46,11 +47,13 @@ namespace Covid19.AI.Behaviour.Systems
 
         public void SetBehaviour(IBehaviour behaviour, TransitionType type)
         {
+            _numberTransitions++;
             if (CurrentBehaviour != null)
             {
                 StopRoutine(CurrentBehaviour);
                 if (type == TransitionType.OverrideTransition)
                 {
+                    _behaviourStack.Pop();// pop the behaviour from the stack
                     Destroy(CurrentBehaviour as Object);
                 }
             }
@@ -58,6 +61,7 @@ namespace Covid19.AI.Behaviour.Systems
             CurrentBehaviour = behaviour; // set the current behaviour
             _behaviourStack.Push(CurrentBehaviour); // push this behaviour to the stack
 
+            float lastNumberTransitions = _numberTransitions;
             if (!_entryBehaviours.Contains(CurrentBehaviour))
             {
                 _npc.DebuggerSystem.Log($"<color=green> {_npc} wake up  {CurrentBehaviour} </color>", _npc);
@@ -65,7 +69,7 @@ namespace Covid19.AI.Behaviour.Systems
                 _entryBehaviours.Add(CurrentBehaviour);
             }
 
-            if (type != TransitionType.EntryTransition)
+            if (lastNumberTransitions == _numberTransitions)
             {
                 StartRoutine(CurrentBehaviour);
             }
@@ -73,10 +77,11 @@ namespace Covid19.AI.Behaviour.Systems
 
         public void RemoveBehaviour(IBehaviour behaviour)
         {
+            _numberTransitions++;
             StopRoutine(behaviour);
             _entryBehaviours.Remove(behaviour); // remove the behaviour => the next time is added the enable is called.
             Destroy(behaviour as Object);
-            _npc.DebuggerSystem.Log($"{_npc} <color=red> Destroyed {behaviour} </color>");
+            _npc.DebuggerSystem.Log($"{_npc} <color=red> Removed {behaviour} </color>");
 
             if (_behaviourStack.Count > 1)
             {
@@ -91,7 +96,6 @@ namespace Covid19.AI.Behaviour.Systems
             _npc.DebuggerSystem.DebugStart(behaviour);
             Coroutine coroutine = _npc.StartCoroutine(behaviour.OnUpdate());
             _dictionary[behaviour] = coroutine;
-            _npc.DebuggerSystem.PrintDictionary();
         }
 
         private void StopRoutine(IBehaviour behaviour)
@@ -103,7 +107,6 @@ namespace Covid19.AI.Behaviour.Systems
                 _dictionary.Remove(behaviour);
             }
 
-            _npc.DebuggerSystem.PrintDictionary();
             behaviour.Exit();
         }
     }
