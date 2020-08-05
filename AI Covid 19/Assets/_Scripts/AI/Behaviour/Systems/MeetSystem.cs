@@ -21,12 +21,17 @@ namespace Covid19.AI.Behaviour.Systems
 
         public float LastMeetingTime { set; private get; }
 
-        public AgentNPC FindNPCToMeet(Type behaviour)
+        public AgentNPC FindNPCToMeet(Type behaviour, Func<AgentNPC, bool> condition = null)
         {
             foreach (AgentNPC partnerNPC in _npc.generalConfig.agentList.items)
             {
                 IBehaviour currentBehaviour = partnerNPC.BehaviourSystem.CurrentBehaviour;
-                if (_npc != partnerNPC && currentBehaviour.GetType() == behaviour &&
+
+                if (_npc == partnerNPC)
+                    continue;
+                if (condition != null && condition(partnerNPC) == false)
+                    continue;
+                if (currentBehaviour.GetType() == behaviour &&
                     _npc.MeetSystem.AcceptsMeeting(partnerNPC) && partnerNPC.MeetSystem.AcceptsMeeting(_npc))
                     return partnerNPC;
             }
@@ -45,7 +50,7 @@ namespace Covid19.AI.Behaviour.Systems
                 infectionCheckBehaviour.meetingPosition = meetingPosition;
                 infectionCheckBehaviour.partnerNPC = partnerNPC;
                 infectionCheckBehaviour.investigationDuration = 3f;
-                _npc.BehaviourSystem.SetBehaviour(infectionCheckBehaviour,TransitionType.StackTransition);
+                _npc.BehaviourSystem.SetBehaviour(infectionCheckBehaviour, TransitionType.StackTransition);
             }
             else
             {
@@ -53,7 +58,7 @@ namespace Covid19.AI.Behaviour.Systems
                 meetBehaviour.meetPosition = meetingPosition;
                 meetBehaviour.partnerNPC = partnerNPC;
                 meetBehaviour.talkDuration = talkDuration;
-                _npc.BehaviourSystem.SetBehaviour(meetBehaviour,TransitionType.StackTransition);
+                _npc.BehaviourSystem.SetBehaviour(meetBehaviour, TransitionType.StackTransition);
             }
         }
 
