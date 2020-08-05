@@ -28,10 +28,11 @@ namespace Covid19.AI.Behaviour.States
             _npc = GetComponent<AgentNPC>();
             _animator = GetComponent<Animator>();
 
-            partnerNPC.GetComponent<MeetBehaviour>();
+            _partnerBehaviour = partnerNPC.GetComponent<MeetBehaviour>();
 
             var goToLocation = gameObject.AddComponent<GoToLocationBehaviour>();
             goToLocation.destination = meetPosition;
+            goToLocation.LocationName = "Meeting Point";
 
             _npc.BehaviourSystem.SetBehaviour(goToLocation, TransitionType.EntryTransition);
         }
@@ -43,6 +44,7 @@ namespace Covid19.AI.Behaviour.States
 
         public IEnumerator OnUpdate()
         {
+            
             yield return null;
 
             StartCoroutine(WaitUntilMeetingEnds());
@@ -74,6 +76,7 @@ namespace Covid19.AI.Behaviour.States
 
         private void EndMeeting()
         {
+            Debug.Log("Meeting ended");
             _npc.MeetSystem.LastMeetingTime = Time.time;
             _npc.Agent.isStopped = false;
             _animator.SetBool(MeetingBool, false);

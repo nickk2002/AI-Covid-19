@@ -14,7 +14,7 @@ namespace Covid19.AI.Behaviour.Systems
         private readonly Animator _animator;
         private readonly AudioSource _audioSource;
 
-        private readonly Infirmery _infirmery;
+        public Infirmery Infirmery { get; }
         private readonly AgentNPC _npc;
         private Coroutine _coughCoroutine;
         private bool _cured = false;
@@ -45,12 +45,12 @@ namespace Covid19.AI.Behaviour.Systems
             _animator = owner.GetComponent<Animator>();
             _audioSource = owner.GetComponent<AudioSource>();
             if (owner.generalConfig.infirmeryList.items.Count > 0)
-                _infirmery = (Infirmery) owner.generalConfig.infirmeryList.items[0];
-            if (_infirmery == null)
+                Infirmery = (Infirmery) owner.generalConfig.infirmeryList.items[0];
+            if (Infirmery == null)
             {
                 Debug.LogError(
                     "Infirmery not set in the General AI SO. And no Add To List Component was added to infirmery gameobject. Trying to find in scene");
-                _infirmery = Object.FindObjectOfType<Infirmery>();
+                Infirmery = Object.FindObjectOfType<Infirmery>();
                 Debug.Log("<color=green>Infirmery was actually found!</color>");
             }
         }
@@ -58,7 +58,7 @@ namespace Covid19.AI.Behaviour.Systems
 
         public void StartInfection()
         {
-            if (_infected || _cured || _infirmery == null) return;
+            if (_infected || _cured || Infirmery == null) return;
 
             _infected = true;
             _infectionGrowthCoroutine = _npc.StartCoroutine(InfectionHandler());
@@ -67,14 +67,15 @@ namespace Covid19.AI.Behaviour.Systems
 
         public void CallDoctor()
         {
-            _infirmery.CallDoctor(_npc);
+            Infirmery.CallDoctor(_npc);
         }
 
         public void FreeBed()
         {
-            _infirmery.FreeBed(_npc);
+            Infirmery.FreeBed(_npc);
         }
 
+        // TODO: Move somewhere else the audio
         private AudioClip RandomAudio()
         {
             AudioClip clip =
@@ -128,17 +129,20 @@ namespace Covid19.AI.Behaviour.Systems
                 // add to the agent infection using the immunity
                 InfectionLevel += Mathf.Max(_npc.generalConfig.maxInfectionValue,
                     _npc.generalConfig.infectionSpeed / _npc.agentConfig.immunityLevel);
-                if (InfectionLevel == _npc.generalConfig.maxInfectionValue)
-                    break; // if it reached the maximum level then we can stop the coroutine
 
-                // if the agent is infected and had not already goen to the infirmery, and the infirmery has available space,then go to infirmery
-                if (InfectionLevel > 10 && _npc.BehaviourSystem.IsCurrentBehaviour(typeof(PatrolBehaviour)) &&
-                    _infirmery.HasAvailableSpace())
-                {
+                // if the agent is infected and the infirmery has available space,then go to infirmery
+                // Cautious Level is 1-> 10, 1-> not cautious, 10 -> very cautious => [1,10] -> [10,1]
+                int threshold = 10 - _npc.agentConfig.cautiousLevel + 1;
+                if (InfectionLevel >= threshold && _npc.BehaviourSystem.IsCurrentBehaviour(typeof(PatrolBehaviour)) &&
+                    Infirmery.HasAvailableSpace())
+                {    
                     var behaviour = _npc.gameObject.AddComponent<PacientAtInfirmeryBehaviour>();
-                    behaviour.destination = _infirmery.GetBedPosition(_npc);
+                    behaviour.destination = Infirmery.GetBedPosition(_npc);
                     _npc.BehaviourSystem.SetBehaviour(behaviour, TransitionType.StackTransition);
                 }
+
+                if (InfectionLevel == _npc.generalConfig.maxInfectionValue)
+                    break; // if it reached the maximum level then we can stop the coroutine
             }
         }
     }

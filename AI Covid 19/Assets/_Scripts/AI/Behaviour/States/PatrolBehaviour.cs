@@ -9,7 +9,6 @@ namespace Covid19.AI.Behaviour.States
         private Vector3 _currentDestination = Vector3.negativeInfinity;
         private int _indexPatrol = 0;
         private AgentNPC _npc;
-        private bool _startPatroling = false;
 
         public void Entry()
         {
@@ -23,31 +22,21 @@ namespace Covid19.AI.Behaviour.States
 
         public IEnumerator OnUpdate()
         {
+            _npc.Agent.SetDestination(_npc.patrolPositions[_indexPatrol].transform.position);
             yield return null;
             while (true)
             {
                 if (_npc.Agent.pathPending)
                     yield return null;
-                if (_startPatroling == false ||
-                    _npc.Agent.remainingDistance < _npc.agentConfig.stoppingDistance)
+                if(_npc.Agent.remainingDistance < _npc.agentConfig.stoppingDistance)
                 {
-                    if (_startPatroling)
-                        _currentDestination = _npc.patrolPositions[_indexPatrol].transform.position;
-                    _startPatroling = true;
-                    _npc.Agent.SetDestination(_npc.patrolPositions[_indexPatrol].transform.position);
-
                     _indexPatrol++;
                     if (_indexPatrol == _npc.patrolPositions.Length)
                         _indexPatrol = 0;
+                    _npc.Agent.SetDestination(_npc.patrolPositions[_indexPatrol].transform.position);
+                    _currentDestination = _npc.patrolPositions[_indexPatrol].transform.position;
                 }
-
                 TransitionToMeeting();
-                while (true)
-                {
-                    if (_npc.BehaviourSystem.CurrentBehaviour == this)
-                        break;
-                    yield return null;
-                }
                 yield return null;
             }
         }
