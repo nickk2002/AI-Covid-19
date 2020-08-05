@@ -41,7 +41,7 @@ namespace Covid19.AI.Behaviour.States
         
         void Start()
         {
-            Time.timeScale = 1;
+            Time.timeScale = 0;
             Debug.Log("Started Wait Coroutine");
             StartMyCoroutine(WaitCoroutine());
         }

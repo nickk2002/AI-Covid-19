@@ -46,6 +46,7 @@ namespace Covid19.AI.Behaviour.Systems
             if (_npc.agentConfig.agentType == AgentType.Doctor || partnerNPC.agentConfig.agentType == AgentType.Doctor)
             {
                 Debug.Log($"infection check behaviour for {_npc.name}");
+:x::x
                 var infectionCheckBehaviour = _npc.gameObject.AddComponent<InfectionCheckBehaviour>();
                 infectionCheckBehaviour.meetingPosition = meetingPosition;
                 infectionCheckBehaviour.partnerNPC = partnerNPC;

@@ -21,6 +21,7 @@ namespace Covid19.AI.Behaviour.States
 
             var goToLocation = gameObject.AddComponent<GoToLocationBehaviour>();
             goToLocation.destination = meetingPosition;
+            goToLocation.LocationName = "Investigate Point";
             _npc.BehaviourSystem.SetBehaviour(goToLocation,TransitionType.EntryTransition);
         }
 
@@ -37,7 +38,8 @@ namespace Covid19.AI.Behaviour.States
             if (_npc.agentConfig.agentType != AgentType.Doctor)
             {
                 PacientAtInfirmeryBehaviour behaviour = _npc.gameObject.AddComponent<PacientAtInfirmeryBehaviour>();
-                behaviour.destination = FindObjectOfType<Infirmery>().GetBedPosition(_npc); //TODO use the infirmery lists
+                
+                behaviour.destination = _npc.InfectionSystem.Infirmery.GetBedPosition(_npc); 
                 _npc.BehaviourSystem.SetBehaviour(behaviour, TransitionType.OverrideTransition);
             }
             else

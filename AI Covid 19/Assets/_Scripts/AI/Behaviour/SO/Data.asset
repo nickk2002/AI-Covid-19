@@ -12,15 +12,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2d2d476ec06e2f64f9890fa67d9b4aaa, type: 3}
   m_Name: Data
   m_EditorClassIdentifier: 
-  consoleDebug: 0
+  consoleDebug: 1
   sightDebug: 1
-  drawRealSight: 1
+  drawRealSight: 0
   agentType: 0
   npcName: Bob
   occupation: Bussines Man
   age: 35
   cautiousLevel: 1
   immunityLevel: 1
-  sociableLevel: 10
+  sociableLevel: 1
   cooldownMeeting: 5
   stoppingDistance: 0.1

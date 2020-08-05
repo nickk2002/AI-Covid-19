@@ -12,10 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2d2d476ec06e2f64f9890fa67d9b4aaa, type: 3}
   m_Name: Doctor Data
   m_EditorClassIdentifier: 
-  consoleDebug: 0
+  consoleDebug: 1
   sightDebug: 1
   drawRealSight: 0
-  agentType: 1
+  agentType: 2
   npcName: Bob
   occupation: Bussines Man
   age: 35

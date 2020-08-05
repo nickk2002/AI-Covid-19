@@ -20,6 +20,7 @@ namespace Covid19.AI.Behaviour.States
             var goToLocation = gameObject.AddComponent<GoToLocationBehaviour>();
             goToLocation.destination = destination.position;
             goToLocation.stopDistance = 2f;
+            goToLocation.LocationName = "Infirmery";
             _npc.BehaviourSystem.SetBehaviour(goToLocation,TransitionType.EntryTransition);
         }
 

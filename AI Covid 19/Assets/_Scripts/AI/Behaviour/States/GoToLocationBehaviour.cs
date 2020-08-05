@@ -1,5 +1,7 @@
 ﻿using System.Collections;
+using Covid19.Utils;
 using UnityEngine;
+using UnityEngine.AI;
 
 namespace Covid19.AI.Behaviour.States
 {
@@ -7,24 +9,37 @@ namespace Covid19.AI.Behaviour.States
     {
         private AgentNPC _npc;
         public Vector3 destination;
-        public float stopDistance;
+        public float stopDistance = 0.1f;
         public float remainingDistance;
+        public string LocationName { set; get; } = "Somewhere";
 
         public void Entry()
         {
             _npc = GetComponent<AgentNPC>();
             _npc.Agent.isStopped = false;
             _npc.Agent.SetDestination(destination);
-            if (stopDistance == 0)
-                stopDistance = 0.1f;
         }
 
         public void Exit()
         {
+            
         }
-
+        
         public IEnumerator OnUpdate()
         {
+            NavMeshPath path = new NavMeshPath();
+            NavMesh.CalculatePath(transform.position, destination, NavMesh.AllAreas, path);
+       
+            // if (path.status == NavMeshPathStatus.PathPartial)
+            // {
+            //     Debug.LogWarning($"{_npc} The Path to the {destination} at {LocationName} is partial. Check the navmesh and the position",CreateGameObject());
+            // }
+            //
+            // if (path.status == NavMeshPathStatus.PathInvalid)
+            // {
+            //     Debug.LogError($"{_npc} The Path to the {destination} at {LocationName} is invalid, can't be reached!", CreateGameObject());
+            // }
+
             while (true)
             {
                 // TODO Check if the position is reachable
@@ -39,9 +54,21 @@ namespace Covid19.AI.Behaviour.States
             }
         }
 
+        private GameObject CreateGameObject()
+        {
+            Debug.Log("called once");
+            GameObject go = new GameObject();
+            go.name = "Invalid Destination!!!";
+            go.transform.position = destination;
+            Texture2D texture = Resources.Load("invalid") as Texture2D;
+            
+            CustomHierarchy.SetIcon(go,texture);
+            return go;
+        }
+
         public override string ToString()
         {
-            return "Going Somewhere";
+            return "Going To" + LocationName;
         }
     }
 }

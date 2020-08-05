@@ -27,13 +27,13 @@ namespace Covid19.AI.Behaviour.Systems
         {
             Debug.Assert(_behaviour.Dictionary.ContainsKey(behaviour) == false,
                 $"{_npc} There are two coroutines running at the same time {behaviour}. Check if there is EntryTransition or if there is a yield before transition");
-            Log($"<color=green> {_npc} started coroutine  {behaviour} + add to dict </color>", _npc);
+            Log($"<color=green> {_npc} started coroutine  {behaviour}</color>", _npc);
         }
 
         public void DebugExit(IBehaviour behaviour)
         {
             if (_behaviour.Dictionary.ContainsKey(behaviour))
-                Log($"<color=red> {_npc} exited {behaviour} + remove from dict</color>", _npc);
+                Log($"<color=red> {_npc} exited {behaviour} </color>", _npc);
             else if (_behaviour.EntryBehaviours.Contains(behaviour))
             {
                 // daca este enable, daca este entry transition atunci nu este in wakeUp
