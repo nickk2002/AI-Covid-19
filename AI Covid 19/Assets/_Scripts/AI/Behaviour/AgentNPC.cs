@@ -1,5 +1,4 @@
-﻿using System;
-using Covid19.AI.Behaviour.Configuration;
+﻿using Covid19.AI.Behaviour.Configuration;
 using Covid19.AI.Behaviour.States;
 using Covid19.AI.Behaviour.Systems;
 using Covid19.AI.Behaviour.UI;
@@ -70,7 +69,13 @@ namespace Covid19.AI.Behaviour
         {
             Time.timeScale = generalConfig.timeScale;
             _agentUI.actionName.name = BehaviourSystem.CurrentBehaviour.ToString();
-            _agentUI.infectionLevel.name = InfectionSystem?.InfectionLevel.ToString("0.0000") ?? String.Empty;
+            if (InfectionSystem == null)
+                _agentUI.infectionLevel.name = "Doctor";
+            else if (InfectionSystem.Cured == false)
+                _agentUI.infectionLevel.name = InfectionSystem.InfectionLevel.ToString("0.0000");
+            else
+                _agentUI.infectionLevel.name = "cured";
+
         }
 
         override public string ToString()
