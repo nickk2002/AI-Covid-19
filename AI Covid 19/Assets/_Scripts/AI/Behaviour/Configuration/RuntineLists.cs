@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using Covid19.Utils;
 using UnityEngine;
 
 namespace Covid19.AI.Behaviour.Configuration
@@ -8,11 +7,13 @@ namespace Covid19.AI.Behaviour.Configuration
     {
         [HideInInspector] public List<T> items;
 
+        public object this[int i] => items[i];
         public void Clear()
         {
             items.Clear();
         }
 
+        public int Count => items.Count;
         public void Add(T item)
         {
             if (!items.Contains(item))
