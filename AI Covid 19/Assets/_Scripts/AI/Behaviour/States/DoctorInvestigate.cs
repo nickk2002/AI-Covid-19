@@ -54,7 +54,7 @@ namespace Covid19.AI.Behaviour.States
 
         private void TransitionToMeeting()
         {
-            AgentNPC partnerNPC = _npc.MeetSystem.FindNPCToMeet(typeof(PatrolBehaviour), x => x.InfectionSystem.Cured == false);
+            AgentNPC partnerNPC = _npc.MeetSystem.FindNPCToMeet(typeof(PatrolBehaviour), x => x.InfectionSystem != null && x.InfectionSystem.Cured == false);
             if (partnerNPC != null)
             {
                 Debug.Log($"Botul {_npc.name} si {partnerNPC.name} se intalnesc pt investigare");
