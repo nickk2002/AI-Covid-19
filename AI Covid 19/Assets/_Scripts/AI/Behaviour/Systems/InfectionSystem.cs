@@ -12,7 +12,6 @@ namespace Covid19.AI.Behaviour.Systems
     {
         private static readonly int Cough = Animator.StringToHash("cough");
         private readonly Animator _animator;
-        private readonly AudioSource _audioSource;
 
         public Infirmery Infirmery { get; }
         private readonly AgentNPC _npc;
@@ -43,12 +42,11 @@ namespace Covid19.AI.Behaviour.Systems
         {
             _npc = owner;
             _animator = owner.GetComponent<Animator>();
-            _audioSource = owner.GetComponent<AudioSource>();
-            if (owner.generalConfig.infirmeryList.items.Count > 0)
-                Infirmery = (Infirmery) owner.generalConfig.infirmeryList.items[0];
+            if (owner.generalConfig.infirmeryList.Count > 0)
+                Infirmery = (Infirmery) owner.generalConfig.infirmeryList[0];
             if (Infirmery == null)
             {
-                Debug.LogError(
+                Debug.LogWarning(
                     "Infirmery not set in the General AI SO. And no Add To List Component was added to infirmery gameobject. Trying to find in scene");
                 Infirmery = Object.FindObjectOfType<Infirmery>();
                 Debug.Log("<color=green>Infirmery was actually found!</color>");
@@ -115,6 +113,7 @@ namespace Covid19.AI.Behaviour.Systems
 
                 // if the agent is infected and the infirmery has available space,then go to infirmery
                 // Cautious Level is 1-> 10, 1-> not cautious, 10 -> very cautious => [1,10] -> [10,1]
+                // TODO : Create an event when the infirmery is available
                 int threshold = 10 - _npc.agentConfig.cautiousLevel + 1;
                 if (InfectionLevel >= threshold && _npc.BehaviourSystem.IsCurrentBehaviour(typeof(PatrolBehaviour)) &&
                     Infirmery.HasAvailableSpace())
@@ -124,8 +123,8 @@ namespace Covid19.AI.Behaviour.Systems
                     _npc.BehaviourSystem.SetBehaviour(behaviour, TransitionType.StackTransition);
                 }
 
-                if (InfectionLevel == _npc.generalConfig.maxInfectionValue)
-                    break; // if it reached the maximum level then we can stop the coroutine
+                // if (InfectionLevel == _npc.generalConfig.maxInfectionValue)
+                //     break; // if it reached the maximum level then we can stop the coroutine
             }
         }
     }
