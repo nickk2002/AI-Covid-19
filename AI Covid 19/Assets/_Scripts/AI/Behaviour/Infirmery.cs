@@ -7,13 +7,22 @@ namespace Covid19.AI.Behaviour
 {
     public class Infirmery : MonoBehaviour
     {
-        public List<Transform> beds;
+
+        [SerializeField] private GameObject bedHolder;
+        [SerializeField] private List<Transform> beds;
         private readonly List<AgentNPC> _doctorList = new List<AgentNPC>();
         private readonly List<bool> _ocuppiedBeds = new List<bool>();
         private readonly Dictionary<AgentNPC,int> _npcBedIndex = new Dictionary<AgentNPC,int>();
 
         private void Awake()
         {
+            if (bedHolder != null)
+            {
+                foreach (Transform t in bedHolder.transform)
+                {
+                    beds.Add(t);
+                }
+            }
             for (int i = 0; i < beds.Count; i++)
                 _ocuppiedBeds.Add(false);
         }
@@ -59,7 +68,7 @@ namespace Covid19.AI.Behaviour
                 return;
             }
 
-            AgentNPC doctor = _doctorList[0];
+            AgentNPC doctor = ClosestDoctorFromPacient(pacient);
             if (doctor.GetComponent<HealAgentBehaviour>() == null)
             {
                 var healBehaviour = doctor.gameObject.AddComponent<HealAgentBehaviour>();
@@ -71,6 +80,22 @@ namespace Covid19.AI.Behaviour
                 var healBehaviour = doctor.gameObject.GetComponent<HealAgentBehaviour>();
                 healBehaviour.AddPacient(pacient);
             }
+        }
+
+        private AgentNPC ClosestDoctorFromPacient(AgentNPC pacient)
+        {
+            AgentNPC bestDoctor = null;
+            float minDist = 2e9f;
+            foreach (AgentNPC doctor in _doctorList)
+            {
+                float sqrtDist = Vector3.SqrMagnitude(pacient.transform.position - doctor.transform.position);
+                if (sqrtDist < minDist)
+                {
+                    minDist = sqrtDist;
+                    bestDoctor = doctor;
+                }
+            }
+            return bestDoctor;
         }
     }
 }
