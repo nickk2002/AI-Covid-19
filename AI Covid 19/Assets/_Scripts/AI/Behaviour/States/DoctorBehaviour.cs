@@ -17,7 +17,8 @@ namespace Covid19.AI.Behaviour.States
             _audioSource = GetComponent<AudioSource>();
 
             Player.OnFirstCough += SayHeyToPlayer;
-            FindObjectOfType<Infirmery>().AddDoctor(_npc);
+            Infirmery infirmery = _npc.generalConfig.infirmeryList[0] as Infirmery;
+            infirmery.AddDoctor(_npc);
 
             var doctorInvestigate = _npc.gameObject.AddComponent<DoctorInvestigate>();
             _npc.BehaviourSystem.SetBehaviour(doctorInvestigate, TransitionType.EntryTransition);
