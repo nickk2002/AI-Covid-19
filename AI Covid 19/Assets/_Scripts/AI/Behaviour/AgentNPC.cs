@@ -9,6 +9,9 @@ using UnityEngine.AI;
 
 namespace Covid19.AI.Behaviour
 {
+    [RequireComponent(typeof(Animator))]
+    [RequireComponent(typeof(NavMeshAgent))]
+    [RequireComponent(typeof(AudioSource))]
     public class AgentNPC : MonoBehaviour
     {
         private AgentUI _agentUI;
@@ -29,7 +32,8 @@ namespace Covid19.AI.Behaviour
         public InfectionSystem InfectionSystem { get; private set; }
         public BehaviourSystem BehaviourSystem { get; private set; }
         public DebuggerSystem DebuggerSystem { get; private set; }
-
+        public AudioSystem AudioSystem { get; private set; }
+        
         private void Start()
         {
             _agentUI = GetComponentInChildren<AgentUI>();
@@ -41,7 +45,8 @@ namespace Covid19.AI.Behaviour
             BehaviourSystem = new BehaviourSystem(this);
 
             DebuggerSystem = new DebuggerSystem(this); // depends on other behaviours
-
+            AudioSystem = new AudioSystem(coughConfiguration.soundArray,GetComponent<AudioSource>());
+            
             if (GetComponent<IBehaviour>() != null)
                 BehaviourSystem.SetBehaviour(GetComponent<IBehaviour>(), TransitionType.StackTransition);
             if (agentConfig == null)

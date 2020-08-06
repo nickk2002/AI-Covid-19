@@ -3,33 +3,32 @@ using System.Collections;
 using System.Collections.Generic;
 using Covid19.AI.Behaviour;
 using Covid19.AI.Behaviour.Configuration;
+using Covid19.AI.Behaviour.Systems;
 using Covid19.Core.Quests;
 using UnityEngine;
-using Random = UnityEngine.Random;
 
 namespace Covid19.Core
 {
     public class Player : MonoBehaviour
     {
-        private readonly List<QuestRequirement> _questRequirementList = new List<QuestRequirement>();
-
-        private float _coughCount = 0;
-
-        private AudioClip _lastAudioClip;
-        private LineRenderer _lineRenderer;
-        private AudioSource _source;
         public MonoBehaviourList agentNPCList;
         public CoughConfiguration coughConfiguration;
         [HideInInspector] public bool hasObject = false;
         [HideInInspector] public Camera mainCamera;
 
         public static event Action OnFirstCough;
+        
+        private readonly List<QuestRequirement> _questRequirementList = new List<QuestRequirement>();
+
+        private float _coughCount = 0;
+        private AudioSystem _audioSystem;
+        private LineRenderer _lineRenderer;
 
         private void Awake()
         {
-            _source = GetComponent<AudioSource>();
             _lineRenderer = gameObject.GetComponent<LineRenderer>();
             mainCamera = GetComponentInChildren<Camera>();
+            _audioSystem = new AudioSystem(coughConfiguration.soundArray,GetComponent<AudioSource>());
         }
 
         private void Start()
@@ -46,21 +45,7 @@ namespace Covid19.Core
         {
             _questRequirementList.Add(questRequirement);
         }
-
-        private AudioClip RandomAudio()
-        {
-            AudioClip clip = coughConfiguration.soundArray[Random.Range(0, coughConfiguration.soundArray.Length - 1)];
-            var tries = 0;
-            while (clip == _lastAudioClip && tries <= 3)
-            {
-                clip = coughConfiguration.soundArray[Random.Range(0, coughConfiguration.soundArray.Length - 1)];
-                tries++;
-            }
-
-            _lastAudioClip = clip;
-            return clip;
-        }
-
+        
         private void TryInfectSomeone()
         {
             foreach (AgentNPC agentNPC in agentNPCList.items)
@@ -96,13 +81,10 @@ namespace Covid19.Core
                     if (_coughCount == 0)
                         OnFirstCough?.Invoke();
                     _coughCount++;
-                    AudioClip coughClip = RandomAudio();
-                    _source.clip = coughClip;
-                    _source.Play();
+                    float length = _audioSystem.PlayRandomCough();
                     TryInfectSomeone();
-                    yield return new WaitForSeconds(coughClip.length);
+                    yield return new WaitForSeconds(length);
                 }
-
                 yield return null;
             }
         }

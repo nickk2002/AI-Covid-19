@@ -75,22 +75,7 @@ namespace Covid19.AI.Behaviour.Systems
             Infirmery.FreeBed(_npc);
         }
 
-        // TODO: Move somewhere else the audio
-        private AudioClip RandomAudio()
-        {
-            AudioClip clip =
-                _npc.coughConfiguration.soundArray[Random.Range(0, _npc.coughConfiguration.soundArray.Length - 1)];
-            var tries = 0;
-            while (clip == _lastAudioClip && tries <= 3)
-            {
-                clip = _npc.coughConfiguration.soundArray[
-                    Random.Range(0, _npc.coughConfiguration.soundArray.Length - 1)];
-                tries++;
-            }
 
-            _lastAudioClip = clip;
-            return clip;
-        }
 
         private void InfectNearbyAgents()
         {
@@ -111,12 +96,10 @@ namespace Covid19.AI.Behaviour.Systems
                 if (_animator.GetBool(Cough) == false)
                 {
                     _animator.SetTrigger(Cough);
-                    AudioClip clip = RandomAudio();
-                    _audioSource.clip = clip;
-                    _audioSource.Play();
                     //Debug.Log($"{_npc.name} has coughed!");
+                    float coughLength = _npc.AudioSystem.PlayRandomCough();
                     InfectNearbyAgents();
-                    yield return new WaitForSeconds(clip.length);
+                    yield return new WaitForSeconds(coughLength);
                 }
             }
         }
