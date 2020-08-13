@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Linq;
 using System.Reflection;
-using Covid19.AI;
 using Covid19.AI.Behaviour;
 using Covid19.AI.Depreceated;
 using UnityEditor;
@@ -16,41 +15,13 @@ namespace Covid19.Utils
         private static readonly Texture BotIcon = Resources.Load("Bot_icon") as Texture;
         private static readonly Texture BotIconSelected = Resources.Load("Bot_icon_selected") as Texture;
         public static readonly Texture MeetingPointIcon = Resources.Load("meet") as Texture;
-        private int _nic;
-
-
+        
         static CustomHierarchy()
         {
-            EditorApplication.hierarchyWindowItemOnGUI += HandleHierarchyWindowItemOnGUI;
+            //EditorApplication.hierarchyWindowItemOnGUI += HandleHierarchyWindowItemOnGUI;
         }
 
-
-        [MenuItem("GameObject/Duplicate %d", false, priority = -100)]
-        private static void DuplicateGameObject()
-        {
-            Debug.Log("heii I am called");
-            foreach (GameObject gameObject in Selection.gameObjects)
-            {
-                string name = gameObject.name;
-                int number = 0,i = name.Length - 1;
-                // "Hospital"
-                while (i >= 0)
-                {
-                    bool isNumeric = int.TryParse(name.Substring(i), out var numberTest);
-                    Debug.Log(name.Substring(i) + " " + isNumeric);
-                    if (!isNumeric)
-                        break;
-                    number = numberTest;
-                    i--;
-                }
-                Debug.Log(number);
-                number++;
-                string duplicatedName = name.Substring(0,i + 1) + number;
-                Transform parent = gameObject.transform.parent;
-                GameObject duplicatedGameObject = Instantiate(gameObject, parent, true);
-                duplicatedGameObject.name = duplicatedName;
-            }
-        }
+        
         [MenuItem("GameObject/Set Meeting Point", false, priority = -100)]
         private static void SetMeetingPoint()
         {
@@ -58,6 +29,7 @@ namespace Covid19.Utils
             SetIcon(Selection.activeGameObject, MeetingPointIcon);
         }
 
+        // TODO: Some improvments here and there
         [MenuItem("GameObject/Position Holder", false, priority = -100)]
         private static void SetUpPositionHolder()
         {
@@ -90,11 +62,49 @@ namespace Covid19.Utils
             editorGUIUtilityType.InvokeMember("SetIconForObject", bindingFlags, null, null, args);
         }
 
+        private static string ChangeName(string name)
+        {
+            if (name.Length == 0)
+                return name;
+            string goodName = "";
+            foreach (char letter in name)
+            {
+                if (letter != '(' && letter != ')')
+                {
+                    goodName = goodName + letter;
+                }
+            }
+            if (goodName == name)
+                return name;
+            int index = goodName.Length - 1;
+            while (index > 0 && Char.IsDigit(goodName[index]))
+            {
+                index--;
+            }
+            int end = index;
+            if (index > 0 && Char.IsWhiteSpace(goodName[index]))
+            {
+                while (index > 0 && Char.IsWhiteSpace(goodName[index]))
+                {
+                    index--;
+                }
+                index++;
+            }
+            int start = index;
+            goodName = goodName.Remove(start, end - start + 1);
+            return goodName;
+        }
         private static void HandleHierarchyWindowItemOnGUI(int instanceId, Rect selectionRect)
         {
             Object obj = EditorUtility.InstanceIDToObject(instanceId);
             var go = EditorUtility.InstanceIDToObject(instanceId) as GameObject;
-
+            if (instanceId < 0 && go != null)
+            {
+                string currentName = go.name;
+                string goodName = ChangeName(currentName);
+                // go.name = goodName;
+                //Debug.Log($"Changed Name {ChangeName("Infirmery             (1)")}");
+            }
             if (obj != null)
                 if (go.GetComponent<Bot>())
                 {
