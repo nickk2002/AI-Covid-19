@@ -21,14 +21,16 @@ namespace Covid19.AI.Behaviour.States
         public void BodyUp()
         {
             pushUpCount++;
-
+            if (pushUpCount == maxPushUps)
+            {
+                _npc.BehaviourSystem.RemoveBehaviour(this);
+            }
         }
         // event called at the end of the push up animation
         // when the body is down.
         public void EndPushUp()
         {
-            Debug.Log("end Push Up");
-            if (pushUpCount == maxPushUps - 1) // o sa faca push up ca sa se ridice
+            if (pushUpCount == maxPushUps - 1) // o sa mai faca inca un push up ca sa se ridice
             {
                 _npc.Animator.SetTrigger(ExitPushUp);
             }
